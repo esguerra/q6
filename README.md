@@ -2,7 +2,8 @@ Qsource development.
 ================================================================================
 
 This a fork of Q6 with a large amount of differences from that
-original code. Use at your own risk.
+original code.   
+**Use at your own risk.**
 
 The forked code is released under a GNU General Public License, Version 2.0
 (GPLv2), that means that all modifications done here belong to the 
