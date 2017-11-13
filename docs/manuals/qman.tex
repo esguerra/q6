@@ -1357,76 +1357,82 @@ parameters, bonds, angles etc. between the two states.
 \end{longtable}
 \normalsize
 
-In this example we define eight atoms as Q-atoms whose charges,
-vdW parameters and bonding arrangement will change between the two
-states (reactant and product state) that we describe by the FEP
-file. The sections [\textbf{FEP}], [\textbf{atoms}],
-[\textbf{change{\_}charges}], [\textbf{atom{\_}types}] and
-[\textbf{change{\_}atoms}] are used as above, that is, we redefine
-the charges and vdW parameters of the eight Q-atoms. $e.g.$, atom
-no. 2, the sulphur, will change its charge from -0.45 to -1.00 and
-its vdW parameters are changed from Q-atom type SH to S-. In this
-model of the reaction we will also make use of a non-Lennard-Jones
-non-bonded potential for certain pairs of atom that make and break
-bonds as listed in the section [\textbf{soft{\_}pairs}]. For these
-atoms, it is more physical to use an exponential function for the
-repulsion than the normal 1/r$^{12}$ form which causes a too
-strong repulsion at very short distances. The vdW interaction
-between these pairs of atoms is given by:
+In this  example we define eight  atoms as Q-atoms whose  charges, vdW
+parameters and bonding arrangement will  change between the two states
+(reactant and  product state) that  we describe  by the FEP  file. The
+sections               [\textbf{FEP}],               [\textbf{atoms}],
+[\textbf{change{\_}charges}],       [\textbf{atom{\_}types}]       and
+[\textbf{change{\_}atoms}] are used as above, that is, we redefine the
+charges and vdW  parameters of the eight Q-atoms. $e.g.$,  atom no. 2,
+the sulphur,  will change its charge  from -0.45 to -1.00  and its vdW
+parameters are changed from Q-atom type SH to S-. In this model of the
+reaction  we will  also  make use  of  a non-Lennard-Jones  non-bonded
+potential for  certain pairs of  atoms whose  bonds we make  and break
+according to the list in the [\textbf{soft{\_}pairs}] section. For the
+description  of  these  bonds  there will  be  problems  of  numerical
+instability when  integrating since  the 1/r$^{12}$ term  is divergent
+when  $r \to  0$, what  is  known as  a singularity.   These types  of
+potentials  which  diverge  at  $r  \to  0$  are  known  as  hard-core
+potentials, and those which do not diverge  when $r \to 0$ are know as
+soft-core potentials. The trick to have a non-divergent function at $r
+= 0$ is of course to use an exponential function, similar to the trick
+used in quantum mechanics to construct basis sets, where the divergent
+Slater-type orbitals,  are replaced by  a sum of  exponential gaussian
+functions.   In  \textbf{Q}  we  refer  to  vdW  soft-core  pairs,  or
+soft-pairs in general by using the expression:
 
 \[
 V_{soft} = C_{i}\cdot C_{j}\cdot e^{(-a_{i}\cdot a_{j}\cdot
 r_{i,j})}
 \]
 
-where r$_{i,j}$ is the distance between the specific atom pair
-subjected to this potential. The C's and a's are atom-type
-specific parameters and the combination rule is geometric as can
-be seen from the formula. Note the absence of the attractive
-1/r$^{6}$ term.
+where  r$_{i,j}$  is  the  distance between  the  specific  atom  pair
+subjected to  this potential. The  C's and a's are  atom-type specific
+parameters and the  combination rule is geometric as can  be seen from
+the formula. Note the absence of the attractive 1/r$^{6}$ term.
 
-Morse potential parameters for bonds that are broken or formed are
-given in the [\textbf{bond{\_}types}] section. The section
-[\textbf{change{\_}bonds}] lists the bonds, identified by pairs of
-atoms and the bond parameters to use in each state. If a bond is
-already defined in the topology then the normal, harmonic
-potential will be turned off. The absence of a bond is specified
-by setting the bond type to 0. Bond angles are redefined in an
-analogous way, but the functional form of the Q-atom angles is
-harmonic, like the normal angles. Parameters for the new angle
-types are given under [\textbf{angle{\_}types}] and the angles for
-which the new types should be used are listed in the
-[\textbf{change{\_}angles}] section. Redefining torsions is done
-in the same way (sections [\textbf{torsion{\_}types}] and
-[\textbf{change{\_}torsions}]). No improper torsions are changed
-in this example.
+Morse potentials  are also soft-core  potentials but in  \textbf{Q} we
+explicitly  call them  by their  name to  differentiate them  from the
+previously given expression. The  Morse potential parameters for bonds
+which are broken  or formed are given  in the [\textbf{bond{\_}types}]
+section.   The  section  [\textbf{change{\_}bonds}] lists  the  bonds,
+identified by  pairs of atoms and  the bond parameters to  use in each
+state.  If a bond is already  defined in the topology then the normal,
+harmonic  potential will  be turned  off.  The  absence of  a bond  is
+specified by setting the bond type  to 0. Bond angles are redefined in
+an analogous  way, but  the functional  form of  the Q-atom  angles is
+harmonic, like the normal angles.   Parameters for the new angle types
+are given under [\textbf{angle{\_}types}] and the angles for which the
+new types should be used are listed in the [\textbf{change{\_}angles}]
+section.   Redefining  torsions is  done  in  the same  way  (sections
+[\textbf{torsion{\_}types}]  and  [\textbf{change{\_}torsions}]).   No
+improper torsions are changed in this example.
 
-Angles, torsions and impropers depend on the existence of bonds
-connecting the atoms defining the angle. Angles of all kinds can
-therefore be coupled to bonds, in which case the angle energy will
-be scaled by the ratio of the actual value of the Morse bond
-energy to the dissociation energy \cite{Aaqvist:1991}. In the
-example angle 6 (P{\-}O{\-}H ) is coupled to bond 3 (O{\-}H) and
-angle 7 (CB{\-}S{\-}H) to bond 2 (S{\-}H), according to the
-[\textbf{angle{\_}couplings}] section. Coupling torsions and
-impropers (not in the example) work the same way.
+Angles,  torsions  and impropers  depend  on  the existence  of  bonds
+connecting  the atoms  defining the  angle.  Angles of  all kinds  can
+therefore be coupled to bonds, in  which case the angle energy will be
+scaled by the  ratio of the actual  value of the Morse  bond energy to
+the dissociation  energy \cite{Aaqvist:1991}.  In the example  angle 6
+(P{\-}O{\-}H  )   is  coupled   to  bond  3   (O{\-}H)  and   angle  7
+(CB{\-}S{\-}H)    to   bond    2    (S{\-}H),    according   to    the
+[\textbf{angle{\_}couplings}] section. Coupling torsions and impropers
+(not in the example) work the same way.
 
-Off-diagonal elements of the Hamiltonian are defined in the
-section [\textbf{off{\_}diagonals}]. They are represented by
-H$_{i,j}$=A$_{i,j}\cdot e^{(-\mu _{i,j}\cdot \rm{r}_{k,l})}$ where
-i and j are the two states involved and r$_{k,l}$ is the distance
-between a specific pair of atoms k and l. The single record in
-this example defines mixing of states 1 and 2 (H$_{1,2})$ for
-q-atoms 2 and 8 with A=1.0 and $\mu $= 0.45.
+Off-diagonal elements  of the Hamiltonian  are defined in  the section
+[\textbf{off{\_}diagonals}].      They     are      represented     by
+H$_{i,j}$=A$_{i,j}\cdot e^{(-\mu  _{i,j}\cdot \rm{r}_{k,l})}$  where i
+and  j are  the  two states  involved and  r$_{k,l}$  is the  distance
+between a specific  pair of atoms k  and l. The single  record in this
+example defines mixing of states 1 and 2 (H$_{1,2})$ for q-atoms 2 and
+8 with A=1.0 and $\mu $= 0.45.
 
 \subsubsection{Monitoring non-bonded interactions}
-In analysing the details of $e.g.$ receptor-ligand interactions, it
-is useful to define some groups of atoms and calculate the
-non-bonded interactions between pairs of atom groups. The example
-FEP file below describes how to use this feature to get the
-non-bonded energies between the pterinine ring of a dihydrofolate
-reductase inhibitor and some amino acid side chains and an amide
-group of a co-factor.
+In analysing the details of $e.g.$ receptor-ligand interactions, it is
+useful to  define some  groups of atoms  and calculate  the non-bonded
+interactions between pairs of atom  groups. The example FEP file below
+describes  how to  use this  feature  to get  the non-bonded  energies
+between the pterinine ring of  a dihydrofolate reductase inhibitor and
+some amino acid side chains and an amide group of a co-factor.
 
 \begin{center}
 \begin{tabularx}{\textwidth}{|l l l l l l l|X|}

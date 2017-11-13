@@ -145,6 +145,9 @@ communication  approach. This  is advantageous  in that  it can  avoid
 overhead which often happens  in one-sided communication, specially if
 one does not  develop according to the system specifics,  like type of
 processors, OS, number of processors, etc.
+To make MPI calls we use precompiler directives, this need to be
+specified in out makefiles with the \textbf{-fpp} flag for intel
+fortran and \textbf{cpp} for the GNU Compiler Collection (GCC).
 
 
 \subsection{Documentation}
