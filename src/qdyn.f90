@@ -30,7 +30,7 @@ program qdyn
   character(*), parameter :: program_name = 'qdyn'
   character(*), parameter :: program_version = '5.7'
   character(*), parameter :: program_date = '2015-02-22'
-  character(*), parameter :: options = compiler_options()
+!  character(*), parameter :: options = compiler_options()
   character(len=32)       :: arg
   integer                 :: k
  
@@ -153,7 +153,8 @@ contains
       print '(a)',  'Welcome to Q'
       print '(2a)', 'This version was compiled using: ', compiler_version()
       print '(a)',  'And the following compiler options: '
-      write (output_unit, *, delim='quote') options
+!      write (output_unit, *, delim='quote') options
+      write ( *, '( A /)' ) trim ( compiler_options() )
       write(*,'(a,a,a)') 'qdum input checker version ', trim(program_version), ' initializing'
       print '(a)',  '--------------------------------------------------------------------------------'
 #elif defined(EVAL)
@@ -161,7 +162,8 @@ contains
       print '(a)',  'Welcome to Q'
       print '(2a)', 'This version was compiled using: ', compiler_version()
       print '(a)',  'And the following compiler options: '
-      write (output_unit, *, delim='quote') options
+!      write (output_unit, *, delim='quote') options
+      write ( *, '( A /)' ) trim ( compiler_options() )
       write(*,'(a,a,a)') 'qdyn evaluation version ', trim(program_version), ' initializing'
       write(*,'(a)') 'This version is for evaluation purposes only.'
       write(*,'(a)') 'Optimizations are disabled - runs at <20% of maximum speed.'
@@ -171,7 +173,8 @@ contains
       print '(a)',  'Welcome to Q'
       print '(2a)', 'This version was compiled using: ', compiler_version()
       print '(a)',  'And the following compiler options: '
-      write (output_unit, *, delim='quote') options
+!      write (output_unit, *, delim='quote') options
+      write ( *, '( A /)' ) trim ( compiler_options() )
       write(*,'(a,a,a,a)') 'qdyn version ', trim(program_version), trim(program_suffix),' initializing'
       print '(a)',  '--------------------------------------------------------------------------------'
 #endif

@@ -26,7 +26,7 @@ program qprep
   character(*), parameter :: program_version = '5.7'
   character(*), parameter :: program_date = '2015-04-01'
   character(*), parameter :: program_suffix  = ''
-  character(*), parameter :: options = compiler_options()
+!  character(*), parameter :: options = compiler_options()
   character(len=200)      :: fileName = ''
   character(len=32)       :: arg  
   logical                 :: use_inputfile
@@ -291,8 +291,8 @@ subroutine startup
   print '(2a)', 'This version was compiled using: ', compiler_version()
   print '(a)',  ' '
   print '(a)',  'And using the following compiler options: '
-  write (output_unit, *, delim='quote') options
-!  write ( *, '( A /)' ) trim ( compiler_options() )
+!  write (output_unit, *, delim='quote') options
+  write ( *, '( A /)' ) trim ( compiler_options() )
 !  print '(a)',  trim(compiler_options())
   print '(a)',  ' '
   print '(a)',  'For command line options type qprep --help  or qprep -h at the terminal.'

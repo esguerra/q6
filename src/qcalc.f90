@@ -40,7 +40,7 @@ program qcalc
   character(*), parameter :: program_name = 'qcalc'
   character(*), parameter :: program_version = '5.7'
   character(*), parameter :: program_date = '2015-02-22'
-  character(*), parameter :: options = compiler_options()
+!  character(*), parameter :: options = compiler_options()
   character(len=32)       :: arg 
   integer                 :: k
 
@@ -125,8 +125,8 @@ subroutine startup
   print '(2a)', 'This version was compiled using: ', compiler_version()
   print '(a)',  ' '
   print '(a)',  'And using the following compiler options: '
-  write (output_unit, *, delim='quote') options
-!  write ( *, '( A /)' ) trim ( compiler_options() )
+!  write (output_unit, *, delim='quote') options
+  write ( *, '( A /)' ) trim ( compiler_options() )
 !  print '(a)',  trim(compiler_options())
   print '(a)',  ' '
   print '(a)',  'For command line options type qcalc --help  or qcalc -h at the terminal.'

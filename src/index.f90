@@ -16,22 +16,18 @@
 !  string-to-integer index lookup table and functions
 !------------------------------------------------------------------------------!
 module indexer
-
   implicit none
-
   !constants
   character(*), private, parameter :: MODULE_VERSION = '5.7'
   character(*), private, parameter :: MODULE_DATE = '2015-02-22'
-
   integer, private                 :: count = 0, top = 0
-  integer, parameter               :: KEYLENGTH = 8
-  integer, parameter, private      :: RESIZE_INCREMENT = 10
+  integer, parameter               :: keylength = 8
+  integer, parameter, private      :: resize_increment = 10
 
   type indexentry
-     character(len=KEYLENGTH)      :: key
+     character(len=keylength)      :: key
      integer                       :: ndx
   end type indexentry
-
   type(indexentry), pointer, private :: ndx(:)
 
   integer, private                 :: memstat
@@ -39,6 +35,7 @@ module indexer
   !declare private procedures
   private grow
 
+  
 contains
   subroutine index_create(size)
     !arguments
@@ -46,7 +43,7 @@ contains
     !locals
 
     call index_clear
-    top = RESIZE_INCREMENT !use default starting size
+    top = resize_increment !use default starting size
     if(present(size)) then
        if(size > 0) then
           top = size
@@ -58,11 +55,9 @@ contains
 
 
   subroutine index_clear
-
     count = 0
     top = 0
     deallocate(ndx, stat=memstat) !ignore error if not allocated
-
   end subroutine index_clear
 
 
@@ -100,17 +95,17 @@ contains
 
 
   subroutine grow
-    call index_resize(top+RESIZE_INCREMENT)
+    call index_resize(top+resize_increment)
   end subroutine grow
 
 
   logical function index_add(key, index)
     !arguments
-    character(*)                            ::      key
-    integer                                         ::      index
+    character(*)                   :: key
+    integer                        :: index
 
     !locals
-    integer                                         ::      i, j
+    integer                        :: i, j
 
     do i = 1, count
        if(ndx(i)%key == key) then !cannot redefine
@@ -136,9 +131,9 @@ contains
 
   logical function index_alias(alias, key)
     !arguments
-    character(*)                            ::      alias, key
+    character(*)                   :: alias, key
     !locals
-    integer                                         ::      index
+    integer                        :: index
     index_alias = .false.
     if(index_get(key, index)) then
        if(index_add(alias, index)) then
@@ -150,11 +145,11 @@ contains
 
   logical function index_get(key, i, allow_wildcard)
     !arguments
-    character(*), intent(in)        ::      key
-    integer, intent(out)            ::      i
-    logical, optional                       ::      allow_wildcard
+    character(*), intent(in)       :: key
+    integer, intent(out)           :: i
+    logical, optional              :: allow_wildcard
     !locals
-    integer                                         ::      hi, lo, mid
+    integer                        :: hi, lo, mid
 
     !perform standard binary search 
     !(Modified from N. C. Shammas/Secrets of the Visual C++ Masters)
@@ -185,3 +180,4 @@ contains
 
 
 end module indexer
+
