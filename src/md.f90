@@ -493,8 +493,8 @@ contains
 
   end subroutine allocate_nbxx_per_cgp
 
-  !----------------------------------------------------------------------
 
+  !----------------------------------------------------------------------
   subroutine allocate_lrf_arrays
 
     if (use_PBC .and. constant_pressure) then
@@ -1364,27 +1364,23 @@ contains
   end subroutine distribute_nonbonds
 
   !-----------------------------------------------------------------------
-
-
   subroutine close_input_files
     close (1)
     if(restart) close (2)
     if ( implicit_rstr_from_file .eq. 1 ) close (12)
     close (13)
-
   end subroutine close_input_files
 
-  !-----------------------------------------------------------------------
 
+  !-----------------------------------------------------------------------
   subroutine close_output_files
     close (3)
     if ( itrj_cycle .gt. 0 ) close (10)
     if ( iene_cycle .gt. 0 ) close (11)
-
   end subroutine close_output_files
 
-  !-----------------------------------------------------------------------
 
+  !-----------------------------------------------------------------------------
   subroutine open_files
     ! --> restart file (2)
     if(restart) then
@@ -1404,7 +1400,6 @@ contains
       open (unit=12, file=exrstr_file, status='old', form='unformatted', action='read', err=12)
     end if
 
-
     return
 
     ! crude error handling
@@ -1415,8 +1410,8 @@ contains
 
   end subroutine open_files
 
-  !-----------------------------------------------------------------------
 
+  !-----------------------------------------------------------------------
   !Restrain all excluded atoms plus heavy solute atoms in the inner shell.
   subroutine fix_shell
     ! local variables
@@ -1457,7 +1452,6 @@ contains
   end subroutine fix_shell
 
   !-----------------------------------------------------------------------
-
   subroutine gauss (am,sd,v,ig)
     ! arguments
     real(8)                                 ::      am,sd,v
@@ -1475,11 +1469,12 @@ contains
     v=(a-6.0)*sd+am
   end subroutine gauss
 
+
   !-----------------------------------------------------------------------
   subroutine get_fep
     ! local variables
-    character                                       ::      libtext*80,qaname*2
-    integer                                 ::      i,j,k,iat
+    character                      :: libtext*80,qaname*2
+    integer                        :: i,j,k,iat
     !temp. array for reallocating long-range exclusion list
     integer(AI), pointer    ::      tempexlong(:,:)
 
@@ -1658,16 +1653,15 @@ contains
 594 format('>>>>> ERROR: Non-Q-atom special excl. pair ',i2,' must be on in all or no states')
   end subroutine get_fep
 
-  !-----------------------------------------------------------------------
 
+  !-----------------------------------------------------------------------
   subroutine get_fname (text,length,filnam)
     ! arguments
-    character                                       ::      text*80,filnam*80
-    integer                                 ::      length
+    character                      :: text*80,filnam*80
+    integer                        :: length
+
     ! local variables
-
-
-    integer                                 ::      i
+    integer                        :: i
 
     length=80
     do i=1,80
@@ -1680,8 +1674,8 @@ contains
 
   end subroutine get_fname
 
-  !-----------------------------------------------------------------------
 
+  !-----------------------------------------------------------------------
   real(8) function improper(istart, iend)
     !arguments
     integer                                         ::      istart, iend
@@ -3291,7 +3285,6 @@ contains
     !  shake_solvent, shake_solute, shake_hydrogens
     !  fk_pshell
 
-
     !  fk_wsphere=-1, wpol_restr, wpol_born fkwpol=-1, Dwmz=-1, awmz=-1
     !    (values initialized to -1 will be set in water_sphere, 
     !    once target radius is known)
@@ -3645,8 +3638,8 @@ contains
 
   end function old_initialize
 
+  
   !-----------------------------------------------------------------------
-
   subroutine lrf_taylor
     ! *** local variables
     integer                                         ::      i,i3,ic
@@ -3716,8 +3709,8 @@ contains
   end subroutine lrf_taylor
 
 
-  !-----------------------------------------------------------------------
 
+  !-----------------------------------------------------------------------
   subroutine make_pair_lists
 #if defined (PROFILING)
     real(8)                                         :: start_loop_time
@@ -3810,12 +3803,21 @@ contains
 
   end subroutine maxwell
 
-  !-----------------------------------------------------------------------
 
+  !----------------------------------------------------------------------------!
+  !!  subroutine: **temperature**
+  !!  This is the thermostat
+  !!  
+  !!  
+  !!  
+  !----------------------------------------------------------------------------!
   subroutine temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
     ! Compute the temperature
     !arguments
-    real(8)                        :: Temp,Tscale_solute,Tscale_solvent,Ekinmax
+    real(8)                        :: Temp
+    real(8)                        :: Tscale_solute
+    real(8)                        :: Tscale_solvent
+    real(8)                        :: Ekinmax
 
     !locals
     integer                        :: i, i3
@@ -3910,6 +3912,7 @@ contains
   !!  subroutine: **md_run**
   !!  Prepare an md run
   !! ******PWchanged 2002-10-01
+  !! This subroutine has the main algorithms for the equations of motion.
   !----------------------------------------------------------------------------!
   subroutine md_run
 
@@ -3953,11 +3956,11 @@ contains
 #endif
 
 
-    !Define number of coord to send/recieve
+    !Define number of coord to send/receive
     nat3=natom*3
 
     ! calculate maximum temperature
-    !**MN-> Only master calc. temp for now.
+    !**Martin Nervall-> Only master calc. temp for now.
     if (nodeid .eq. 0) then
       Ekinmax = 1000.0*Ndegf*Boltz*Temp0/2.0/real(natom)
 
@@ -3973,7 +3976,7 @@ contains
       if ( detail_temps ) then
         write (*,120) 'Solvent', Temp_solvent, Tfree_solvent
         write (*,120) 'Solute', Temp_solute, Tfree_solute
-         !                       write (*,120) 'Excl solute, solvent', Texcl_solute, Texcl_solvent
+         ! write (*,120) 'Excl solute, solvent', Texcl_solute, Texcl_solvent
       end if
 120   format(a7,' temperatures are : Ttot =',f10.2,' Tfree =',f10.2)
       write (*,*)

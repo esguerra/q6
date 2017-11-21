@@ -132,7 +132,7 @@ tabsize=3}
 \bibliographystyle{nar}
 \vspace{20pt}
 \section{Introduction}
-This is  the developers manual  for \textbf{Q}, the free  energy from
+This is  the developers  manual for \textbf{Q},  the free  energy from
 molecular dynamics program.\\
 \noindent \textbf{Q}  is entirely written in  modern \textbf{FORTRAN}.
 Its  initial   development  was   in  \textbf{FORTRAN}  90,   but  the
@@ -158,6 +158,23 @@ To run it we use:
 \begin{Verbatim}
     ford -d ../../src -o devdocs forddocs.md
 \end{Verbatim}
+
+One exclamation mark ignored, two exclamation marks taken as FORD
+documentation.
+FORD by default documents after the function, or subroutine, or so, but
+to make it document with what is prior to the, say, subroutine, after
+version 1.10 one should use a greater than symbol after the
+exclamation mark.
+
+\begin{Verbatim}
+!------------------------------------------------------------------------------!
+!>  **subroutine: put_ene**
+!!    defines what goes in the energy files.
+!------------------------------------------------------------------------------!
+  subroutine put_ene(unit, e2, offd)
+\end{Verbatim}
+  
+
 
 \subsection{Makefile}
 \label{makefile}

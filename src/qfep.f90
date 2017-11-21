@@ -109,19 +109,19 @@ program qfep
   !print*, iline
   do i=1,4
     read (iline,*,iostat=error)(dummy,j=1,i)
-!   print*, error,"***",i,dummy
+    !   print*, error,"***",i,dummy
     if (error .ne. 0) then
       dummyno=i-1
       exit
     endif
   enddo
   if (dummyno .eq. 2) then
-          read (iline,*) rt,nskip
+    read (iline,*) rt,nskip
   elseif (dummyno .eq. 3) then
-          read (iline,*) rt,nskip,gas
+    read (iline,*) rt,nskip,gas
   else
-          print*, "num. correct arguments for KT, data points to skip or calculation mode"
-          stop
+    print*, "num. correct arguments for KT, data points to skip or calculation mode"
+    stop
   end if
   ! masoud
 
@@ -358,7 +358,6 @@ program qfep
 
 
      ! Average energies for each file are calculated
-
      if(ipt <= nskip) then !skipped all points in the file
         write(*,900) trim(filnam)
 900     format('>>>>> ERROR: number of data sets in ',a,&

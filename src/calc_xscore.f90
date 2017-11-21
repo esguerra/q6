@@ -9,17 +9,18 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!>  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!  calc_xscore.f90
-!  by Peter Hanspers & Martin Nervall
-!  Qcalc trajectory analysis main program
+!!  calc_xscore.f90
+!!  by Peter Hanspers & Martin Nervall
+!!  Qcalc trajectory analysis main program
+!! v.2003.11, Structure-Based Drug Design Toolkits, developed by Dr. Renxiao
+!! Wang F90 implementation and qcalc integration by Peter Hanspers. Most of the
+!! structure from the original xscore source code is ported to f90.
+!! Before scoring, protein and ligand data structures are translated to
+!! xscore format.
 !------------------------------------------------------------------------------!
 module calc_xscore
-  ! v.2003.11, Structure-Based Drug Design Toolkits, developed by Dr. Renxiao Wang
-  ! F90 implementation and qcalc integration by Peter Hanspers
-  ! Most of the structure from the original xscore source code is ported to f90.
-  ! Before scoring, protein and ligand data structures are translated to xscore format.
 
   use CALC_BASE
   use MASKMANIP
@@ -58,13 +59,13 @@ module calc_xscore
     character(len=256) :: charge_type
 
     integer ::  num_ring
-    type(tXRing),pointer             :: ring(:)
-    integer                                                                  :: ring_count  ! actual count
+    type(tXRing),pointer            :: ring(:)
+    integer                         :: ring_count  ! actual count
 
     type(tXDot),pointer             :: vol_dot(:)
-    integer                                                         :: num_vol_dot
+    integer                         :: num_vol_dot
     type(tXDot),pointer             :: sur_dot(:)
-    integer                                                         :: num_sur_dot
+    integer                         :: num_sur_dot
   end type
 
   type tXProtein  ! full version
@@ -7990,251 +7991,253 @@ subroutine Protein_Calculate_HB_Root(protein)
 1       end do
 end subroutine Protein_Calculate_HB_Root
 
+
+
 subroutine Protein_Detect_Connections(protein,lite_run)
-        type(tXProtein)         :: protein
-        integer,optional        :: lite_run
-        integer ::  i,j,k,count,id 
-        integer ::  mark 
-        real ::  cutoff,d 
+  type(tXProtein)         :: protein
+  integer,optional        :: lite_run
+  integer ::  i,j,k,count,id
+  integer ::  mark
+  real ::  cutoff,d
 
-        ! build the connections for regular atoms first
-        cutoff=2.00   ! covalent bond distance cutoff
+  ! build the connections for regular atoms first
+  cutoff=2.00   ! covalent bond distance cutoff
 
-        do i = 0,protein%num_atom -1 
-         if((protein%atom(i)%valid.eq.0)) then          ! allow invalid cofactor atoms
-                goto 1
-         elseif(protein%atom(i)%part.ne.1) then
-                goto 1
-         elseif(protein%atom(i)%num_neib>0) then
-                goto 1  ! already done 
-         end if
-         count=0 
+  do i = 0,protein%num_atom -1
+    if((protein%atom(i)%valid.eq.0)) then          ! allow invalid cofactor atoms
+      goto 1
+    elseif(protein%atom(i)%part.ne.1) then
+      goto 1
+    elseif(protein%atom(i)%num_neib>0) then
+      goto 1  ! already done
+    end if
+    count=0
 
-         if(present(lite_run)) goto 100
+    if(present(lite_run)) goto 100
 
-         ! find internal connections inside the same residue first
-         do j = 0,protein%num_atom -1 
-                 if(i.eq.j) then        
-                        goto 2 
-                 elseif(protein%atom(j)%valid.eq.0) then 
-                        goto 2 
-                 elseif(protein%atom(j)%part.ne.1) then 
-                        goto 2 
-                 elseif(protein%atom(i)%chain.ne.protein%atom(j)%chain) then 
-                        goto 2 
-                 elseif(protein%atom(i)%residue.ne.protein%atom(j)%residue) then 
-                        goto 2 
-                 elseif(protein%atom(i)%res_id.ne.protein%atom(j)%res_id) then 
-                        goto 2 
-                 end if
+    ! find internal connections inside the same residue first
+    do j = 0,protein%num_atom -1
+      if(i.eq.j) then
+        goto 2
+      elseif(protein%atom(j)%valid.eq.0) then
+        goto 2
+      elseif(protein%atom(j)%part.ne.1) then
+        goto 2
+      elseif(protein%atom(i)%chain.ne.protein%atom(j)%chain) then
+        goto 2
+      elseif(protein%atom(i)%residue.ne.protein%atom(j)%residue) then
+        goto 2
+      elseif(protein%atom(i)%res_id.ne.protein%atom(j)%res_id) then
+        goto 2
+      end if
                  
-                 ! there is no bond between hydrogen atoms
-                 if((protein%atom(i)%ttype.eq.'H').and.(protein%atom(j)%ttype.eq.'H')) then
-                        goto 2
-                end if
+      ! there is no bond between hydrogen atoms
+      if((protein%atom(i)%ttype.eq.'H').and.(protein%atom(j)%ttype.eq.'H')) then
+        goto 2
+      end if
 
-                ! now check whether atom i and atom j are covalently bound
-                if(ForceField_Patom_Connection_Test(protein%atom(i),protein%atom(j)).eq.1) then
-                         if(count>=MAX_ATOM_NEIB) then
-                                goto 2   ! already full
-                         else
-                                 protein%atom(i)%neib(count)=j+1
-                                 count = count +1
-                         end if
-                 else 
-                        goto 2
-                end if
-2        end do
+      ! now check whether atom i and atom j are covalently bound
+      if(ForceField_Patom_Connection_Test(protein%atom(i),protein%atom(j)).eq.1) then
+        if(count>=MAX_ATOM_NEIB) then
+          goto 2   ! already full
+        else
+          protein%atom(i)%neib(count)=j+1
+          count = count +1
+        end if
+      else
+        goto 2
+      end if
+      2   end do
 
-! JUMP HERE IF LITE RUN
+    ! JUMP HERE IF LITE RUN
 100 continue
-         ! now detect peptide amide bonds
-         if((protein%atom(i)%name.eq.'N').and.(protein%atom(i)%ttype.eq.'N.am')) then
-                do j = 0,protein%num_atom -1 
-                         if(protein%atom(j)%valid.eq.0) then 
-                                goto 3 
-                         elseif(protein%atom(j)%part.ne.1) then 
-                                goto 3 
-                         elseif(protein%atom(i)%chain.ne.protein%atom(j)%chain) then 
-                                goto 3 
-                         elseif(protein%atom(i)%res_id.eq.protein%atom(j)%res_id) then 
-                                goto 3 
-                         elseif(protein%atom(j)%ttype.ne.'C.2') then 
-                                goto 3 
-                         elseif(protein%atom(j)%name.ne.'C') then 
-                                goto 3 
-                         end if
+    ! now detect peptide amide bonds
+    if((protein%atom(i)%name.eq.'N').and.(protein%atom(i)%ttype.eq.'N.am')) then
+      do j = 0,protein%num_atom -1
+        if(protein%atom(j)%valid.eq.0) then
+          goto 3
+        elseif(protein%atom(j)%part.ne.1) then
+          goto 3
+        elseif(protein%atom(i)%chain.ne.protein%atom(j)%chain) then
+          goto 3
+        elseif(protein%atom(i)%res_id.eq.protein%atom(j)%res_id) then
+          goto 3
+        elseif(protein%atom(j)%ttype.ne.'C.2') then
+          goto 3
+        elseif(protein%atom(j)%name.ne.'C') then
+          goto 3
+        end if
 
-                         d=Distance(protein%atom(i)%coor,protein%atom(j)%coor) 
+        d=Distance(protein%atom(i)%coor,protein%atom(j)%coor)
 
-                         if(d>cutoff) then 
-                                goto 3 
-                         elseif(count>=MAX_ATOM_NEIB) then 
-                                goto 3  
-                         else
-                                 protein%atom(i)%neib(count)=j+1  
-                                 count = count +1 
-                         end if
-3               end do
-        elseif((protein%atom(i)%name.eq.'C').and.(protein%atom(i)%ttype.eq.'C.2')) then
-                do j = 0,protein%num_atom -1 
-                        if(protein%atom(j)%valid.eq.0) then 
-                                goto 4 
-                        elseif(protein%atom(j)%part.ne.1) then 
-                                goto 4 
-                        elseif(protein%atom(i)%chain.ne.protein%atom(j)%chain) then 
-                                goto 4 
-                        elseif(protein%atom(i)%res_id.eq.protein%atom(j)%res_id) then 
-                                goto 4 
-                        elseif(protein%atom(j)%ttype.ne.'N.am') then 
-                                goto 4 
-                        elseif(protein%atom(j)%name.ne.'N') then 
-                                goto 4 
-                        end if
+        if(d>cutoff) then
+          goto 3
+        elseif(count>=MAX_ATOM_NEIB) then
+          goto 3
+        else
+          protein%atom(i)%neib(count)=j+1
+          count = count +1
+        end if
+        3               end do
+      elseif((protein%atom(i)%name.eq.'C').and.(protein%atom(i)%ttype.eq.'C.2')) then
+        do j = 0,protein%num_atom -1
+          if(protein%atom(j)%valid.eq.0) then
+            goto 4
+          elseif(protein%atom(j)%part.ne.1) then
+            goto 4
+          elseif(protein%atom(i)%chain.ne.protein%atom(j)%chain) then
+            goto 4
+          elseif(protein%atom(i)%res_id.eq.protein%atom(j)%res_id) then
+            goto 4
+          elseif(protein%atom(j)%ttype.ne.'N.am') then
+            goto 4
+          elseif(protein%atom(j)%name.ne.'N') then
+            goto 4
+          end if
 
-                        d=Distance(protein%atom(i)%coor,protein%atom(j)%coor) 
+          d=Distance(protein%atom(i)%coor,protein%atom(j)%coor)
 
-                        if(d>cutoff) then 
-                                goto 4 
-                        elseif(count>=MAX_ATOM_NEIB) then 
-                                goto 4  
-                        else
-                                 protein%atom(i)%neib(count)=j+1  
-                                 count = count +1 
-                        end if
-4               end do
-         end if
+          if(d>cutoff) then
+            goto 4
+          elseif(count>=MAX_ATOM_NEIB) then
+            goto 4
+          else
+            protein%atom(i)%neib(count)=j+1
+            count = count +1
+          end if
+          4               end do
+        end if
 
-         protein%atom(i)%num_neib=count 
-1 end do
+        protein%atom(i)%num_neib=count
+        1 end do
 
         ! now find the patoms bound to the metal ions
         cutoff=3.00   ! M-bond distance cutoff
 
         do i = 0,protein%num_atom -1 
-         if(protein%atom(i)%valid.eq.0) then 
-                goto 5 
-         elseif(protein%atom(i)%part.eq.1) then 
-                goto 5 
-         elseif(protein%atom(i)%xtype.ne.'M+') then 
-                goto 5 
-         elseif(protein%atom(i)%num_neib>0) then 
-                goto 5   ! already done
-         end if
-
-         count=0 
-
-         do j = 0,protein%num_atom -1 
-                 if(protein%atom(j)%valid.eq.0) then 
-                        goto 6 
-                 elseif(protein%atom(j)%part.ne.1) then 
-                        goto 6 
-                 elseif((protein%atom(j)%hb.ne.'A').and.(protein%atom(j)%hb.ne.'DA')) then 
-                        goto 6 
-                 end if
-
-                 d=Distance(protein%atom(i)%coor,protein%atom(j)%coor) 
-
-                 if(d>cutoff) then 
-                        goto 6 
-                 elseif(count>=MAX_ATOM_NEIB) then 
-                        goto 6 
-                 else 
-                         protein%atom(i)%neib(count)=j+1   ! note this
-                         count = count +1 
-                         ! here we do not add connections to atom(j)
-                 end if
-6               end do
-                protein%atom(i)%num_neib=count 
-5       end do
-
-        ! Return if lite run
-        if(present(lite_run)) return
-
-        ! now build the connections for SO4s and PO4s
-        do i = 0,protein%num_atom -1 
-         if(protein%atom(i)%valid.eq.0) then 
-                goto 7 
-         elseif(protein%atom(i)%part.eq.1) then 
-                goto 7 
-         elseif((protein%atom(i)%residue.ne.'SO4').and. &               ! check this
-                                        (protein%atom(i)%residue.ne.'PO4')) then 
-                goto 7 
-         elseif((protein%atom(i)%name.ne.'S').and.      &                               ! check this
-                                        (protein%atom(i)%name.ne.'P')) then 
-                goto 7 
-         end if
-
-         if(protein%atom(i)%num_neib>0) goto 7   ! done 
-
-         ! now check the satellite atoms for this P or S atom
-         do j = 0,protein%num_atom -1 
-                 if(protein%atom(j)%valid.eq.0) then 
-                        goto 8 
-                 elseif(protein%atom(j)%part.eq.1) then 
-                        goto 8 
-                 elseif((protein%atom(j)%residue.ne.'SO4').and.(protein%atom(j)%residue.ne.'PO4')) then 
-                        goto 8 
-                 elseif((protein%atom(j)%res_id.ne.protein%atom(i)%res_id)) then 
-                        goto 8 
-                 elseif(index(protein%atom(j)%name,'S').ne.0) then 
-                        goto 8 
-                 elseif(index(protein%atom(j)%name,'P').ne.0) then 
-                        goto 8 
-                 end if
-
-                 count=protein%atom(i)%num_neib
-                 mark=0
-                
-                 do k = 0,count -1 
-                         if(protein%atom(i)%neib(k).eq.(j+1)) then
-                                 mark=1
-                                 exit
-                         else
-                                goto 9
-                         end if
-9                end do
-        
-                 if(mark.eq.0) then
-                         protein%atom(i)%neib(count)=j+1   ! note this
-                         protein%atom(i)%num_neib = protein%atom(i)%num_neib +1 
-                 end if
-
-                 count=protein%atom(j)%num_neib
-                 mark=0
-
-                 do k = 0,count -1 
-                         if(protein%atom(j)%neib(k).eq.(i+1)) then
-                                 mark=1
-                                 exit
-                         else
-                                goto 10
-                         end if
-10       end do
-                 
-         if(mark.eq.0) then
-                         protein%atom(j)%neib(count)=i+1   ! note this
-                         protein%atom(j)%num_neib = protein%atom(j)%num_neib +1 
+          if(protein%atom(i)%valid.eq.0) then
+            goto 5
+          elseif(protein%atom(i)%part.eq.1) then
+            goto 5
+          elseif(protein%atom(i)%xtype.ne.'M+') then
+            goto 5
+          elseif(protein%atom(i)%num_neib>0) then
+            goto 5   ! already done
           end if
-8        end do
-7 end do
 
-        ! now determine number of heavy atoms for each valid atom
-        do i = 0,protein%num_atom -1 
-                 if(protein%atom(i)%valid<=0) goto 12
+          count=0
 
-                 count=0 
-                 do j = 0,protein%atom(i)%num_neib -1 
-                         id=protein%atom(i)%neib(j) 
-                         if(protein%atom(id-1)%ttype.eq.'H') then
-                                goto 13
-                         else 
-                                count = count +1 
-                         end if
-13       end do
+          do j = 0,protein%num_atom -1
+            if(protein%atom(j)%valid.eq.0) then
+              goto 6
+            elseif(protein%atom(j)%part.ne.1) then
+              goto 6
+            elseif((protein%atom(j)%hb.ne.'A').and.(protein%atom(j)%hb.ne.'DA')) then
+              goto 6
+            end if
 
-                 protein%atom(i)%num_nonh=count 
-12 end do
+            d=Distance(protein%atom(i)%coor,protein%atom(j)%coor)
+
+            if(d>cutoff) then
+              goto 6
+            elseif(count>=MAX_ATOM_NEIB) then
+              goto 6
+            else
+              protein%atom(i)%neib(count)=j+1   ! note this
+              count = count +1
+                    ! here we do not add connections to atom(j)
+            end if
+            6               end do
+            protein%atom(i)%num_neib=count
+            5       end do
+
+            ! Return if lite run
+            if(present(lite_run)) return
+
+            ! now build the connections for SO4s and PO4s
+            do i = 0,protein%num_atom -1
+              if(protein%atom(i)%valid.eq.0) then
+                goto 7 
+              elseif(protein%atom(i)%part.eq.1) then
+                goto 7 
+              elseif((protein%atom(i)%residue.ne.'SO4').and. &               ! check this
+                (protein%atom(i)%residue.ne.'PO4')) then
+                goto 7 
+              elseif((protein%atom(i)%name.ne.'S').and.      &                               ! check this
+                (protein%atom(i)%name.ne.'P')) then
+                goto 7 
+              end if
+
+              if(protein%atom(i)%num_neib>0) goto 7   ! done
+
+              ! now check the satellite atoms for this P or S atom
+              do j = 0,protein%num_atom -1
+                if(protein%atom(j)%valid.eq.0) then
+                  goto 8
+                elseif(protein%atom(j)%part.eq.1) then
+                  goto 8
+                elseif((protein%atom(j)%residue.ne.'SO4').and.(protein%atom(j)%residue.ne.'PO4')) then
+                  goto 8
+                elseif((protein%atom(j)%res_id.ne.protein%atom(i)%res_id)) then
+                  goto 8
+                elseif(index(protein%atom(j)%name,'S').ne.0) then
+                  goto 8
+                elseif(index(protein%atom(j)%name,'P').ne.0) then
+                  goto 8
+                end if
+
+                count=protein%atom(i)%num_neib
+                mark=0
+                
+                do k = 0,count -1
+                  if(protein%atom(i)%neib(k).eq.(j+1)) then
+                    mark=1
+                    exit
+                  else
+                    goto 9
+                  end if
+                  9                end do
+        
+                  if(mark.eq.0) then
+                    protein%atom(i)%neib(count)=j+1   ! note this
+                    protein%atom(i)%num_neib = protein%atom(i)%num_neib +1
+                  end if
+
+                  count=protein%atom(j)%num_neib
+                  mark=0
+
+                  do k = 0,count -1
+                    if(protein%atom(j)%neib(k).eq.(i+1)) then
+                      mark=1
+                      exit
+                    else
+                      goto 10
+                    end if
+                  10  end do
+                 
+                    if(mark.eq.0) then
+                      protein%atom(j)%neib(count)=i+1   ! note this
+                      protein%atom(j)%num_neib = protein%atom(j)%num_neib +1
+                    end if
+                    8    end do
+                    7  end do
+
+                    ! now determine number of heavy atoms for each valid atom
+                    do i = 0,protein%num_atom -1
+                      if(protein%atom(i)%valid<=0) goto 12
+
+                      count=0
+                      do j = 0,protein%atom(i)%num_neib -1
+                        id=protein%atom(i)%neib(j)
+                        if(protein%atom(id-1)%ttype.eq.'H') then
+                          goto 13
+                        else
+                          count = count +1
+                        end if
+                        13  end do
+
+                        protein%atom(i)%num_nonh=count
+                        12 end do
 end subroutine Protein_Detect_Connections
 
-end module CALC_XSCORE
+end module calc_xscore

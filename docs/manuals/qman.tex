@@ -130,8 +130,8 @@ Regarding the  name of the program  there are many conjectures  as the
 original reason seems to be lost.  Maybe \textbf{Q} stands for
 the commonly used letter to  describe partition functions, or maybe it
 stands  for  the  letter  denoting  heat,  or  maybe  for  waiting  in
-\textbf{Q}ueue of  maybe for \textbf{Q}uantum,  but we would be  a bit
-hesitant about that last one.
+\textbf{Q}ueue, or perhaps it stands for charge, of  maybe for 
+\textbf{Q}uantum, but we would be a bit hesitant about that last one.
 
 The  molecule in  the  \textbf{Q}  logo is  that  of  a derivative  of
 2,4-quinazolinediamine, to  be more  precise, its  full IUPAC  name is
@@ -1047,12 +1047,12 @@ information about the data in each section is found in the section
   \hline shake{\_}hydrogens       & on           & Shake bonds to hydrogen in solute \& solvent \\
   \hline lrf                      & on           & Use lrf for electrostatics beyond cut-off \\
   \hline [cut-offs]               &              & Cut-off radii for different groups of atoms \\
-  \hline solute{\_}solute         & 10           & Solute-solute cut-off (Å) \\
-  \hline solvent{\_}solvent       & 10           & Water-water cut-off (Å) \\
-  \hline solute{\_}solvent        & 10           & Solute-water cut-off (Å) \\
-  \hline q{\_}atom                & 10           & Q-atom non-q-atom cut-off (Å) \\
+  \hline solute{\_}solute         & 10           & Solute-solute cut-off (ï¿½) \\
+  \hline solvent{\_}solvent       & 10           & Water-water cut-off (ï¿½) \\
+  \hline solute{\_}solvent        & 10           & Solute-water cut-off (ï¿½) \\
+  \hline q{\_}atom                & 10           & Q-atom non-q-atom cut-off (ï¿½) \\
   \hline [sphere]                 &              & Definition of the simulation sphere \\
-  \hline shell{\_}radius          & 18           & Definition of the inner restrained shell (Å). \\
+  \hline shell{\_}radius          & 18           & Definition of the inner restrained shell (ï¿½). \\
   \hline shell{\_}force           & 10.0         & Restraining force constant in shell (kcal$\cdot $mol$^{-1}\cdot ${\AA}$^{-2}$) \\
   \hline [solvent]                &              & Solvent boundary settings \\
   \hline radial{\_}force          & 60.0         & Force constant for radial restraining (kcal$\cdot $mol$^{-1}\cdot ${\AA}$^{-2}$) \\
@@ -2527,7 +2527,7 @@ should be written. Enter y for yes or n for no.\\
 \hline \bf{writetop} & wt & [topology file ["title"]] & Write topology file.\\
 \hline \bf{xlink} & xl &  & Search for possible cross-links such
 as disulphides and make bonds. For each non-bonded heavy atom pair
-separated by less than 2.1 Å, the program will ask whether to add a bond or not.\\
+separated by less than 2.1 ï¿½, the program will ask whether to add a bond or not.\\
 \hline
 \end{longtable}
 
@@ -2540,10 +2540,10 @@ set solvent\_pack 2.6.
 \begin{tabularx}{\textwidth}{|p{120pt}|X|p{60pt}|}
 \hline \normalsize \sc{name} & \normalsize \sc{meaning} & \normalsize \sc{default value} \\
 \hline \bf{solvent\_pack}  &  minimum distance between solute and
-solvent heavy atoms when adding solvent & 2.4 Å \\
-\hline \bf{solute\_density} & number density of solute & 0.05794 Å$^{-3}$ \\
+solvent heavy atoms when adding solvent & 2.4 ï¿½ \\
+\hline \bf{solute\_density} & number density of solute & 0.05794 ï¿½$^{-3}$ \\
 \hline \bf{max\_xlink} & upper limit of bond length when searching
-for possible cross-link bonds & 2.1 Å \\
+for possible cross-link bonds & 2.1 ï¿½ \\
 \hline {\bf{random\_\-seed\_\-solute}} & integer seed value for
 the random number sequence used to generate solute hydrogen atom coordinates & 179857\\
 \hline \bf{random\_\-seed\_\-solvent} & integer seed value for the
@@ -2594,7 +2594,7 @@ default ATOM. CONECT records in PDB file will be generated for
 HETATM groups. \\
 \hline Solvent & on or off & If on, this entry is recognised
 as a solvent.\\
-\hline Density & number density (Å$^{-3}$) & Only used for solvents,
+\hline Density & number density (ï¿½$^{-3}$) & Only used for solvents,
 to solvate using a grid and to calculate the effective
 solvent radius.\\
 \hline
@@ -2786,12 +2786,12 @@ on page \pageref{fig:prm_ex}.
 \begin{tabularx}{\textwidth}{|l|X|}
 \hline \bf{col.} & \bf{description} \\
 \hline 1 & atom type name, max 8 characters \\
-\hline 2 &  Lennard-Jones A parameter for type 1 pairs (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}$ $\cdot$ Å$^{6}$)
-for geometric combination or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$Å$^{12}$) for arithmetic combination) \\
-\hline 3 & LJ A parameter type 2 (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}$ $\cdot$ Å$^{6}$) or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$Å$^{12}$)\\
-\hline 4 &  LJ B parameter type 1 (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}$ $\cdot$ Å$^{3}$) or $\varepsilon$ (kcal$\cdot$mol$^{-1}\cdot$Å$^{6}$)\\
-\hline 5 & LJ A parameter type 3 (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}$ $\cdot$ Å$^{6}$) or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$Å$^{12}$)\\
-\hline 6  & LJ B parameter type 2 and 3 (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}\cdot$Å$^{3}$) or $\varepsilon$(kcal$\cdot$mol$^{-1}\cdot$Å$^{6}$)\\
+\hline 2 &  Lennard-Jones A parameter for type 1 pairs (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}$ $\cdot$ ï¿½$^{6}$)
+for geometric combination or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{12}$) for arithmetic combination) \\
+\hline 3 & LJ A parameter type 2 (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}$ $\cdot$ ï¿½$^{6}$) or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{12}$)\\
+\hline 4 &  LJ B parameter type 1 (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}$ $\cdot$ ï¿½$^{3}$) or $\varepsilon$ (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{6}$)\\
+\hline 5 & LJ A parameter type 3 (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}$ $\cdot$ ï¿½$^{6}$) or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{12}$)\\
+\hline 6  & LJ B parameter type 2 and 3 (kcal$^{1/2}$ $\cdot$ mol$^{-1/2}\cdot$ï¿½$^{3}$) or $\varepsilon$(kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{6}$)\\
 \hline 7 & mass of (extended) atom (u) \\
 \hline 8  & SYBYL atom type (5 character string), optional\\
 \hline
@@ -2821,8 +2821,8 @@ atom types col. description \\
 \hline \bf{col.} & \bf{description} \\
 \hline 1 &  atom type 1\\
 \hline 2 &  atom type 2 \\
-\hline 3 & force constant (kcal $\cdot$ mol$^{-1}$ $\cdot$ Å$^{-2}$) \\
-\hline 4 & equilibrium length (Å) \\
+\hline 3 & force constant (kcal $\cdot$ mol$^{-1}$ $\cdot$ ï¿½$^{-2}$) \\
+\hline 4 & equilibrium length (ï¿½) \\
 \hline 5 & SYBYL bond type (2 character string), optional \\
 \hline
 \end{tabularx}
@@ -2835,7 +2835,7 @@ of atom types col. description.\\
 \hline 2  & atom type 2 \\
 \hline 3 & atom type 3 \\
 \hline 4 & force constant (kcal $\cdot$ mol$^{-1}$ $\cdot$ rad$^{-2}$) \\
-\hline 5 & equilibrium angle (°)\\
+\hline 5 & equilibrium angle (ï¿½)\\
 \hline
 \end{tabularx}
 
@@ -2853,7 +2853,7 @@ before to indicate that more components follow on subsequent
 lines, i. e. for a torsion potential with multiple components all
 but the last
 component should be entered with negative periodicity. \\
-\hline 7  & phase shift ($\delta$/n define the location of first maximum) (°) \\
+\hline 7  & phase shift ($\delta$/n define the location of first maximum) (ï¿½) \\
 \hline 8 & number of paths \\
 \hline
 \end{tabularx}
@@ -2865,7 +2865,7 @@ for pairs of atom types or for single atom types col. description \\
 \hline 1 & atom type 1 \\
 \hline 2 & atom type 2 or 0 or ? to match any atom type \\
 \hline 3 & force constant (kcal $\cdot$ mol$^{-1}$ $\cdot$ rad$^{-2}$) \\
-\hline 4 & equilibrium angle (°)\\
+\hline 4 & equilibrium angle (ï¿½)\\
 \hline
 \end{tabularx}
 \normalsize
@@ -2899,7 +2899,7 @@ Table \ref{tab:wat_file}.
 \caption{Water file format} \label{tab:wat_file}
 \begin{tabularx}{\textwidth}{|l|X|}
 \hline \bf{line} & \bf{content}\\
-\hline 1 & For a box: side of the box (Å).For a sphere: radius of
+\hline 1 & For a box: side of the box (ï¿½).For a sphere: radius of
 the sphere followed by the word \textbf{sphere}. \\
 \hline 3 $\cdot$ n-1 & Coordinates of the oxygen atom of water
 molecule n in PDB format. \\
@@ -2912,7 +2912,7 @@ water molecule n in PDB format. \\
 \end{table}
 
 %End Nervall
-%Start Almlöf
+%Start Almlï¿½f
 
 \subsection{Boundary conditions}
 \label{subsec:boundary}
@@ -2921,7 +2921,7 @@ water molecule n in PDB format. \\
 \label{subsubsec:soluteboundary} Solute  atoms outside  the simulation
 sphere  are  excluded from  non-bonded  interactions  and are  tightly
 restrained to their initial coordinates by a harmonic potential with a
-force constant  of 200 kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$.  All bonded
+force constant  of 200 kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$.  All bonded
 interactions  are evaluated  as for  atoms inside  the sphere.  Solute
 atoms  in  the outermost  shell  of  the  simulation sphere  are  also
 restrained to their  initial coordinates with a  harmonic potential to
@@ -2931,7 +2931,7 @@ file   (section   [\textbf{sphere}],    keywords   shell\_radius   and
 shell\_force). The restrained shell radius  is by default equal to the
 outer, \emph{i.e.} no  atoms will be restrained  unless the restrained
 shell radius is  redefined. The force constant has a  default value of
-10 kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$.
+10 kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$.
 
 The grouping of atoms in the inside shell or excluded regions is
 done before the simulation starts using the initial coordinates
@@ -2953,9 +2953,9 @@ equation $V_{sphere} \left(r_w\right) = \frac{4\pi}{3}\cdot r_w^3
 = N_p\left(r_w\right)\cdot v_p+N_w\cdot v_w $ where N$_p$(r$_w$)
 is the number of heavy solute atoms within a radius r$_w$ from the
 water centre, v$_p$ is the average volume per heavy atom in
-proteins (17.3 Å$^3$), N$_w$ is the (fixed) number of solvent
+proteins (17.3 ï¿½$^3$), N$_w$ is the (fixed) number of solvent
 molecules and v$_w$ is the volume of a solvent molecule (29.9
-Å$^3$ for water).
+ï¿½$^3$ for water).
 
 The radial restraining potential has a half-harmonic term that
 pushes solvent molecules back into the sphere and a Morse-like
@@ -2980,17 +2980,17 @@ T:  $r_0 = r_w - \sqrt{\frac{k_b \cdot T}{K}}$ where r$_w$ is the
 target solvent radius. The appropriate values of D$_e$ and
 $\alpha$ depend on r$_w$ and are calculated using empirical
 functions calibrated to give correct values for water spheres from
-12 to 30 Å:
+12 to 30 ï¿½:
 \begin {equation}
 \label {eq:empscaas}
 \begin {split}
 D_e \left(r_w \right) = 0.26 \frac{kcal}{mol} \cdot e^{\left(
--0.19 \frac{1}{\text{Å}} \cdot \left( r_w - 15\text{Å} \right)
+-0.19 \frac{1}{\text{ï¿½}} \cdot \left( r_w - 15\text{ï¿½} \right)
 \right)} + 0.74
 \frac{kcal}{mol} \\
-\alpha \left(r_w \right) = 0.20 \frac{1}{\text{Å}} \left/ \left(1
-+ e^{ \left( 0.4 \frac{1}{\text{Å}} \cdot \left( r_w - 25\text{Å}
-\right) \right)} \right) \right. + 0.30 \frac{1}{\text{Å}}
+\alpha \left(r_w \right) = 0.20 \frac{1}{\text{ï¿½}} \left/ \left(1
++ e^{ \left( 0.4 \frac{1}{\text{ï¿½}} \cdot \left( r_w - 25\text{ï¿½}
+\right) \right)} \right) \right. + 0.30 \frac{1}{\text{ï¿½}}
 \end{split}
 \end{equation}
 
@@ -3013,9 +3013,9 @@ Born's formula is taken into account unless disabled by setting
 charge\_correction to off in the input file. The polarization
 distribution restraints are applied in three thin shells to
 minimise the radial dependence of the polarization which occurs in
-a single, thicker shell. The outermost shell is 0.5 Å thick, the
-second 1.0 Å, the third 1.5 Å, so the polarization is restrained
-in the outermost 3 Å of the simulation sphere.
+a single, thicker shell. The outermost shell is 0.5 ï¿½ thick, the
+second 1.0 ï¿½, the third 1.5 ï¿½, so the polarization is restrained
+in the outermost 3 ï¿½ of the simulation sphere.
 
 The restraining works by sorting the molecules of each shell
 according to the angle between dipole vector and radial axis and
@@ -3105,7 +3105,7 @@ and combinations thereof. \small
 \begin{tabular}{|l|l|}
 \hline time & fs \\
 \hline temperature & K \\
-\hline length & Å \\
+\hline length & ï¿½ \\
 \hline energy & kcal$\cdot$mol$^{-1}$ \\
 \hline charge & e \\
 \hline
@@ -3349,16 +3349,16 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 \multicolumn{3}{p{394pt}}{}\\
 
 \multicolumn{3}{p{394pt}}{[\textbf{cut-offs}]: Cut-off radii for non-bonded interactions.}\\
-\hline solute\_solute & Cut-off radius (Å) for solute-solute atom pairs. & Optional, default 10 Å.\\
-\hline solvent\_solvent & Cut-off radius (Å) for solvent-solvent. & Optional, default 10 Å.\\
-\hline solute\_solvent & Cut-off radius (Å) for solute-solvent. & Optional, default 10 Å.\\
-\hline q\_atom & Cut-off radius (Å) for Q-atoms interaction with all atoms. & Optional, default 99 Å, \emph{$i.e.$} no cut-off. If PBC used, compare to boxlength.\\
-\hline lrf & Cut-off radius (Å) for LRF expansion. & Optional, default 99 Å, \emph{$i.e.$} no cut-off.\\
+\hline solute\_solute & Cut-off radius (ï¿½) for solute-solute atom pairs. & Optional, default 10 ï¿½.\\
+\hline solvent\_solvent & Cut-off radius (ï¿½) for solvent-solvent. & Optional, default 10 ï¿½.\\
+\hline solute\_solvent & Cut-off radius (ï¿½) for solute-solvent. & Optional, default 10 ï¿½.\\
+\hline q\_atom & Cut-off radius (ï¿½) for Q-atoms interaction with all atoms. & Optional, default 99 ï¿½, \emph{$i.e.$} no cut-off. If PBC used, compare to boxlength.\\
+\hline lrf & Cut-off radius (ï¿½) for LRF expansion. & Optional, default 99 ï¿½, \emph{$i.e.$} no cut-off.\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
 
 \multicolumn{3}{p{394pt}}{[\textbf{sphere}]: Not used in PBC simulations.}\\
-\hline shell\_force & Force constant (kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$) for shell restraints. & Optional, default 10 kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$.\\
+\hline shell\_force & Force constant (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$) for shell restraints. & Optional, default 10 kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$.\\
 \hline shell\_radius & Inner radius of restrained shell (\AA). & Optional, default outer shell radius.\\
 \hline exclude\_bonded & Flag controlling whether bonded interactions between excluded atoms should be eliminated (on) or retained (off) to reproduce energies in earlier versions. & Optional, default off.\\
 \hline
@@ -3366,7 +3366,7 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 
 \multicolumn{3}{p{394pt}}{[\textbf{solvent}]: Boundary conditions of solvent sphere. Optional, can be omitted in vacuum simulations and must be omitted in PBC simulations.}\\
 \hline radius & Target solvent radius. &  Optional. Use this only to override the calculated target radius from the topology.\\
-\hline radial\_force & Force constant (kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$) for half-harmonic radial restraint at boundary. & Optional, default 60 kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$.\\
+\hline radial\_force & Force constant (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$) for half-harmonic radial restraint at boundary. & Optional, default 60 kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$.\\
 \hline polarization & Polarization restraints in outer solvent shell on or off. & Optional, default on.\\
 \hline charge\_correction &  Enable (on) or disable (off) correction of solvent polarization restraints for total charge of Q-atoms by Born's formula. & Optional, default on.\\
 \hline polarization\_force & Force constant (kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$) for solvent polarization restraints. & Optional, default = 20 kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$.\\
@@ -3413,7 +3413,7 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 \multicolumn{3}{p{394pt}}{[\textbf{sequence\_restraints}]: Restrain sequences of atoms.}\\
 \hline 1 & \multicolumn{2}{p{320pt}|}{Number of first atom in sequence.}\\
 \hline 2 & \multicolumn{2}{p{320pt}|}{Number of last atom in sequence.}\\
-\hline 3 & \multicolumn{2}{p{320pt}|}{Force constant (kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$) for harmonic potential.}\\
+\hline 3 & \multicolumn{2}{p{320pt}|}{Force constant (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$) for harmonic potential.}\\
 \hline 4 & \multicolumn{2}{p{320pt}|}{Flag for restraining also hydrogens (0=no, 1=yes).}\\
 \hline 5 & \multicolumn{2}{p{320pt}|}{Flag for restraining the sequence of atoms to its mass center (2), geometrical centre by a force proportional to the corresponding atom mass normalized with C12 mass and acting on all atoms (1), or each atom to its initial coordinates (0 or missing).}\\
 \hline
@@ -3421,8 +3421,8 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 
 \multicolumn{3}{p{394pt}}{[\textbf{atom\_restraints}]: Restrain individual atom positions.}\\
 \hline 1 & \multicolumn{2}{p{320pt}|}{Atom number.}\\
-\hline 2,3,4 & \multicolumn{2}{p{320pt}|}{Target x y and z coordinates (Å).}\\
-\hline 5,6,7 & \multicolumn{2}{p{320pt}|}{Force constants (kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$) in x y and z directions. With separate force constants for x,y,z this can be used to restrain atoms to lines and planes as well.}\\
+\hline 2,3,4 & \multicolumn{2}{p{320pt}|}{Target x y and z coordinates (ï¿½).}\\
+\hline 5,6,7 & \multicolumn{2}{p{320pt}|}{Force constants (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$) in x y and z directions. With separate force constants for x,y,z this can be used to restrain atoms to lines and planes as well.}\\
 \hline 8 & \multicolumn{2}{p{320pt}|}{FEP state where the restraint is active (energies and forces will be scaled by lambda) or 0 = active in all states.}\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
@@ -3430,9 +3430,9 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 \multicolumn{3}{p{394pt}}{[\textbf{distance\_restraints}]: Restrain atom-atom distances.}\\
 \hline 1 & \multicolumn{2}{p{320pt}|}{  Number of first atom.}\\
 \hline 2 & \multicolumn{2}{p{320pt}|}{  Number of last atom.}\\
-\hline 3 & \multicolumn{2}{p{320pt}|}{  Lower distance limit for unrestrained region (Å).}\\
-\hline 4 & \multicolumn{2}{p{320pt}|}{  Upper distance limit for unrestrained region (Å). Set lower limit = upper limit for standard harmonic potential.}\\
-\hline 5 & \multicolumn{2}{p{320pt}|}{  Force constant (kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$).}\\
+\hline 3 & \multicolumn{2}{p{320pt}|}{  Lower distance limit for unrestrained region (ï¿½).}\\
+\hline 4 & \multicolumn{2}{p{320pt}|}{  Upper distance limit for unrestrained region (ï¿½). Set lower limit = upper limit for standard harmonic potential.}\\
+\hline 5 & \multicolumn{2}{p{320pt}|}{  Force constant (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$).}\\
 \hline 6 & \multicolumn{2}{p{320pt}|}{  FEP state where the restraint is active (energies and forces will be scaled by lambda) or 0 = active in all states.}\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
@@ -3441,7 +3441,7 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 \hline 1 & \multicolumn{2}{p{320pt}|}{  Number of first atom in sequence.}\\
 \hline 2 & \multicolumn{2}{p{320pt}|}{  Number of last atom in sequence.}\\
 \hline 3 & \multicolumn{2}{p{320pt}|}{  Distance from water centre beyond which the restraining potential is applied.}\\
-\hline 4 & \multicolumn{2}{p{320pt}|}{  Force constant (kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$) for harmonic potential.}\\
+\hline 4 & \multicolumn{2}{p{320pt}|}{  Force constant (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$) for harmonic potential.}\\
 \hline 5 & \multicolumn{2}{p{320pt}|}{  Constant D$_{e}$ in the Morse potential, depth of the potential energy minimum.}\\
 \hline 6 & \multicolumn{2}{p{320pt}|}{  Constant a in the Morse potential.}\\
 \hline 7 & \multicolumn{2}{p{320pt}|}{  Flag for restraining also hydrogens (0=no, 1=yes).}\\
@@ -3583,12 +3583,12 @@ on page \pageref{tab:FEP_file_f_p_t_r}.
 
 \multicolumn{3}{p{394pt}}{[\textbf{atom\_types}]: Define new atom types for Q-atoms: Standard LJ parameters and parameters for the exponential repulsion potential $V_{soft} = C_i\cdot C_j\epsilon^{-a_i\cdot a_j\cdot r_{i,j})}$.}\\
 \hline 1 & \multicolumn{2}{p{341pt}|}{Name (max 8 characters).}\\
-\hline 2 & \multicolumn{2}{p{341pt}|}{Lennard-Jones A parameter (kcal$^{\frac{1}{2}}\cdot$mol$^{-\frac{1}{2}}\cdot$Å$^{6}$) for geometric combination or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$Å$^{12}$)for arithmetic combination rule.}\\
-\hline 3 & \multicolumn{2}{p{341pt}|}{LJ B parameter (kcal$^{\frac{1}{2}}\cdot$mol$^{-\frac{1}{2}}\cdot$Å$^{3}$) or $\epsilon$ (kcal$\cdot$mol$^{-1}\cdot$Å$^{6}$).}\\
+\hline 2 & \multicolumn{2}{p{341pt}|}{Lennard-Jones A parameter (kcal$^{\frac{1}{2}}\cdot$mol$^{-\frac{1}{2}}\cdot$ï¿½$^{6}$) for geometric combination or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{12}$)for arithmetic combination rule.}\\
+\hline 3 & \multicolumn{2}{p{341pt}|}{LJ B parameter (kcal$^{\frac{1}{2}}\cdot$mol$^{-\frac{1}{2}}\cdot$ï¿½$^{3}$) or $\epsilon$ (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{6}$).}\\
 \hline 4 & \multicolumn{2}{p{341pt}|}{Soft repulsion force constant C$_i$ (kcal$^{\frac{1}{2}}\cdot$mol$^{-\frac{1}{2}}$) in V$_{soft}$.}\\
-\hline 5 & \multicolumn{2}{p{341pt}|}{Soft repulsion distance dependence parameter a$_i$ (Å$^{-\frac{1}{2}}$) in V$_{soft}$.}\\
-\hline 6 & \multicolumn{2}{p{341pt}|}{Lennard-Jones A parameter (kcal$^{\frac{1}{2}}\cdot$mol$^{-\frac{1}{2}}\cdot$Å$^{6}$) or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$Å$^{12}$) for 1-4 interactions.}\\
-\hline 7 & \multicolumn{2}{p{341pt}|}{LJ B parameter (kcal$^{\frac{1}{2}}\cdot$mol$^{-\frac{1}{2}}\cdot$Å$^{3}$) or e (kcal$\cdot$mol$^{-1}\cdot$Å$^{6}$) for 1-4 interactions.}\\
+\hline 5 & \multicolumn{2}{p{341pt}|}{Soft repulsion distance dependence parameter a$_i$ (ï¿½$^{-\frac{1}{2}}$) in V$_{soft}$.}\\
+\hline 6 & \multicolumn{2}{p{341pt}|}{Lennard-Jones A parameter (kcal$^{\frac{1}{2}}\cdot$mol$^{-\frac{1}{2}}\cdot$ï¿½$^{6}$) or R$^*$ (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{12}$) for 1-4 interactions.}\\
+\hline 7 & \multicolumn{2}{p{341pt}|}{LJ B parameter (kcal$^{\frac{1}{2}}\cdot$mol$^{-\frac{1}{2}}\cdot$ï¿½$^{3}$) or e (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{6}$) for 1-4 interactions.}\\
 \hline 8 & \multicolumn{2}{p{341pt}|}{Atomic mass (u).}\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
@@ -3641,9 +3641,9 @@ on page \pageref{tab:FEP_file_f_p_t_r}.
 \multicolumn{3}{p{394pt}}{Morse and harmonic potentials can be mixed (but each bond type is either kind). Entries with four values are Morse potentials and entries with three values are harmonic.}\\
 \hline & \textbf{Morse potential} & \textbf{Harmonic potential}\\
 \hline 1 & \multicolumn{2}{p{341pt}|}{\centering{Q-bond type number (starting with 1).}}\\
-\hline 2 & Morse potential dissociation energy, D$_e$ (kcal$\cdot$mol$^{-1}$). &  Harmonic force constant k$_b$ (kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$).\\
-\hline 3 & Exponential co-efficient $\alpha$ in Morse potential (Å$^{-2}$). & Equilibrium bond length r$_0$ in harmonic potential (Å).\\
-\hline 4 & Equilibrium bond length r$_0$ in Morse potential (Å).&\\
+\hline 2 & Morse potential dissociation energy, D$_e$ (kcal$\cdot$mol$^{-1}$). &  Harmonic force constant k$_b$ (kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$).\\
+\hline 3 & Exponential co-efficient $\alpha$ in Morse potential (ï¿½$^{-2}$). & Equilibrium bond length r$_0$ in harmonic potential (ï¿½).\\
+\hline 4 & Equilibrium bond length r$_0$ in Morse potential (ï¿½).&\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
 
@@ -3657,7 +3657,7 @@ on page \pageref{tab:FEP_file_f_p_t_r}.
 \multicolumn{3}{p{394pt}}{[\textbf{angle\_types}]: Define Q-angle types.}\\
 \hline 1 & \multicolumn{2}{p{341pt}|}{Q-angle type number (starting with 1).}\\
 \hline 2 & \multicolumn{2}{p{341pt}|}{Harmonic force constant (kcal$\cdot$mol$^{-1}$$\cdot$rad$^{-2}$).}\\
-\hline 3 & \multicolumn{2}{p{341pt}|}{Equilibrium angle (°).}\\
+\hline 3 & \multicolumn{2}{p{341pt}|}{Equilibrium angle (ï¿½).}\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
 
@@ -3673,7 +3673,7 @@ on page \pageref{tab:FEP_file_f_p_t_r}.
 \hline 1 & \multicolumn{2}{p{341pt}|}{Q-torsion type number (starting with 1).}\\
 \hline 2 & \multicolumn{2}{p{341pt}|}{Force constant = $\frac{1}{2}\cdot$barrier height (kcal$\cdot$mol$^{-1}$).}\\
 \hline 3 & \multicolumn{2}{p{341pt}|}{Periodicity (number of maxima per turn).}\\
-\hline 4 & \multicolumn{2}{p{341pt}|}{Phase shift (°).}\\
+\hline 4 & \multicolumn{2}{p{341pt}|}{Phase shift (ï¿½).}\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
 
@@ -3689,7 +3689,7 @@ on page \pageref{tab:FEP_file_f_p_t_r}.
 \multicolumn{3}{p{394pt}}{[\textbf{improper\_types}]: Define Q-improper types.}\\
 \hline 1 & \multicolumn{2}{p{341pt}|}{Q-improper type number (starting with 1).}\\
 \hline 2 & \multicolumn{2}{p{341pt}|}{Harmonic force constant (kcal$\cdot$mol$^{-1}$$\cdot$rad$^{-2}$). N.B. new impropers defined here are always harmonic.}\\
-\hline 3 & \multicolumn{2}{p{341pt}|}{Equilibrium angle (°).}\\
+\hline 3 & \multicolumn{2}{p{341pt}|}{Equilibrium angle (ï¿½).}\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
 
@@ -3723,7 +3723,7 @@ on page \pageref{tab:FEP_file_f_p_t_r}.
 \multicolumn{3}{p{394pt}}{[\textbf{shake\_constraints}]: Define extra shake constraints. The effective constraint distance will be the sum of the distances given for each state, weighted by their $\lambda$ values. Note: constraints defined here do not override constraints imposed by setting the shake flag to \emph{on} in the \textbf{qdyn} input file. To remove a constraint the bond must be redefined as a Q-bond. The order in which atoms are given is not important.}\\
 \hline 1 & \multicolumn{2}{p{341pt}|}{Topology atom number of first atom.}\\
 \hline 2 & \multicolumn{2}{p{341pt}|}{Topology atom number of second atom.}\\
-\hline 3... & \multicolumn{2}{p{341pt}|}{Constraint distance (Å) in state 1, state 2, ...}\\
+\hline 3... & \multicolumn{2}{p{341pt}|}{Constraint distance (ï¿½) in state 1, state 2, ...}\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
 
@@ -3733,7 +3733,7 @@ on page \pageref{tab:FEP_file_f_p_t_r}.
 \hline 3 & \multicolumn{2}{p{341pt}|}{Q-atom k.}\\
 \hline 4 & \multicolumn{2}{p{341pt}|}{Q-atom l.}\\
 \hline 5 & \multicolumn{2}{p{341pt}|}{A$_{i,j}$ (kcal$\cdot$mol$^{-1}$).}\\
-\hline 6 & \multicolumn{2}{p{341pt}|}{$\mu_{i,j}$ (Å$^{-1}$).}\\
+\hline 6 & \multicolumn{2}{p{341pt}|}{$\mu_{i,j}$ (ï¿½$^{-1}$).}\\
 \hline
 \end{longtable}
 \normalsize
@@ -3765,7 +3765,7 @@ and the simulation is initialized.
 \hline  Shake constraints  on  all solvent  bonds: on  \newline{}Shake constraints on all solute bonds to hydrogen: off \newline Shake constraints on all bonds to hydrogen: off & \\
 \hline Nonbonded method   = LRF Taylor expansion outside cut-off & Local reaction field approximation applied beyond cut-off.\\
 \hline Cut-off radii for non-bonded interactions:\newline \begin{tabular}{ll}Solute-solute:&10.00\\Solvent-solvent:&10.00\\Solute-solvent:&10.00\\Q-atom-non-Q-atom:&99.00\\LRF:&99.00 \end{tabular} & \\
-\hline \begin{tabular}{lll}Shell restraint force constant    &     =  & 50.00 \end{tabular} & Heavy solute atoms in the shell region defined in the topology will be restrained to their initial positions by harmonic potentials with force constant 50 kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$.\\
+\hline \begin{tabular}{lll}Shell restraint force constant    &     =  & 50.00 \end{tabular} & Heavy solute atoms in the shell region defined in the topology will be restrained to their initial positions by harmonic potentials with force constant 50 kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$.\\
 \hline Water polarization force constant set to default & \\
 \hline \begin{tabular}{p{101.5pt}p{101.5pt}}Non-bonded pair list update interval =& 25 \end{tabular}& \\
 \hline \begin{tabular}{p{117pt}ll}Energy summary print-out interval & = & 10\end{tabular}\newline\begin{tabular}{p{117pt}ll}Temperature print-out interval & = & 1\\Trajectory write interval& = & 5\\Energy file write interval & = & 5 \end{tabular}&Energy summary will be written to log file every 10 steps, Temperature every step, a trajectory frame every 10 steps, and an energy file record every 5 steps.\\
@@ -3774,7 +3774,7 @@ and the simulation is initialized.
 \hline \begin{tabular}{ll}Final coord. file & = eq1.re\\Trajectory file & = eq1.dcd\\Energy file & = eq1.en\\FEP input file & = pt.fep \end{tabular} & \\
 \hline \begin{tabular}{lll}lambda-values & = & 0.50000 0.50000 \end{tabular} & Weights for the 2 FEP states used.\\
 \hline Listing of restraining data: & \\
-\hline \begin{tabular}{ll}No. of sequence restraints = & 1 \end{tabular} \newline \begin{tabular}{lllll} atom\_i & atom\_j & fc & H-flag & to\_centre \\ 1 & 1619 & 5.00 & 0 & 0 \end{tabular} & Atoms 1 through 1619 will be restrained to their initial positions  with force constant 5 kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$ but hydrogens will not be restrained. Restraints will be applied to individual atom positions, not to the geometrical centre of the set of atoms.\\
+\hline \begin{tabular}{ll}No. of sequence restraints = & 1 \end{tabular} \newline \begin{tabular}{lllll} atom\_i & atom\_j & fc & H-flag & to\_centre \\ 1 & 1619 & 5.00 & 0 & 0 \end{tabular} & Atoms 1 through 1619 will be restrained to their initial positions  with force constant 5 kcal$\cdot$mol$^{-1}\cdot$ï¿½$^{-2}$ but hydrogens will not be restrained. Restraints will be applied to individual atom positions, not to the geometrical centre of the set of atoms.\\
 \hline \begin{tabular}{ll}No. of distance restraints = & 6\end{tabular} \newline \begin{tabular}{rrrrrr}atom\_i & atom\_j & dist1 & dist2 & fc & state \\ 1631 & 1624 & 1.50 & 1.50 & 5.00 & 0 \\ 1631 & 922 & 1.50 & 1.50 & 5.00 & 0 \\ 922 & 1624 & 3.00 & 4.00 & 5.00 & 0 \\ 911 & 924 & 3.20 & 3.20 & 10.00 & 0 \\ 912 & 924 & 2.20 & 2.60 & 10.00 & 0 \\ 932 & 1621 & 3.20 & 3.20 & 10.00 & 0 \end{tabular} & Six atom-atom distances will be restrained using harmonic potentials (dist1=dist2) or flat-bottom potentials (0 between dist1 and dist2) with different force constants. The zero means that the restraints will be in effect in all states.\\
 \hline
 \end{longtable}
@@ -3788,7 +3788,7 @@ and the simulation is initialized.
 \hline CDC25 + PP1 + 2 H2O & Title of topology.\\
 \hline \begin{tabular}{lll}No. of solute atoms & = & 1631\\No. of solvent atoms & = & 882\end{tabular} & \multirow{-1}{203pt}[0.5\baselineskip]{There are 1631 solute atoms.}\\
 \hline \begin{tabular}{llr}No. of coordinates & = & 7539\\No. of atom type codes & = & 2513\\No. of solute bonds & = & 1670\\No. of solvent bonds & = & 882\\No. of solute angles & = & 2380\\No. of solvent angles & = & 294\\No. of solute torsions & = & 3037\\No. of solvent torsions & = & 0\\No. of solute impropers & = & 626\\No. of solvent impropes & = & 0\\No. of atomic charges & = & 2513\\No. of solute charge grps & = & 1036\\No. of solvent charge gps & = & 294 \end{tabular}& \\
-\hline \begin{tabular}{llr}vdW rule [ 1=G / 2=A ] & = & 1\\El-static 1-4 damping & = & 1.000\\Coulomb constant & = & 332.0000 \\&&\end{tabular} & \multirow{-1}{203pt}[1.5\baselineskip]{The force field uses the geometric combinatin rule for LJ parameters, no recuction of electrostaic 1-4 interactions and the constant in Coulomb's law is 332 kcal$\cdot$mol$^{-1}\cdot$e$^{-2}\cdot$Å.}\\
+\hline \begin{tabular}{llr}vdW rule [ 1=G / 2=A ] & = & 1\\El-static 1-4 damping & = & 1.000\\Coulomb constant & = & 332.0000 \\&&\end{tabular} & \multirow{-1}{203pt}[1.5\baselineskip]{The force field uses the geometric combinatin rule for LJ parameters, no recuction of electrostaic 1-4 interactions and the constant in Coulomb's law is 332 kcal$\cdot$mol$^{-1}\cdot$e$^{-2}\cdot$ï¿½.}\\
 \hline \begin{tabular}{llr}No. of atom types & = & 32\\No. of LJ type 2 pairs & = & 87 \end{tabular} & \\
 \hline \begin{tabular}{llr}No. of heavy atoms & = & 1342 \end{tabular}& \\
 \hline \begin{tabular}{llr}No. of 1-4 neighbours & = & 2962\\No. long-range 1-4 nbrs & = & 0 \end{tabular}& \multirow{-1}{203pt}[0.5\baselineskip]{The 1-4 neighbour list.}\\
@@ -3825,17 +3825,17 @@ and the simulation is initialized.
 \hline Assigning Q-atom types to all Q atoms:\newline \begin{tabular}{rrr}Q atom & atom type in state 1 & state 2 \\ 1 & CB & CB  \\2 & SH & S- \\3 & H & H \\4 & P & P \\5 & OE & OE \\6 & OD & OD \\7 & OD & OD \\8 & OD & OE\end{tabular} & Atom types for ALL Q atoms are redefined in each state.\\
 \hline No. of soft repulsion non-bonded pairs = 2\newline \begin{tabular}{rr}atom\_i & atom\_j \\ 2 & 3 \\ 3 & 8\end{tabular} & Two pairs of non-bonded atoms should interact with the exponential repulsion potential instead of Lennard-Jones.\\
 \hline No. of excluded non-bonded pairs = 3\newline \begin{tabular}{rrrr}atom\_i & atom\_j & excluded in state 1 & state 2 \\ 1631 & 1621 & 0 & 1 \\ 1631 & 1622 & 0 & 1 \\ 1631 & 1623 & 0 & 1\end{tabular} & Three pairs of non-bonded atoms should not interact at all.\\
-\hline Q-bond types:\newline \begin{tabular}{rrrrrr}type \# & Morse & E\_diss & alpha & b0 & Harmonic force\_k \\ 1 & 85.00 & 2.00 & 1.61 & &\\2 & 120.00 & 2.00 & 1.49 &&\\ 3 & 110.00 & 2.00 & 1.00 &&\\ 4 & 94.00 & 2.00 & 1.33&&\end{tabular} & Four Morse type bond potentials are defined. The first one has a dissociation energy of 85 kcal/mol, exponential coefficient 2 Å-2 and equilibrium bond length 1.61 Å.\\
+\hline Q-bond types:\newline \begin{tabular}{rrrrrr}type \# & Morse & E\_diss & alpha & b0 & Harmonic force\_k \\ 1 & 85.00 & 2.00 & 1.61 & &\\2 & 120.00 & 2.00 & 1.49 &&\\ 3 & 110.00 & 2.00 & 1.00 &&\\ 4 & 94.00 & 2.00 & 1.33&&\end{tabular} & Four Morse type bond potentials are defined. The first one has a dissociation energy of 85 kcal/mol, exponential coefficient 2 ï¿½-2 and equilibrium bond length 1.61 ï¿½.\\
 \hline No. of changing bonds = 3\newline \begin{tabular}{rrrr}atom\_i & atom\_j & bond type in state 1 & state 2 \\ 922 & 1631 & 4 & 0 \\ 1624 & 1631 & 0 & 3 \\ 1620 & 1624 & 2 & 1\end{tabular} & Three bonds are redefined using the Morse bond types above. Bond type zero in one state means the bond is not present in that state.\\
-\hline Q-angle types:\newline \begin{tabular}{rrr}type \# & force-k & theta0 \\ 1 & 95.00 & 109.50 \\ 2 & 140.00 & 120.00 \\ 3 & 110.00 & 109.50 \\ 4 & 95.00 & 96.00\end{tabular} & Four angle potentials are defined. The first one has a harmonic force constant of 95 kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$ and equilibrium angle 109.5°.\\
+\hline Q-angle types:\newline \begin{tabular}{rrr}type \# & force-k & theta0 \\ 1 & 95.00 & 109.50 \\ 2 & 140.00 & 120.00 \\ 3 & 110.00 & 109.50 \\ 4 & 95.00 & 96.00\end{tabular} & Four angle potentials are defined. The first one has a harmonic force constant of 95 kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$ and equilibrium angle 109.5ï¿½.\\
 \hline No. of changing angles = 4\newline \begin{tabular}{rrrrr}atom\_i & atom\_j & atom\_k & angle type in state 1 & state 2 \\ 921 & 922 & 1631 & 4 & 0 \\ 1631 & 1624 & 1620 & 0 & 3 \\ 1624 & 1620 & 1622 & 2 & 1 \\ 1624 & 1620 & 1623 & 2 & 1\end{tabular} & Four angles are redefined using the angle types above. Angle type zero in one state means the angle is not present in that state.\\
-\hline Q-torsion types:\newline \begin{tabular}{rrrr}type \# & force-k & mult & delta \\ 1 & 0.70 & 3.00 & 0.00 \\ 2 & 0.25 & -3.00 & 0.00 \\ 3 & 0.75 & 2.00 & 0.00\end{tabular} & Three torsion potentials are definedThe first one has a rotation barrier half-height of 0.7 kcal/mol, 3 maxima per turn and the first maximum at 0°.\\
+\hline Q-torsion types:\newline \begin{tabular}{rrrr}type \# & force-k & mult & delta \\ 1 & 0.70 & 3.00 & 0.00 \\ 2 & 0.25 & -3.00 & 0.00 \\ 3 & 0.75 & 2.00 & 0.00\end{tabular} & Three torsion potentials are definedThe first one has a rotation barrier half-height of 0.7 kcal/mol, 3 maxima per turn and the first maximum at 0ï¿½.\\
 \hline No. of changing torsions = 7\newline \begin{tabular}{rrrrrr}atom\_i & atom\_j & atom\_k & atom\_l & torsion type in state 1 & state 2 \\ 920 & 921 & 922 & 1631 & 1 & 0 \\ 1631 & 1624 & 1620 & 1621 & 0 & 2 \\ 1631 & 1624 & 1620 & 1621 & 0 & 3 \\ 1631 & 1624 & 1620 & 1622 & 0 & 2 \\ 1631 & 1624 & 1620 & 1622 & 0 & 3 \\ 1631 & 1624 & 1620 & 1623 & 0 & 2 \\ 1631 & 1624 & 1620 & 1623 & 0 & 3\end{tabular} & Seven torsions are redefined using the torsion types above. torsion code zero in one state means the torsion is not present in that state.\\
-\hline Q-improper types:\newline \begin{tabular}{rrr}type \# & force-k & imp0 \\ 1 & 95.00 & 120.00\end{tabular} & One improper torsion potential is defined. It has a harmonic force constant of 95 kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$ and its minimum at 120°.\\
+\hline Q-improper types:\newline \begin{tabular}{rrr}type \# & force-k & imp0 \\ 1 & 95.00 & 120.00\end{tabular} & One improper torsion potential is defined. It has a harmonic force constant of 95 kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$ and its minimum at 120ï¿½.\\
 \hline No. of changing impropers= 1\newline \begin{tabular}{rrrrrr} atom\_i & atom\_j & atom\_k & atom\_l & improper type in state 1 & state 2 \\ 920 & 921 & 922 & 1631 & 1 & 0\end{tabular} & One improper torsion is redefined using the improper type defined above. Improper code zero in one state means the improper is not present in that state.\\
 \hline No. of angle-Morse couplings = 2\newline \begin{tabular}{rr}angle\_i & bond\_j \\ 1 & 1 \\ 2 & 2\end{tabular} & Two Q angles are to be coupled to Q bonds.\\
 \hline No. of torsion-Morse couplings = 7\newline \begin{tabular}{rrr}torsion\_i & bond\_j \\ 1 & 1 \\ 2 & 2 \\ 3 & 2 \\ 4 & 2 \\ 5 & 2 \\ 6 & 2 \\ 7 & 2\end{tabular} & Seven Q torsions are to be coupled to Q bonds.\\
-\hline No. offdiagonal (Hij) funcs. =  1\newline \begin{tabular}{rrrrrr}state\_i & state\_j & atom\_k & atom\_l & Aij & mu\_ij \\ 1 & 2 & 2 & 8 & 1.00 & 0.45\end{tabular} & One off-diagonal Hamiltonian functions for mixing of states is defined. It relates states 1 and 2 by a function of the distance between Q atoms 2 and 8 and the parameters A=1.00 kcal/mol and $\mu$=0.45 Å$^{-1}$ \\
+\hline No. offdiagonal (Hij) funcs. =  1\newline \begin{tabular}{rrrrrr}state\_i & state\_j & atom\_k & atom\_l & Aij & mu\_ij \\ 1 & 2 & 2 & 8 & 1.00 & 0.45\end{tabular} & One off-diagonal Hamiltonian functions for mixing of states is defined. It relates states 1 and 2 by a function of the distance between Q atoms 2 and 8 and the parameters A=1.00 kcal/mol and $\mu$=0.45 ï¿½$^{-1}$ \\
 \hline No. atom groups to monitor = 2\newline \begin{tabular}{rrrrrr}group 1: & 921 & 922&&&\\group 2: & 1620 & 1621 & 1622 & 1623 & 1624\end{tabular} & Two groups of atoms are defined for monitoring their non-bonded interactions.\\
 \hline No. of group pairs to monitor = 1\newline \begin{tabular}{rr}group\_i & group\_j\\1 & 2\end{tabular} & The non-bonded interactions between atom group 1 and atom group 2 above are to be monitored.\\
 \hline \end{longtable}
@@ -3980,7 +3980,7 @@ energy summaries.
 %\item Any tri-atomic molecule may be used as solvent, not only SPC or TIP3P water models.
 %\end{itemize}
 
-%Almlöf end
+%Almlï¿½f end
 %===============================================================================
 
 \subsection{Utility programs} A number of little programs and scripts that may
@@ -4090,7 +4090,7 @@ See section \ref{subsection:scoring} on page \pageref{subsection:scoring} for mo
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%% Ändrar numreringen på tabellerna%%%%%%%%
+%%%%%% ï¿½ndrar numreringen pï¿½ tabellerna%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\setcounter{table}{13}
 
@@ -4178,7 +4178,7 @@ See section \ref{subsection:scoring} on page \pageref{subsection:scoring} for mo
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%% INTE BRA MEN FÅR DUGA SÅ LÄNGE!%%%%%%%
+%%%%%%% INTE BRA MEN Fï¿½R DUGA Sï¿½ Lï¿½NGE!%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 
@@ -4554,7 +4554,7 @@ Binding Affinities for Sulfonamide Inhibitors with Human Thrombin
 Using Monte Carlo Simulations with a Linear Response Method.
 \textit{J. Med. Chem.} \textbf{1997}, \textit{40}, 1539-1550.
 
-\bibitem{Hansson:1998}Hansson, T., Marelius, J. and Åqvist, J., Ligand Binding Affinity
+\bibitem{Hansson:1998}Hansson, T., Marelius, J. and ï¿½qvist, J., Ligand Binding Affinity
 Prediction by Linear Interaction Energy Methods, J. Comput.-Aided
 Mol. Des. 1998, 12, 27-35.
 
@@ -4565,7 +4565,7 @@ Chem. Phys. Lett. 1978, 55, 454-458.
 \bibitem{Berkowitz:1982}Berkowitz, M. and McCammon, J.A., Molecular Dynamics with Stochastic Boundary Conditions,
 Chem. Phys. Lett. 1982, 90, 215-217.
 
-\bibitem{Brunger:1984}Brünger, A. T., Brooks, C.L. III. and Karplus, M., Stochastic Boundary Conditions for
+\bibitem{Brunger:1984}Brï¿½nger, A. T., Brooks, C.L. III. and Karplus, M., Stochastic Boundary Conditions for
 Molecular Dynamics Simulations of ST2 Water, Chem. Phys. Lett.
 1984, 105, 495-500.
 
@@ -4580,12 +4580,12 @@ pp 331-342.
 of Simple Potential Functions for Simulating Liquid Water. J.
 Chem. Phys. 1983, 79, 926-935.
 
-\bibitem{Kolmodin:}Kolmodin, K. and Åqvist, J, PTP proton transfer...
+\bibitem{Kolmodin:}Kolmodin, K. and ï¿½qvist, J, PTP proton transfer...
 
-\bibitem{Aaqvist:1991}Åqvist, J., Free Energy Perturbation Study of Metal Ion Catalyzed Proton Transfer in Water. J. Phys. Chem. 1991, 95,
+\bibitem{Aaqvist:1991}ï¿½qvist, J., Free Energy Perturbation Study of Metal Ion Catalyzed Proton Transfer in Water. J. Phys. Chem. 1991, 95,
 4587-4590.
 
-\bibitem{Wennerstroem} http://www.ibg.uu.se/upload/PetraW.pdf Wennerström, P. (valid link
+\bibitem{Wennerstroem} http://www.ibg.uu.se/upload/PetraW.pdf Wennerstrï¿½m, P. (valid link
 2003-06).
 
 \bibitem{VMD} Humphrey, W., Dalke, A. and Schulten, K., VMD -Visual Molecular Dynamics, J. Mol. Graph., 1996, 14,
@@ -4613,7 +4613,7 @@ Chem. Phys. 1983, 79, 926-935.
 \bibitem{Gunsteren:mod} van Gunsteren, W. F., [GROMOS87
 modification].
 
-\bibitem{Gunsteren:1996} van Gunsteren, W.F., Billeter, S.R., Eising, A.A., Hünenberger, P.H., Krüger, P., Mark, A.E. and Tironi, I.G., Biomolecular Simulation: The GROMOS96 Manual and User Guide. Hochschulverlag AG an der ETH Zürich,
+\bibitem{Gunsteren:1996} van Gunsteren, W.F., Billeter, S.R., Eising, A.A., Hï¿½nenberger, P.H., Krï¿½ger, P., Mark, A.E. and Tironi, I.G., Biomolecular Simulation: The GROMOS96 Manual and User Guide. Hochschulverlag AG an der ETH Zï¿½rich,
 1996.
 
 \bibitem{Jorgensen:1996} Jorgensen W.L., Maxwell D.S., Tirado-Rives J., Development and Testing of the OPLS All-Atom Force Field on

@@ -11,7 +11,7 @@
 !------------------------------------------------------------------------------!
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!!  program: **qprep**  
+!>  program: **qprep**
 !!  by Johan Aqvist & John Marelius  
 !!  qprep topology preparation main program  
 !------------------------------------------------------------------------------!
@@ -54,7 +54,7 @@ program qprep
 contains
 
   !----------------------------------------------------------------------------!
-  !!  subroutine: **qprep_from_inputfile**  
+  !>  subroutine: **qprep_from_inputfile**
   !!  Read input from file and execute commands  
   !----------------------------------------------------------------------------!
   subroutine qprep_from_inputfile(filename)
@@ -84,7 +84,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !!  subroutine: qprep_from_commandline  
+  !>  subroutine: qprep_from_commandline
   !!  Read input from command line and execute commands  
   !----------------------------------------------------------------------------!
   subroutine qprep_from_commandline
@@ -106,7 +106,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !!  subroutine: parse_command(command)  
+  !>  subroutine: parse_command(command)
   !!  Parse a command and call corresponding subroutine  
   !----------------------------------------------------------------------------!
   subroutine parse_command(command)
@@ -184,7 +184,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !!  subroutine: help  
+  !>  subroutine: help
   !!  Give help on commands  
   !----------------------------------------------------------------------------!
   subroutine help
@@ -281,7 +281,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !!  subroutine: startup  
+  !>  subroutine: startup
   !!  Startup  
   !----------------------------------------------------------------------------!
 subroutine startup
@@ -306,7 +306,7 @@ end subroutine startup
 
 
   !----------------------------------------------------------------------------!
-  !!  subroutine: shutdown
+  !>  subroutine: shutdown
   !!  Shutdown call
   !----------------------------------------------------------------------------!
   subroutine shutdown
@@ -316,7 +316,7 @@ end subroutine startup
 
   
   !----------------------------------------------------------------------------!
-  !!  subroutine: commandlineoptions  
+  !>  subroutine: commandlineoptions
   !----------------------------------------------------------------------------!
   subroutine commandlineoptions
   do i = 1, command_argument_count()
@@ -337,7 +337,7 @@ end subroutine startup
   end subroutine commandlineoptions
 
   !----------------------------------------------------------------------------!
-  !!  subroutine: print_help  
+  !>  subroutine: print_help
   !----------------------------------------------------------------------------!
   subroutine print_help()
     print '(a)', 'usage:'
@@ -355,7 +355,7 @@ end subroutine startup
 
 
   !----------------------------------------------------------------------------!
-  !! function: check_inputfile  
+  !> function: check_inputfile
   !! Determine if qprep is to be run from command line or from input file  
   !----------------------------------------------------------------------------!
   logical function check_inputfile(infilename)
