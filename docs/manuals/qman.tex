@@ -3327,7 +3327,7 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 \hline stepsize & MD stepsize ($\Delta$t) (fs). & Required.\\
 \hline temperature & Target temperature (K). & Required.\\
 \hline bath\_coupling & Temperature bath relaxation time T (fs)\cite{Berendsen:1984}. & Optional, default 100 fs. Must be $\geq$ stepsize. \\
-\hline separate\_scaling & Enable (on) or disable (off) separate temperature scaling of solute and solvent. & Optional, default on. \\
+\hline separate\_scaling & Enable (on) or disable (off) separate temperature scaling of solute and solvent. & Optional, default off. \\
 \hline random\_seed & Integer value to seed the random number generator. & Optional. Used only for random velocities. Change number to get a different set of velocities.\\
 \hline initial\_temperature & Temperature (K) of Maxwellian distribution for random velocities. & Optional except when no restart file is used. Use \emph{only} when velocities should be randomised!\\
 \hline shake\_solvent & Enable (on) or disable (off) shake constraining of bonds and angles of water. & Optional, default on. We recommend the use of shake for water.\\
