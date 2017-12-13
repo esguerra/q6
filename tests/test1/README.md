@@ -77,12 +77,13 @@ Benchmarks
 
 |  Machine     | Compiler    | Comp. time (min) | Sim. time (ns) | Num Proc. |    Date    |
 |:-------------|:-----------:|:----------------:|:--------------:|:---------:|:----------:|
-| csb          | ifort       | 79.00            |      0.20      |   8       | 2014-05-22 |
-| triolith     | ifort       | 00.00            |      0.20      |   8       | 2014-XX-XX |
-| tintin       | ifort       | 00.00            |      0.20      |   8       | 2014-XX-XX |
-| csb          | gcc         | 00.00            |      0.20      |   8       | 2014-XX-XX |
-| triolith     | gcc         | 00.00            |      0.20      |   8       | 2014-XX-XX |
-| tintin       | gcc         | 00.00            |      0.20      |   8       | 2014-XX-XX |
+| csb          | no-impi     | xx.xx            |      0.20      |   16      | 2017-12-13 |
+| kebnekeise   | ifort 18.0.1|  6.38            |      0.20      |   20      | 2017-12-13 |
+| hebbe        | ifort       | xx.xx            |      0.20      |   20      | 2017-12-13 |
+| csb          | gcc 6.2.0   | 10.38            |      0.20      |   16      | 2017-12-13 |
+| kebnekeise   | gcc 6.4.0   |  7.33            |      0.20      |   20      | 2017-12-12 |
+| hebbe        | gcc 6.3.0   | 10.47            |      0.20      |   20      | 2017-12-13 |
+
 
 
 TODO
@@ -91,9 +92,11 @@ TODO
 The following to-do list highlights what needs to be done for
 expanding the benchmark
 
-- [ ] Make a script that will send runs of 1, 2, 3, 4, 5ns runs to
+- [ ] Write a script that will send runs of 1, 2, 3, 4, 5ns runs to
       different cluster nodes at the same time.
-- [ ] Make number of processors gradient script.
-- [x] Make a markdown document describing the test.
-- [ ] Make a general R script for plotting and making statistics with
+- [ ] Write number of processors gradient script.
+- [x] Write a markdown document describing the test.
+- [ ] Write a general R script for plotting and making statistics with
       the benchmarks.
+
+
