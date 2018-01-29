@@ -10,6 +10,10 @@ The forked code is released under a GNU General Public License, Version 2.0
 Public license owners, that is, Paul Bauer, j. marelius, j. aqvist,
 s. c. l. kamerlin.
 
+Status
+------
+[![Build Status](https://img.shields.io/travis/esguerra/Q6/master.svg?style=plastic)](https://travis-ci.org/esguerra/Q6)
+
 
 The main idea of this fork is to aim for clean and readable Q code.  
 The code is in the process of being reorganized and cleaned-up
@@ -33,7 +37,7 @@ Some basic development rules somewhat similar to those of the
 
 
 Coding Standards
---------------------------------------------------------------------------------
+----------------
 
 The **GROMACS** developers have identified the following important main
 points for taking into account when organizing a molecular dynamics
@@ -57,7 +61,7 @@ is a good example to draw from.
 
   
 1. Code formatting
---------------------------------------------------------------------------------
+------------------
 
 * No tabs, spaces only.  
 * Two spaces for indentation of each level.  
@@ -70,22 +74,22 @@ is a good example to draw from.
 
 
 2. Code constructs
---------------------------------------------------------------------------------
+------------------
 *to do*  
 
 
 3. Interfaces
---------------------------------------------------------------------------------
+-------------
 *to do*  
 
 
 4. Comments in code
---------------------------------------------------------------------------------
+-------------------
 *to do*  
 
 
 5. Compilation
---------------------------------------------------------------------------------
+--------------
 
 5.1  gfortran from gcc
 ----------------------
@@ -135,22 +139,22 @@ have not tested Windows MPI yet, nor the openMPI port for cygwin.
 
 
 6. Allowed Fortran Features
---------------------------------------------------------------------------------
+---------------------------
 *to do*  
 
 
 7. Error Handling
---------------------------------------------------------------------------------
+-----------------
 *to do*  
 
 
 8. Benchmarking
---------------------------------------------------------------------------------
+---------------
 *to do*  
 
 
 9. Accuracy Testing
---------------------------------------------------------------------------------
+-------------------
 *to do*  
 
 
