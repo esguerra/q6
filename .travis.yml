@@ -9,6 +9,7 @@ install:
   - cd src
   - make all COMP=gcc
   - cd ..
+script: make
 #script:
 #  - cd tests/test1
 #  - ./run_tests
