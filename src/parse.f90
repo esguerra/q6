@@ -47,6 +47,7 @@ subroutine parse_startup()
   argp = 1
 end subroutine parse_startup
 
+
 !------------------------------------------------------------------------------!
 !>  function: parse_open_file
 !>
@@ -72,10 +73,11 @@ integer         :: stat
 end function parse_open_file
 
 
-!--------------------------------------------------------------------------
-!Moved from Misc
-!--------------------------------------------------------------------------
-
+!------------------------------------------------------------------------------!
+!>  function: openit
+!!  Moved from Misc
+!!  split text in inbuf into 
+!------------------------------------------------------------------------------!
 integer function openit(lun, fil, stat, frm, mode)
 !arguments
         INTEGER lun
@@ -87,7 +89,7 @@ integer function openit(lun, fil, stat, frm, mode)
         if(trim(fil).eq.'') write(*,*) 'Invalid filename'
 
         errcode = -1
-!.......................................................................
+
         do while(errcode /= 0)
                 OPEN(unit = lun, file = fil, status = stat, form = frm, &
                         iostat = errcode, action=mode)
@@ -100,19 +102,20 @@ integer function openit(lun, fil, stat, frm, mode)
         openit = errcode
 
 10      format('>>>>> Failed to open ',a,' (unit ',i2,' error code ',i4,')')
-!.......................................................................
 end function openit
 
-!--------------------------------------------------------------------------
 
-!split text in inbuf into 
+!------------------------------------------------------------------------------!
+!>  subroutine: split
+!!  split text in inbuf into 
+!------------------------------------------------------------------------------!
 subroutine split
-        integer                                         ::      p
-        logical                                         ::      ws_flag 
-        logical                                         ::      quote_flag 
-        character, save                         ::      TAB = achar(9)
-        integer                                         ::      inlen
-        integer                                         ::      trimlen(1)
+  integer                           :: p
+  logical                           :: ws_flag 
+  logical                           :: quote_flag 
+  character, save                   :: TAB = achar(9)
+  integer                           :: inlen
+  integer                           :: trimlen(1)
 
         argc = 0
         argp = 1
@@ -148,40 +151,48 @@ subroutine split
         end do
 end subroutine split
 
-!--------------------------------------------------------------------------
 
+!-------------------------------------------------------------------------------!
+!>  subroutine: **getline**
+!!  goes line by line in input files.
+!!  TODO: In case there is no quit card give a different error to:
+!!    Fortran runtime error: End of file
+!!  which is now the case.
+!-------------------------------------------------------------------------------!
 subroutine getline()
-        do
-                if (read_from_file) then
-                        read(INFILE, '(a200)') inbuf
-                else  
-                        read(*, '(a200)') inbuf
-                endif
-                inbuf = adjustl(inbuf)
-                !only exit if not a comment line
-                if(scan(inbuf(1:1), '!#*') == 0) exit
-        end do
-        call split
+  do
+     if (read_from_file) then
+        read(INFILE, '(a200)') inbuf
+     else
+        read(*, '(a200)') inbuf
+     endif
+     inbuf = adjustl(inbuf)
+     !only exit if not a comment line
+     if(scan(inbuf(1:1), '!#*') == 0) exit
+  end do
+  call split
 end subroutine getline
 
-!--------------------------------------------------------------------------
 
+!-------------------------------------------------------------------------------!
+!>  subroutine: **get_string_arg**
+!! 
+!-------------------------------------------------------------------------------!
 subroutine get_string_arg(arg, prompt)
-!arguments
-        character(*), intent(out)       ::      arg
-        character(*), optional, intent(in)      ::      prompt
-        
-        do while(argp > argc)
-                if(present(prompt))     write(unit=*, fmt='(a)', advance='no') prompt
-                call getline
-        end do
-        arg = inbuf(argv(argp)%istart :argv(argp)%iend)
-        argp = argp + 1
-                
+  !arguments
+  character(*), intent(out)               :: arg
+  character(*), optional, intent(in)      :: prompt
+
+  do while(argp > argc)
+     if(present(prompt))     write(unit=*, fmt='(a)', advance='no') prompt
+     call getline
+  end do
+  arg = inbuf(argv(argp)%istart :argv(argp)%iend)
+  argp = argp + 1                
 end subroutine get_string_arg
 
-!--------------------------------------------------------------------------
 
+!--------------------------------------------------------------------------
 subroutine get_line_arg(arg, prompt)
 !arguments
         character(*), intent(out)       ::      arg

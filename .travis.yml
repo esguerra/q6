@@ -1,0 +1,20 @@
+language: c
+addons:
+  apt:
+    packages:
+    - gcc-7
+    - gfortran-7
+    - binutils
+install:
+  - cd src
+  - make all COMP=gcc
+  - cd ..
+#script:
+#  - cd tests/test1
+#  - ./run_tests
+#after_success:
+#  - cd $TEST_DIR
+#  - rm *.log *.dcd *.en
+
+
+
