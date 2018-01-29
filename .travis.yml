@@ -1,15 +1,18 @@
-#language: c
+language: c
 addons:
   apt:
     packages:
     - gcc
     - gfortran
     - binutils
-install:
+#install:
+#  - cd src
+#  - make all COMP=gcc
+#  - cd ..
+script:
   - cd src
   - make all COMP=gcc
   - cd ..
-#script: make
 #script:
 #  - cd tests/test1
 #  - ./run_tests
