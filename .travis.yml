@@ -1,18 +1,19 @@
+sudo: required
+
 language: c
-addons:
-  apt:
-    packages:
-    - gcc
-    - gfortran
-    - binutils
-#install:
-#  - cd src
-#  - make all COMP=gcc
-#  - cd ..
+
+services:
+  - docker
+
+before_install:
+- docker pull esguerra/docker-fed27gcc
+- docker run esguerra/docker-fed27gcc /bin/sh -c "cd /root/Q6/src"
+- docker ps -a
+
 script:
-  - cd src
   - make all COMP=gcc
-  - cd ..
+  - make mpi COMP=gcc
+
 #script:
 #  - cd tests/test1
 #  - ./run_tests
