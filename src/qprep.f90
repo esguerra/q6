@@ -53,10 +53,11 @@ program qprep
 
 contains
 
-  !----------------------------------------------------------------------------!
-  !>  subroutine: **qprep_from_inputfile**
-  !!  Read input from file and execute commands  
-  !----------------------------------------------------------------------------!
+
+!------------------------------------------------------------------------------!
+!>  subroutine: **qprep_from_inputfile**
+!!  Read input from file and execute commands
+!------------------------------------------------------------------------------!
   subroutine qprep_from_inputfile(filename)
   character(200)  :: filename
   character(200)  :: command

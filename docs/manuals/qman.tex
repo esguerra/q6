@@ -2239,12 +2239,12 @@ OH-groups).\cite{Hansson:1998}
 
 \section{REFERENCE GUIDE}
 \subsection{Program modules}
-Q is  build from  Fortran90 modules, which  are combined  in different
-sets in  the \textbf{Q}  programs, as shown  in figure  \ref{fig:modules}. This
-makes it  easier to  maintain the  software. It  also makes  it rather
-straight-forward for  users with  experience in programming  to create
-their own  special-purpose programs by re-using  $e.g.$ the trajectory
-and topology modules.
+Q is  built from  Fortran90 modules, which  are combined  in different
+sets   in    the   \textbf{Q}    programs,   as   shown    in   figure
+\ref{fig:modules}. This makes  it easier to maintain  the software. It
+also makes  it rather  straight-forward for  users with  experience in
+programming to  create their own special-purpose  programs by re-using
+$e.g.$ the trajectory and topology modules.
 
 \begin{figure}[h]
 \centerline{\includegraphics*[scale=0.9]{\dirfig/modules.pdf}}
@@ -2297,12 +2297,14 @@ A$_{i}$ and B$_{i}$ and are combined using either of the two
 standard rules to determine the effective interaction parameters.
 The geometric rule is simply: A$_{ij}= \:$A$_{i}\cdot $A$_{j}$ and
 B$_{ij}=\:$B$_{i}\cdot $B$_{j}$ where A$_{i}=\:$A$_{ii}^{1/2}$ and
-B$_{i}=\:$B$_{ii}^{1/2}$. Some force fields use the form:\\
+B$_{i}=\:$B$_{ii}^{1/2}$. Some force fields use the form:
 
-$\varepsilon_{ij} \cdot \left( {\left( {\frac{R_{ij}^\ast
+\begin{align}
+\varepsilon_{ij} \cdot \left( {\left( {\frac{R_{ij}^\ast
 }{r_{ij}}} \right)^{12}-2\cdot \left( {\frac{R_{ij}^\ast
-}{r_{ij}}} \right)^6} \right)$\\
-
+}{r_{ij}}} \right)^6} \right)
+\end{align}
+  
 for the 6-12 Lennard-Jones potential. In this case the atom
 type-parameters $\varepsilon _{i}$, $\varepsilon _{j}$,
 R$^{\ast}_{i}$ and R$^{\ast }_{j}$ are combined using the rules:

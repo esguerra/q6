@@ -29,12 +29,12 @@ module md
 #include "mpif.h"
 #endif
 
-  !-----------------------------------------------------------------------------
-  !       shared variables
-  !-----------------------------------------------------------------------------
-  !-----------------------------------------------------------------------------
-  !       Constants
-  !-----------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!       Shared variables
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!       Constants
+!-------------------------------------------------------------------------------
   character*(*), parameter  :: md_version = '5.7'
   character*(*), parameter  :: md_date = '2015-02-22'
   real, parameter           :: rho_wat = 0.0335  ! molecules / A**3
@@ -287,8 +287,10 @@ module md
   !these three used only under periodic conditions
   integer                          :: nbpp_cgp_pair !number of solute-solute chargegroups interacting
   type(CGP_PAIR_TYPE), allocatable :: nbpp_cgp(:)
+
   integer                          :: nbpw_cgp_pair
   type(CGP_PAIR_TYPE), allocatable :: nbpw_cgp(:)
+
   integer                          :: nbqp_cgp_pair
   type(CGP_PAIR_TYPE), allocatable :: nbqp_cgp(:)
 
@@ -817,13 +819,13 @@ contains
   ! --- Dynamics subroutines, alphabetically
   real(8) function angle(istart, iend)
     ! *** arguments
-    integer                                         ::      istart, iend
+    integer                                         :: istart, iend
 
     ! *** local variables
-    integer                                         ::      i,j,k,ia,ic,i3,j3,k3
-    real(8)                                         ::      bjiinv, bjkinv, bji2inv, bjk2inv
-    real(8)                                         ::      scp,angv,da,dv,f1
-    real(8)                                         ::  rji(3),rjk(3),di(3),dk(3) 
+    integer                                         :: i,j,k,ia,ic,i3,j3,k3
+    real(8)                                         :: bjiinv, bjkinv, bji2inv, bjk2inv
+    real(8)                                         :: scp,angv,da,dv,f1
+    real(8)                                         :: rji(3),rjk(3),di(3),dk(3)
 
     ! global variables used:
     ! ang, x, anglib, d
@@ -954,8 +956,8 @@ contains
 
   end function urey_bradley
 
-  !-----------------------------------------------------------------------
 
+  !-----------------------------------------------------------------------
   real(8) function bond(istart, iend)
     ! *** arguments
     integer                                         ::      istart, iend
@@ -1021,7 +1023,9 @@ contains
     end do
 
   end subroutine cgp_centers
-  !-----------------------------------------------------------------------
+
+
+!-----------------------------------------------------------------------
   subroutine make_nbqqlist
     !locals
     integer                                         ::      is
@@ -1042,8 +1046,8 @@ contains
       ' in state :',i3)
   end subroutine make_nbqqlist
 
-  !-----------------------------------------------------------------------
 
+  !-----------------------------------------------------------------------
   subroutine distribute_nonbonds
     !locals
     integer                                 :: npp, npw, nqp, nww, nqw
@@ -1053,7 +1057,7 @@ contains
     integer                                 :: mpitype_pair_assignment, mpitype_node_assignment
     integer                                 :: average_pairs,inode,icgp,sum,less_than_sum
     integer                                 :: n_bonded, n_nonbonded, master_assign
-    real                                   :: percent
+    real                                    :: percent
     integer                                 :: master_sum
     !!!!Tmp vars f�r allokering
     integer,parameter :: vars = 5
@@ -1112,7 +1116,7 @@ contains
 #if defined (USE_MPI)
       else ! i.e. slave nodes exists
 
-        ! A simple solution to avoid parallelising the bonded
+        ! A simple solution to avoid parallelizing the bonded
         ! Calculate n_bonded and n_nonbonded
         ! Approximate time of computing one bonded with one nonbonded
         ! The number of qq-interactions are neglected
@@ -1256,7 +1260,7 @@ contains
       end if    !if (numnodes .eq. 1)
 
        ! deallocate bookkeeping arrays
-       !deallocate(nppcgp, npwcgp, nqpcgp, nwwmol)
+       ! deallocate(nppcgp, npwcgp, nqpcgp, nwwmol)
 
     end if   !if (nodeid .eq. 0)
 
@@ -1363,6 +1367,7 @@ contains
 
   end subroutine distribute_nonbonds
 
+
   !-----------------------------------------------------------------------
   subroutine close_input_files
     close (1)
@@ -1454,12 +1459,12 @@ contains
   !-----------------------------------------------------------------------
   subroutine gauss (am,sd,v,ig)
     ! arguments
-    real(8)                                 ::      am,sd,v
-    integer                                 ::      ig
+    real(8)                                 :: am,sd,v
+    integer                                 :: ig
 
     ! local variables
-    integer                                 ::      i
-    real(8)                                 ::      a,y
+    integer                                 :: i
+    real(8)                                 :: a,y
 
     a=0.0
     do i=1,12
@@ -3709,7 +3714,6 @@ contains
   end subroutine lrf_taylor
 
 
-
   !-----------------------------------------------------------------------
   subroutine make_pair_lists
 #if defined (PROFILING)
@@ -3781,8 +3785,12 @@ contains
 
   end subroutine make_pair_lists
 
-  !-----------------------------------------------------------------------
 
+!------------------------------------------------------------------------------!
+!>  subroutine: **maxwell**
+!!  Generates Maxwell velocities using a gaussian randomizer.
+!!  uses randm
+!------------------------------------------------------------------------------!
   subroutine maxwell
     ! *** local variables
     integer                                         :: i,j,k
@@ -3805,7 +3813,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !!  subroutine: **temperature**
+  !>  subroutine: **temperature**
   !!  This is the thermostat
   !!  
   !!  
@@ -3908,12 +3916,12 @@ contains
   end subroutine temperature
 
 
-  !----------------------------------------------------------------------------!
-  !!  subroutine: **md_run**
-  !!  Prepare an md run
-  !! ******PWchanged 2002-10-01
-  !! This subroutine has the main algorithms for the equations of motion.
-  !----------------------------------------------------------------------------!
+!------------------------------------------------------------------------------!
+!>  subroutine: **md_run**
+!!  Prepare an md run
+!! ******PWchanged 2002-10-01
+!! This subroutine has the main algorithms for the equations of motion.
+!------------------------------------------------------------------------------!
   subroutine md_run
 
     ! local variables
@@ -4168,7 +4176,7 @@ contains
           write(*,201) istep, Temp, Tfree
           if (detail_temps) then
             write(*,2020) Tfree_solute, Tfree_solvent
-             !                                                       write(*,2030) Texcl_solute, Texcl_solvent
+             !  write(*,2030) Texcl_solute, Texcl_solvent
           end if
         end if
 
@@ -4256,8 +4264,8 @@ contains
 #endif
 #endif
 
-
 end subroutine md_run
+
 
 !-----------------------------------------------------------------------
 subroutine nbpp_count(npp, nppcgp)
@@ -10095,8 +10103,8 @@ subroutine nonbon2_qw_box
   end do !jw
 end subroutine nonbon2_qw_box
 
-!----------------------------------------------------------------------------------------------------
 
+!-------------------------------------------------------------------------------
 subroutine nonbon2_ww
    ! local variables
   integer                                         :: iw,ip,i,j,i3,j3,ia
@@ -10226,6 +10234,7 @@ subroutine nonbon2_ww
   end do
 
 end subroutine nonbon2_ww
+
 
 !----------------------------------------------------------------------------------------------------
 subroutine nonbon2_ww_box
@@ -12309,21 +12318,24 @@ subroutine nonbond_ww_spc_box
 
 end subroutine nonbond_ww_spc_box
 
-!-----------------------------------------------------------------------
 
+!------------------------------------------------------------------------------!
+!>  subroutine: **nonbond_3atomsolvent**
+!!
+!------------------------------------------------------------------------------!
 subroutine nonbond_3atomsolvent
    ! local variables
   integer                                         :: iw,ip,i,j,i3,j3, ia
   integer                                         :: ipstart
-  real(8)                                         ::      r1X, r2X, r3X, r2
-  real(8)                                         ::      dx1X,  dy1X,  dz1X
-  real(8)                                         ::      dx2X, dy2X, dz2X
-  real(8)                                         ::      dx3X, dy3X, dz3X
-  real(8)                                         ::      Vel,V_a,V_b,dv
-  real(8), save                                   ::      A_11, B_11, A_12, B_12, A_13, B_13
-  real(8), save                                   ::      A_22, B_22, A_23, B_23, A_33, B_33
-  real, save                                      ::      crg1, crg2, crg3
-  integer                                         ::      iac1, iac2, iac3
+  real(8)                                         :: r1X, r2X, r3X, r2
+  real(8)                                         :: dx1X,  dy1X,  dz1X
+  real(8)                                         :: dx2X, dy2X, dz2X
+  real(8)                                         :: dx3X, dy3X, dz3X
+  real(8)                                         :: Vel,V_a,V_b,dv
+  real(8), save                                   :: A_11, B_11, A_12, B_12, A_13, B_13
+  real(8), save                                   :: A_22, B_22, A_23, B_23, A_33, B_33
+  real, save                                      :: crg1, crg2, crg3
+  integer                                         :: iac1, iac2, iac3
 
   ! global variables used:
   !  iaclib, nat_solute, x, E, d
@@ -12586,6 +12598,7 @@ subroutine nonbond_3atomsolvent
   end do ! iw
 
 end subroutine nonbond_3atomsolvent
+
 
 !-----------------------------------------------------------------------
 !******PWadded 2001-10-23
@@ -13524,7 +13537,7 @@ subroutine pot_energy_nonbonds
         end if
         if(natom > nat_solute) then !if any solvent
           if(solvent_type == SOLVENT_SPC) then
-            !use the optimised SPC routine when possible
+            !use the optimized SPC routine when possible
             call nonbond_ww_spc_box
             call nonbond_qw_spc_box
           elseif(solvent_type == SOLVENT_3ATOM) then !otherwise calc. LJ with all atoms
@@ -13547,7 +13560,7 @@ subroutine pot_energy_nonbonds
       call lrf_taylor
     end if
 
-  else !simulation sphere
+  else !simulation sphere SBC
 
     select case(ivdw_rule)
       case(VDW_GEOMETRIC)
@@ -13560,7 +13573,7 @@ subroutine pot_energy_nonbonds
         end if
         if(natom > nat_solute) then !if any solvent
           if(solvent_type == SOLVENT_SPC) then
-            !use the optimised SPC routine when possible
+            !use the optimized SPC routine when possible
             call nonbond_ww_spc
             call nonbond_qw_spc
           elseif(solvent_type == SOLVENT_3ATOM) then !otherwise calc. LJ with all atoms
@@ -13573,7 +13586,7 @@ subroutine pot_energy_nonbonds
         call nonbon2_qp
         if(natom > nat_solute) then !if any solvent
           call nonbon2_pw
-          call nonbon2_qw !no SPC-specific optimised routines here
+          call nonbon2_qw !no SPC-specific optimized routines here
           call nonbon2_ww
         end if
     end select
@@ -15581,6 +15594,8 @@ subroutine put_back_in_box
   end if
 
 end subroutine put_back_in_box
+
+
 !----------------------------------------------------------------------------
 subroutine MC_volume()
 
@@ -15810,7 +15825,7 @@ subroutine MC_volume()
 
 end subroutine MC_volume
 
-!-----------------------------------------------------------------------------------------------------
+
 subroutine new_potential( old )
 
   type(ENERGIES), intent(in)              :: old
