@@ -1,14 +1,17 @@
 #!/bin/bash
 #set -x
 #trap read debug
-export bindir=/Users/esguerra/software/qsource/development/esguerra/bin
-$bindir/qprep  generate.inp > generate.log
-time mpirun -np 8 $bindir/qdynp start.inp > start.log
+module load gcc/6.2.0
+export bindir=/home/esguerra/software/qsource/bin
+export numproc="16"
+
+$bindir/qprep < generate.inp > generate.log
+time mpirun -np $numproc $bindir/qdynp start.inp > start.log
 
 ################################################################################
 # HEATING: For loop for smooth heating to 300K
 ################################################################################
-time mpirun -np 8 $bindir/qdynp heat1.inp > heat1.log
+time mpirun -np $numproc $bindir/qdynp heat1.inp > heat1.log
 for i in $(seq -w 2 1 6)
 do
         j=`expr $i "-" 1`
@@ -53,7 +56,7 @@ trajectory                heat"$i".dcd
 [sequence_restraints]
 1 2486 0.5 0 1
 " > heat$i.inp
-time mpirun -np 8 $bindir/qdynp heat$i.inp > heat$i.log
+time mpirun -np $numproc $bindir/qdynp heat$i.inp > heat$i.log
 done
 
 
@@ -61,7 +64,7 @@ done
 # RELAXATION (For loop for smooth release of restraints)
 ################################################################################
 
-time mpirun -np 8 $bindir/qdynp relax1.inp > relax1.log
+time mpirun -np $numproc $bindir/qdynp relax1.inp > relax1.log
 
 for i in $(seq -w 1 1 6)
 do
@@ -105,10 +108,10 @@ trajectory                relax"$k".dcd
 [sequence_restraints]
 1 2486 "$j" 0 1
 " > relax$k.inp
-time mpirun -np 8 $bindir/qdynp relax$k.inp > relax$k.log
+time mpirun -np $numproc $bindir/qdynp relax$k.inp > relax$k.log
 done
 
 
-time mpirun -np 8 $bindir/qdynp equi.inp > equi.log 
-#time mpirun -np 8 qdynp prod.inp > prod.log 
+time mpirun -np $numproc $bindir/qdynp equi.inp > equi.log 
+#time mpirun -np $numproc qdynp prod.inp > prod.log 
 
