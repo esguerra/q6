@@ -2,14 +2,15 @@
 #set -x
 #trap read debug
 
+module load gcc/6.2.0
 qprep < generate.inp > generate.log
-time mpirun -np 8 qdynp start.inp > start.log
+time mpirun -np 16 qdynp start.inp > start.log
 
 ################################################################################
 # HEATING: This is a for loop to heat smoothly from 1 to 300 Kelvin (27 Celsius)
 # which is NOT the physiological temperature.
 ################################################################################
-time mpirun -np 8 qdynp heat1.inp > heat1.log
+time mpirun -np 16 qdynp heat1.inp > heat1.log
 for i in $(seq -w 2 1 6)
 do
         j=`expr $i "-" 1`
@@ -66,7 +67,7 @@ trajectory                heat"$i".dcd
 [sequence_restraints]
 1 2846 10.0 0 1
 " > heat$i.inp
-time mpirun -np 8 qdynp heat$i.inp > heat$i.log
+time mpirun -np 16 qdynp heat$i.inp > heat$i.log
 done
 
 
@@ -74,7 +75,7 @@ done
 # RELAXATION: A for-loop to do a smooth release of restraints
 ################################################################################
 
-time mpirun -np 8 qdynp relax1.inp > relax1.log
+time mpirun -np 16 qdynp relax1.inp > relax1.log
 
 for i in $(seq -w 1 1 5)
 do
@@ -128,7 +129,7 @@ trajectory                relax"$k".dcd
 [sequence_restraints]
 1 2846 "$j" 0 1
 " > relax$k.inp
-time mpirun -np 8 qdynp relax$k.inp > relax$k.log
+time mpirun -np 16 qdynp relax$k.inp > relax$k.log
 done
 
 
@@ -136,11 +137,11 @@ done
 # EQUILIBRATION: After releasing the constraints the system is allowed to
 # equilibrate.
 ################################################################################
-time mpirun -np 8 qdynp equi.inp > equi.log
+time mpirun -np 16 qdynp equi.inp > equi.log
 #qprep < equipdb.inp > equipdb.log
 
 ################################################################################
 # PRODUCTION: After the system is in equilibrium a production run can be started
 # for as long as desired.
 ################################################################################
-#mpirun -np 8 qdynp prod.inp > prod.out
+#mpirun -np 16 qdynp prod.inp > prod.out
