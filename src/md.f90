@@ -105,7 +105,7 @@ module md
   integer                   :: itrj_cycle, iene_cycle
   integer                   :: itemp_cycle, iout_cycle
   logical                   :: force_rms
-  !******PWadded 2001-10-23
+  !******PetraWadded 2001-10-23
   integer                   :: ivolume_cycle
 
   ! --- Protein boundary
@@ -8850,8 +8850,8 @@ subroutine nbmonitorlist
   end do  !par
 end subroutine nbmonitorlist
 
-!---------------------------------------------------------------------------------------------------------                 
 
+!---------------------------------------------------------------------------------------------------------                 
 subroutine nonbond_monitor
    !monitor nonbonded energies between selected groups of atoms
 
@@ -8957,7 +8957,7 @@ subroutine nonbond_monitor
           endif
           Vel  = qi*qj*r
           if(ivdw_rule==1) then !geometric comb. rule
-            Vvdw = aLJi*aLJj*r6*r6-bLJi*bLJj*r6
+            Vvdw = aLJi*aLJj*r6*r6 - bLJi*bLJj*r6
           else !arithmetic
             Vvdw = bLJi * bLJj * (aLJi+aLJj)**6 * r6 * &
               ((aLJi+aLJj)**6 * r6 - 2.0)

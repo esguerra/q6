@@ -32,7 +32,7 @@ module prep
 
   !library
   !max number of library entries
-  integer, parameter               :: max_entry = 1000
+  integer, parameter               :: max_entry = 2000
   !max atoms in a residue (only used when reading PDB file)
   integer, parameter               :: max_atlib = 500
   integer, parameter               :: max_cgplib = 100
@@ -44,7 +44,7 @@ module prep
   integer, parameter               :: max_extrabnd = 100
 
   !Topology
-  integer, parameter               :: max_lib = 1000
+  integer, parameter               :: max_lib = 2000
   integer, parameter               :: max_long = 10000
   integer, parameter               :: max_conn = 10
 
