@@ -1,4 +1,3 @@
----
 project: Q-FEP-MD
 summary: Developer docs for Q
 author: John Marelius, Johan Aqvist, and others.
@@ -12,16 +11,14 @@ source: false
 graph: true 
 macro: TEST LOGIC=.true.
 github: http://www.icm.uu.se/cbbi/aqvist-lab 
-email: johan.aqvist@icm.uu.se  
-predocmark: >  
-predocmark_alt: <  
-docmark: !  
-coloured_edges: true  
-sort: alpha  
-display: public protected private  
----
+email: johan.aqvist@icm.uu.se
+predocmark: >
+predocmark_alt: <
+docmark: !
+coloured_edges: true
+display: public protected private
+sort: alpha
 
---------------------
 
 
 Introduction {#introduction}  

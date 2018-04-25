@@ -8,14 +8,14 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
-!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
-!!  and Paul Bauer
-!!  module: prep.f90
-!!  by Johan Aqvist & John Marelius
-!!  topology preparation, solvation, validation and PDB I/O
-!------------------------------------------------------------------------------!
 module prep
+  !!------------------------------------------------------------------------------
+  !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+  !!  and Paul Bauer
+  !!  **module: prep.f90**
+  !!  by Johan Aqvist & John Marelius
+  !!  topology preparation, solvation, validation and PDB I/O
+  !!------------------------------------------------------------------------------
   use trj
   use parse
   use prmfile
@@ -60,10 +60,10 @@ module prep
   integer, target                  :: random_seed_solute = 179857
   integer, target                  :: random_seed_solvent = 758971
 
+
 !variables
 !  Library information
 !-------------------------------------------------------------------------------
-
   type lib_bond_type
     integer(AI)                    :: i,j
   end type lib_bond_type
@@ -206,11 +206,11 @@ module prep
 
 contains
 
-!------------------------------------------------------------------------------!
-!!  subroutine: prep_startup
-!!
-!------------------------------------------------------------------------------!
 subroutine prep_startup
+  !!------------------------------------------------------------------------------
+  !!  **subroutine: prep_startup**
+  !!
+  !!------------------------------------------------------------------------------
   logical                         :: l
   !initialize used modules
   call topo_startup               ! empty
@@ -237,30 +237,30 @@ subroutine prep_startup
 end subroutine prep_startup
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: allocate_for_pdb
-!
-!------------------------------------------------------------------------------!
 subroutine allocate_for_pdb(atoms, residues, molecules)
-!arguments
-  integer, intent(in)             :: atoms, residues, molecules
+  !!------------------------------------------------------------------------------
+  !!  **subroutine: allocate_for_pdb**
+  !!
+  !!------------------------------------------------------------------------------
+  !arguments
+  integer, intent(in)              :: atoms, residues, molecules
   allocate(xtop(3*atoms), heavy(atoms), makeH(atoms), &
           res(residues), istart_mol(molecules), &
           stat=alloc_status)
   
   if(alloc_status /= 0) then
-          write(*,*) 'ERROR: Out of memory when allocating arrays for new atoms'
-          stop 255
+    write(*,*) 'ERROR: Out of memory when allocating arrays for new atoms'
+    stop 255
   end if
 
 end subroutine allocate_for_pdb
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: prep_shutdown
-!
-!------------------------------------------------------------------------------!
 subroutine prep_shutdown
+!!------------------------------------------------------------------------------  
+!!  **subroutine: prep_shutdown**  
+!!  
+!!------------------------------------------------------------------------------    
   call topo_deallocate
   call index_shutdown
   call mask_finalize(mask)
@@ -268,21 +268,21 @@ subroutine prep_shutdown
 end subroutine prep_shutdown
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: clearlib
-!
-!------------------------------------------------------------------------------!
 subroutine clearlib
+!!------------------------------------------------------------------------------  
+!!  **subroutine: clearlib**  
+!!  
+!!------------------------------------------------------------------------------    
   lib_files = ''
   nlibres = 0
 end subroutine clearlib
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: check_alloc
-!
-!------------------------------------------------------------------------------!
 subroutine check_alloc(message)
+!!------------------------------------------------------------------------------  
+!!  **subroutine: check_alloc**  
+!!  
+!!------------------------------------------------------------------------------  
 !arguments
   character(*) message
 
@@ -294,70 +294,69 @@ subroutine check_alloc(message)
 end subroutine check_alloc
 
 
-
-!------------------------------------------------------------------------------!
-!!  subroutine: addbond
-!
-!------------------------------------------------------------------------------!
 subroutine addbond
-! *** local variables
-  integer                   :: ia, ja
-  real(8)                   :: bond_dist, rij(3)
-  character(len=80)         :: reply
-  integer                   :: readstat
+!!------------------------------------------------------------------------------  
+!!  **subroutine: addbond**  
+!!  
+!!------------------------------------------------------------------------------    
+  ! *** local variables
+  integer                          :: ia, ja
+  real(8)                          :: bond_dist, rij(3)
+  character(len=80)                :: reply
+  integer                          :: readstat
 
   call get_string_arg(reply, &
-          '-----> First atom (residue_number:atom_name): ')
+    '-----> First atom (residue_number:atom_name): ')
   if(scan(reply, ':') > 0) then !got res:at
-          ia=get_atom_from_descriptor(reply)
-          if(ia== 0) then
-                  write(*,910) trim(reply)
-910                 format('>>>>> ERROR: Could not find atom ',a)
-                  return
-          end if
+    ia=get_atom_from_descriptor(reply)
+    if(ia== 0) then
+      write(*,910) trim(reply)
+910   format('>>>>> ERROR: Could not find atom ',a)
+      return
+    end if
   else !got atom number
-          read(reply, *, iostat=readstat) ia
-          if(readstat /= 0) then
-                  write(*,910) trim(reply)
-                  return
-          end if
+    read(reply, *, iostat=readstat) ia
+    if(readstat /= 0) then
+      write(*,910) trim(reply)
+      return
+    end if
   end if
   if(ia > nat_pro .or. ia < 1) then
-          write(*,'(a)') 'Out of range!'
-          return
+    write(*,'(a)') 'Out of range!'
+    return
   end if
   call get_string_arg(reply, &
-          '-----> Second atom (residue_number:atom_name): ')
+    '-----> Second atom (residue_number:atom_name): ')
   if(scan(reply, ':') > 0) then !got res:at
-          ja=get_atom_from_descriptor(reply)
-          if(ja== 0) then
-                  write(*,910) trim(reply)
-                  return
-          end if
+    ja=get_atom_from_descriptor(reply)
+    if(ja== 0) then
+      write(*,910) trim(reply)
+      return
+    end if
   else !got atom number
-          read(reply, *, iostat=readstat) ja
-          if(readstat /= 0) then
-                  write(*,910) trim(reply)
-                  return
-          end if
+    read(reply, *, iostat=readstat) ja
+    if(readstat /= 0) then
+      write(*,910) trim(reply)
+      return
+    end if
   end if
   if(ja > nat_pro .or. ja < 1) then
-          write(*,'(a)') 'Out of range!'
-          return
+    write(*,'(a)') 'Out of range!'
+    return
   elseif(ja == ia) then
-          write(*,'(a)') 'First and second atom must be different!'
-          return
+    write(*,'(a)') 'First and second atom must be different!'
+    return
   end if
   rij(:) = xtop(3*ia-2:3*ia) - xtop(3*ja-2:3*ja)
   bond_dist = sqrt(dot_product(rij,rij))
   if(bond_dist >  max_xlink) then
-          write(*,100) bond_dist
-100             format('>>> WARNING: Bond distance is',f6.2,' A.')
-                call get_string_arg(reply, '-----> Make bond anyway (y/n)? ')
-                call upcase(reply)
-                if(reply /= 'Y' .and. reply /= 'YES') then
-                        return
-                end if
+    write(*,100) bond_dist
+100 format('>>> WARNING: Bond distance is',f6.2,' A.')
+    call get_string_arg(reply, '-----> Make bond anyway (y/n)? ')
+    call upcase(reply)
+    if(reply /= 'Y' .and. reply /= 'YES') then
+      return
+    end if
   end if
   if(nextrabnd < max_extrabnd) then
     nextrabnd = nextrabnd+1
@@ -365,29 +364,27 @@ subroutine addbond
     extrabnd(nextrabnd)%j = ja
   else
     write(*,900) max_extrabnd
-900             format('>>>>> ERROR: Too many extra bonds. (Max ',i5,')')
+900 format('>>>>> ERROR: Too many extra bonds. (Max ',i5,')')
   end if
 
 end subroutine addbond
 
 
-
-!------------------------------------------------------------------------------!
-!!  subroutine: clearbond
-!
-!------------------------------------------------------------------------------!
 subroutine clearbond
+!!------------------------------------------------------------------------------  
+!!  **subroutine: clearbond**  
+!!  
+!!------------------------------------------------------------------------------    
   !clear extra bonds
   nextrabnd = 0
 end subroutine clearbond
 
 
-
-!------------------------------------------------------------------------------!
-!!  subroutine: angle_ene
-!
-!------------------------------------------------------------------------------!
 subroutine angle_ene(emax, nlarge, av_ene)
+!!------------------------------------------------------------------------------  
+!!  **subroutine: angle_ene**  
+!!  
+!!------------------------------------------------------------------------------  
 ! *** local variables
   integer i, j, k, ia, ic, istart, iend, i3, j3, k3, nlarge
   real rji(3), rjk(3), bji, bjk, scp, angle, da, ae, dv, f1, di(3),&
@@ -407,8 +404,8 @@ subroutine angle_ene(emax, nlarge, av_ene)
   k = ang(ia)%k
   ic = ang(ia)%cod
   if(ic == 0) then !missing parameter
-          write(*, '(4i5,1x,a)') ia, i, j, k, 'MISSING PARAMETERS'
-          cycle 
+    write(*, '(4i5,1x,a)') ia, i, j, k, 'MISSING PARAMETERS'
+    cycle
   end if
   i3 = i * 3 - 3
   j3 = j * 3 - 3
@@ -431,59 +428,58 @@ subroutine angle_ene(emax, nlarge, av_ene)
   av_ene = av_ene+ae
 
   if(ae>emax) then
-          nlarge = nlarge+1
-          write( * , '(5i5,4f8.2)') ia, i, j, k, ic, anglib(ic)%fk ,&
-                  anglib(ic)%ang0, angle * 180. / pi, ae
-  endif
+    nlarge = nlarge+1
+    write( * , '(5i5,4f8.2)') ia, i, j, k, ic, anglib(ic)%fk ,&
+    anglib(ic)%ang0, angle * 180. / pi, ae
+  end if
 
-  enddo
+  end do
 
   if(nangles/=0) av_ene = av_ene / real(nangles)
 
 end subroutine angle_ene
 
 
-!------------------------------------------------------------------------------!
-!!  function: anglecode
-!
-!------------------------------------------------------------------------------!
 integer function anglecode(taci, tacj, tack)
+!!------------------------------------------------------------------------------
+!!  function: anglecode
+!!
+!!------------------------------------------------------------------------------  
 !arguments
-  character(*), intent(in)        :: taci, tacj, tack
+  character(*), intent(in)         :: taci, tacj, tack
 
 ! *** local variables
   integer i
 
-  character(len=KEYLENGTH)        :: ti, tj, tk
+  character(len=KEYLENGTH)         :: ti, tj, tk
 
-        ti = wildcard_tac(taci)
-        tj = wildcard_tac(tacj)
-        tk = wildcard_tac(tack)
+  ti = wildcard_tac(taci)
+  tj = wildcard_tac(tacj)
+  tk = wildcard_tac(tack)
 
-!.......................................................................
-        do i = 1, nang_types
-                if((ti == ang_types(i)%taci .and. tj == ang_types(i)%tacj &
-                        .and. tk == ang_types(i)%tack) .or. (ti==ang_types(i)%tack &
-                        .and. tj == ang_types(i)%tacj .and. tk == ang_types(i)%taci)) then
-                                anglecode = ang_types(i)%cod
-                                return
-                endif
-        enddo
 
-        anglecode = 0
-        write( * , '(a,3(1x,a8))') '>>> Missing angle type for atom types' &
-                , ti, tj, tk
-        topo_ok = .false.
-!.......................................................................
+  do i = 1, nang_types
+    if((ti == ang_types(i)%taci .and. tj == ang_types(i)%tacj &
+      .and. tk == ang_types(i)%tack) .or. (ti==ang_types(i)%tack &
+      .and. tj == ang_types(i)%tacj .and. tk == ang_types(i)%taci)) then
+      anglecode = ang_types(i)%cod
+      return
+    end if
+  end do
+
+  anglecode = 0
+  write( * , '(a,3(1x,a8))') '>>> Missing angle type for atom types' &
+    , ti, tj, tk
+  topo_ok = .false.
+
 end function anglecode
 
 
-
-!------------------------------------------------------------------------------!
-! subroutine: bond_ene
-!
-!------------------------------------------------------------------------------!
 subroutine bond_ene(emax, nlarge, av_ene)
+!!-------------------------------------------------------------------------------
+!! subroutine: bond_ene
+!!
+!!-------------------------------------------------------------------------------  
   ! *** local variables
   integer i, j, ib, ic, istart, iend, i3, j3, nlarge
   real rij(3), b, db, be, dv, emax, av_ene
@@ -494,7 +490,6 @@ subroutine bond_ene(emax, nlarge, av_ene)
   av_ene = 0
 
   do ib = istart, iend
-
     i = bnd(ib)%i
     j = bnd(ib)%j
     ic = bnd(ib)%cod
@@ -502,7 +497,6 @@ subroutine bond_ene(emax, nlarge, av_ene)
       write(*, '(3i5,1x,a)') ib, i, j,  'MISSING PARAMETERS'
       cycle
     end if
-        
     i3 = i * 3 - 3
     j3 = j * 3 - 3
     rij(1) = xtop(j3 + 1) - xtop(i3 + 1)
@@ -512,14 +506,12 @@ subroutine bond_ene(emax, nlarge, av_ene)
     db = b - bondlib(ic)%bnd0
     be = 0.5 * bondlib(ic)%fk * db**2
     av_ene = av_ene+be
-
     if(be>emax) then
       nlarge = nlarge+1
       write( * , '(4i5,4f8.2)') ib, i, j, ic, bondlib(ic)%fk,&
         bondlib(ic)%bnd0, b, be
-    endif
-
-  enddo
+    end if
+  end do
 
   if(nbonds/=0) av_ene = av_ene / real(nbonds)
 
@@ -528,12 +520,11 @@ subroutine bond_ene(emax, nlarge, av_ene)
 end subroutine bond_ene
 
 
-
-!------------------------------------------------------------------------------!
-! function: wildcard_tac
-!
-!------------------------------------------------------------------------------!
 character(keylength) function wildcard_tac(taci)
+!!-------------------------------------------------------------------------------  
+!! **function: wildcard_tac**  
+!!
+!!-------------------------------------------------------------------------------  
 !arguments
   character(*), intent(in)        :: taci
 ! *** local variables
@@ -544,50 +535,48 @@ character(keylength) function wildcard_tac(taci)
     wildcard_tac = taci(1:hash_pos-1) 
   else
     wildcard_tac = taci
-  endif
+  end if
 end function wildcard_tac
 
 
-!------------------------------------------------------------------------------!
-! function: bondcode
-!
-!------------------------------------------------------------------------------!
 integer function bondcode(taci, tacj)
-!arguments
-        character(*), intent(in)        :: taci, tacj
-! *** local variables
-        character(len=keylength)                :: ti, tj
-        integer i
-        integer                                         :: leni, lenj
-        integer                                         :: score, max_score = 0, max_cod
-!.......................................................................
+!!------------------------------------------------------------------------------
+!!  **function: bondcode**
+!!
+!!------------------------------------------------------------------------------
+  !arguments
+  character(*), intent(in)         :: taci, tacj
+  ! *** local variables
+  character(len=keylength)         :: ti, tj
+  integer i
+  integer                          :: leni, lenj
+  integer                          :: score, max_score = 0, max_cod
 
-        ti = wildcard_tac(taci)
-        tj = wildcard_tac(tacj)
 
-        do i = 1, nbnd_types
-                if(ti==bnd_types(i)%taci .and. tj==bnd_types(i)%tacj &
-                        .or. tj==bnd_types(i)%taci .and. ti==bnd_types(i)%tacj) then
+  ti = wildcard_tac(taci)
+  tj = wildcard_tac(tacj)
 
-                        bondcode = bnd_types(i)%cod
-                        return 
-                endif
-        enddo
+  do i = 1, nbnd_types
+    if(ti==bnd_types(i)%taci .and. tj==bnd_types(i)%tacj &
+      .or. tj==bnd_types(i)%taci .and. ti==bnd_types(i)%tacj) then
+      bondcode = bnd_types(i)%cod
+      return
+    end if
+  end do
 
-        write( * , '(a,2(1x,a8))') '>>> Missing bond type for atom types' &
-                , ti, tj
-        topo_ok = .false.
-        bondcode = 0
+  write( * , '(a,2(1x,a8))') '>>> Missing bond type for atom types' &
+    , ti, tj
+  topo_ok = .false.
+  bondcode = 0
 
-!.......................................................................
 end function bondcode
 
 
-!------------------------------------------------------------------------------!
-! subroutine: changeimp
-!
-!------------------------------------------------------------------------------!
 subroutine changeimp
+!!-------------------------------------------------------------------------------
+!! subroutine: changeimp
+!!
+!!-------------------------------------------------------------------------------  
   ! *** local variables
   integer ii, ip, i, j, k, l, noptimp, nchange, nlarge
   real emax, av_ene
@@ -607,8 +596,8 @@ subroutine changeimp
       imp(ip)%j = j
       imp(ip)%k = k
       imp(ip)%l = l
-    enddo
-  endif
+    end do
+  end if
 
   if(noptimp==2) then
     call prompt('-----> Give an energy threshold [kcal/mol] = ')
@@ -620,17 +609,17 @@ subroutine changeimp
     call impr_ene(emax, nlarge, av_ene, 0)
     write( * , '(a,i5)') 'No. above Emax now        = ', nlarge
     write( * , '(a,f8.2)') '< impr. tors energy > = ', av_ene
-  endif
+  end if
   write( *, * )
   return
 end subroutine changeimp
 
 
-!------------------------------------------------------------------------------!
+subroutine checkangs
+!-------------------------------------------------------------------------------
 !!  subroutine: checkangs
 !
-!------------------------------------------------------------------------------!
-subroutine checkangs
+!-------------------------------------------------------------------------------
   ! *** local variables
   integer nlarge
   real emax, av_ene
@@ -645,11 +634,11 @@ subroutine checkangs
 end subroutine checkangs
 
 
-!------------------------------------------------------------------------------!
+subroutine checkbonds
+!-------------------------------------------------------------------------------
 !!  subroutine: checkbonds
 !
-!------------------------------------------------------------------------------!
-subroutine checkbonds
+!-------------------------------------------------------------------------------
   ! *** local variables
   integer nlarge
   real emax, av_ene
@@ -664,11 +653,11 @@ subroutine checkbonds
 end subroutine checkbonds
 
 
-!------------------------------------------------------------------------------!
+subroutine checkimps
+!-------------------------------------------------------------------------------
 !!  subroutine: checkimps
 !
-!------------------------------------------------------------------------------!
-subroutine checkimps
+!-------------------------------------------------------------------------------
   ! *** local variables
   integer nlarge
   real emax, av_ene
@@ -685,11 +674,11 @@ subroutine checkimps
 end subroutine checkimps
 
 
-!------------------------------------------------------------------------------!
+subroutine checktors
+!-------------------------------------------------------------------------------
 !!  subroutine: checktors
 !
-!------------------------------------------------------------------------------!
-subroutine checktors
+!-------------------------------------------------------------------------------
   ! *** local variables
   integer nlarge
   real emax, av_ene
@@ -705,30 +694,29 @@ subroutine checktors
 end subroutine checktors
 
 
-!------------------------------------------------------------------------------!
+function cross_product(a, b)
+!-------------------------------------------------------------------------------
 !!  function: cross_product
 !
-!------------------------------------------------------------------------------!
-function cross_product(a,b)
+!-------------------------------------------------------------------------------
   real(8) :: a(3), b(3), cross_product(3)
-
   cross_product(1) = a(2) * b(3) - a(3) * b(2)
   cross_product(2) = a(3) * b(1) - a(1) * b(3)
   cross_product(3) = a(1) * b(2) - a(2) * b(1)
 end function cross_product
 
 
-!------------------------------------------------------------------------------!
+subroutine xlink
+!-------------------------------------------------------------------------------
 !!  subroutine: xlink
 !
-!------------------------------------------------------------------------------!
-subroutine xlink
+!-------------------------------------------------------------------------------
   !add cross-linking bonds like SS-bridges
   !locals
-  integer                                         :: ires, jres, iat, jat, i, j, b
-  integer                                         :: irc, jrc
-  real                                            :: d2
-  character(len=1)                        :: reply
+  integer                          :: ires, jres, iat, jat, i, j, b
+  integer                          :: irc, jrc
+  real                             :: d2
+  character(len=1)                 :: reply
 
   if(.not. check_residues()) then
     return
@@ -780,7 +768,6 @@ subroutine xlink
               write(*,900) max_extrabnd
 900           format('>>>>> ERROR: Too many extra bonds. (Max ',i5,')')
             end if
-
           end if
         end do jloop
       end do
@@ -802,420 +789,422 @@ end subroutine xlink
 
 
 integer function impcode(taci, tacj, tack, tacl)
+!!-------------------------------------------------------------------------------
+!!  function: impcode
+!!
+!!-------------------------------------------------------------------------------
 !arguments
-        character(KEYLENGTH)                    :: taci, tacj, tack, tacl
+  character(keylength)             :: taci, tacj, tack, tacl
+
 ! *** local variables
-        integer i
-        character(KEYLENGTH)                    :: ti, tj, tk, tl
-        logical                                                 :: found1, found2, found3, found4
-        ti = wildcard_tac(taci)
-        tj = wildcard_tac(tacj)
-        tk = wildcard_tac(tack)
-        tl = wildcard_tac(tacl)
-!.......................................................................
-        !find a match with four types (i and j and k and l)
-!       do i = 1, nimp_prm
-!               if( (ti == imp_prm(i)%taci .or. &
-!                        ti == imp_prm(i)%tacj .or. &
-!                        ti == imp_prm(i)%tack .or. &
-!                        ti == imp_prm(i)%tacl) .and. &
-!                        
-!                       (tj == imp_prm(i)%taci .or. &
-!                        tj == imp_prm(i)%tacj .or. &
-!                        tj == imp_prm(i)%tack .or. &
-!                        tj == imp_prm(i)%tacl) .and. &
-!                        
-!                       (tk == imp_prm(i)%taci .or. &
-!                        tk == imp_prm(i)%tacj .or. &
-!                        tk == imp_prm(i)%tack .or. &
-!                        tk == imp_prm(i)%tacl) .and. &
-!                        
-!                       (tl == imp_prm(i)%taci .or. &
-!                        tl == imp_prm(i)%tacj .or. &
-!                        tl == imp_prm(i)%tack .or. &
-!                        tl == imp_prm(i)%tacl)) then
-!                       
-!                       impcode = i
-!                       return
-!               endif
-!       enddo
+  integer i
+  character(keylength)             :: ti, tj, tk, tl
+  logical                          :: found1, found2, found3, found4
+  ti = wildcard_tac(taci)
+  tj = wildcard_tac(tacj)
+  tk = wildcard_tac(tack)
+  tl = wildcard_tac(tacl)
+  !.......................................................................
+  !find a match with four types (i and j and k and l)
+  !       do i = 1, nimp_prm
+  !               if( (ti == imp_prm(i)%taci .or. &
+  !                        ti == imp_prm(i)%tacj .or. &
+  !                        ti == imp_prm(i)%tack .or. &
+  !                        ti == imp_prm(i)%tacl) .and. &
+  !
+  !                       (tj == imp_prm(i)%taci .or. &
+  !                        tj == imp_prm(i)%tacj .or. &
+  !                        tj == imp_prm(i)%tack .or. &
+  !                        tj == imp_prm(i)%tacl) .and. &
+  !
+  !                       (tk == imp_prm(i)%taci .or. &
+  !                        tk == imp_prm(i)%tacj .or. &
+  !                        tk == imp_prm(i)%tack .or. &
+  !                        tk == imp_prm(i)%tacl) .and. &
+  !
+  !                       (tl == imp_prm(i)%taci .or. &
+  !                        tl == imp_prm(i)%tacj .or. &
+  !                        tl == imp_prm(i)%tack .or. &
+  !                        tl == imp_prm(i)%tacl)) then
+  !
+  !                       impcode = i
+  !                       return
+  !               end if
+  !       end do
 
 
-        !find a match with four types (i and j and k and l)
-        do i = 1, nimp_prm
-                        found1 = .false.
-                        found2 = .false.
-                        found3 = .false.
-                        found4 = .false.
+  !find a match with four types (i and j and k and l)
+  do i = 1, nimp_prm
+    found1 = .false.
+    found2 = .false.
+    found3 = .false.
+    found4 = .false.
 
-                    if (ti == imp_prm(i)%taci) then
-                                found1 = .true. 
-                        else if (ti == imp_prm(i)%tacj) then
-                                found2 = .true.
-                        else if (ti == imp_prm(i)%tack) then
-                                found3 = .true.
-                        else if (ti == imp_prm(i)%tacl) then 
-                                found4 = .true.
-                        endif
+    if (ti == imp_prm(i)%taci) then
+      found1 = .true.
+    else if (ti == imp_prm(i)%tacj) then
+      found2 = .true.
+    else if (ti == imp_prm(i)%tack) then
+      found3 = .true.
+    else if (ti == imp_prm(i)%tacl) then
+      found4 = .true.
+    end if
 
-                        if ((.not. found1) .and. (tj == imp_prm(i)%taci)) then 
-                                found1 = .true. 
-                        else if ((.not. found2) .and. (tj == imp_prm(i)%tacj)) then 
-                                found2 = .true.
-                        else if ((.not. found3) .and. (tj == imp_prm(i)%tack)) then 
-                                found3 = .true.
-                        else if ((.not. found4) .and. (tj == imp_prm(i)%tacl)) then 
-                                found4 = .true.
-                        endif
+    if ((.not. found1) .and. (tj == imp_prm(i)%taci)) then
+      found1 = .true.
+    else if ((.not. found2) .and. (tj == imp_prm(i)%tacj)) then
+      found2 = .true.
+    else if ((.not. found3) .and. (tj == imp_prm(i)%tack)) then
+      found3 = .true.
+    else if ((.not. found4) .and. (tj == imp_prm(i)%tacl)) then
+      found4 = .true.
+    end if
                          
-                        if ((.not. found1) .and. (tk == imp_prm(i)%taci)) then 
-                                found1 = .true.
-                        else if ((.not. found2) .and. (tk == imp_prm(i)%tacj)) then 
-                                found2 = .true.
-                        else if ((.not. found3) .and. (tk == imp_prm(i)%tack)) then 
-                                found3 = .true.
-                        else if ((.not. found4) .and. (tk == imp_prm(i)%tacl)) then 
-                                found4 = .true.
-                        endif
+    if ((.not. found1) .and. (tk == imp_prm(i)%taci)) then
+      found1 = .true.
+    else if ((.not. found2) .and. (tk == imp_prm(i)%tacj)) then
+      found2 = .true.
+    else if ((.not. found3) .and. (tk == imp_prm(i)%tack)) then
+      found3 = .true.
+    else if ((.not. found4) .and. (tk == imp_prm(i)%tacl)) then
+      found4 = .true.
+    end if
                          
-                        if ((.not. found1) .and. (tl == imp_prm(i)%taci)) then 
-                                found1 = .true.
-                        else if ((.not. found2) .and. (tl == imp_prm(i)%tacj)) then 
-                                found2 = .true.
-                        else if ((.not. found3) .and. (tl == imp_prm(i)%tack)) then 
-                                found3 = .true.
-                        else if ((.not. found4) .and. (tl == imp_prm(i)%tacl)) then 
-                                found4 = .true.
-                        endif
+    if ((.not. found1) .and. (tl == imp_prm(i)%taci)) then
+      found1 = .true.
+    else if ((.not. found2) .and. (tl == imp_prm(i)%tacj)) then
+      found2 = .true.
+    else if ((.not. found3) .and. (tl == imp_prm(i)%tack)) then
+      found3 = .true.
+    else if ((.not. found4) .and. (tl == imp_prm(i)%tacl)) then
+      found4 = .true.
+    end if
                     
-                        if (found1 .and. found2 .and. found3 .and. found4) then
-                                impcode = i
-                                return
-                        endif
-        enddo
+    if (found1 .and. found2 .and. found3 .and. found4) then
+      impcode = i
+      return
+    end if
+  end do
 
 
-        !now we have to handle force fields differently
-        select case (ff_type)
-                case (FF_GROMOS, FF_AMBER)
-                !find a match with three types (j and k and l) or
-                !(i and j and k)
-                do i = 1, nimp_prm
+  !now we have to handle force fields differently
+  select case (ff_type)
+    case (FF_GROMOS, FF_AMBER)
+      !find a match with three types (j and k and l) or
+      !(i and j and k)
+      do i = 1, nimp_prm
 
-                        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tacl /='') then 
-                        ! for ?  A*  B  C   ...
+        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tacl /='') then
+          ! for ?  A*  B  C   ...
 
-                                if((tj == imp_prm(i)%tacj .and. &
-                                        tk == imp_prm(i)%tack .and. &
-                                        tl == imp_prm(i)%tacl) .or. &
+          if((tj == imp_prm(i)%tacj .and. &
+            tk == imp_prm(i)%tack .and. &
+            tl == imp_prm(i)%tacl) .or. &
                                         
-                                        (tj == imp_prm(i)%tacj .and. &
-                                        tk == imp_prm(i)%tacl .and. &
-                                        tl == imp_prm(i)%tack) .or. &
+            (tj == imp_prm(i)%tacj .and. &
+            tk == imp_prm(i)%tacl .and. &
+            tl == imp_prm(i)%tack) .or. &
 
-                    (tj == imp_prm(i)%tacj .and. &
-                                        ti == imp_prm(i)%tack .and. &
-                                        tl == imp_prm(i)%tacl) .or. &
+            (tj == imp_prm(i)%tacj .and. &
+            ti == imp_prm(i)%tack .and. &
+            tl == imp_prm(i)%tacl) .or. &
 
-                                        (tj == imp_prm(i)%tacj .and. &
-                                        ti == imp_prm(i)%tacl .and. &
-                                        tl == imp_prm(i)%tack) .or. &
+            (tj == imp_prm(i)%tacj .and. &
+            ti == imp_prm(i)%tacl .and. &
+            tl == imp_prm(i)%tack) .or. &
 
-                                        (tj == imp_prm(i)%tacj .and. &
-                                        ti == imp_prm(i)%tack .and. &
-                                        tk == imp_prm(i)%tacl) .or. &
+            (tj == imp_prm(i)%tacj .and. &
+            ti == imp_prm(i)%tack .and. &
+            tk == imp_prm(i)%tacl) .or. &
 
-                                        (tj == imp_prm(i)%tacj .and. &
-                                        ti == imp_prm(i)%tacl .and. &
-                                        tk == imp_prm(i)%tack)) then
+            (tj == imp_prm(i)%tacj .and. &
+            ti == imp_prm(i)%tacl .and. &
+            tk == imp_prm(i)%tack)) then
 
-                                        impcode = i
-                                        return
-                                endif
-                        elseif(imp_prm(i)%taci /= '' .and. imp_prm(i)%tacl =='') then
-                                ! and for A*  B  C  ?  (2nd half) ...
+            impcode = i
+            return
+          end if
+        elseif(imp_prm(i)%taci /= '' .and. imp_prm(i)%tacl =='') then
+          ! and for A*  B  C  ?  (2nd half) ...
 
-                                if((tj == imp_prm(i)%taci .and. &
-                                        tk == imp_prm(i)%tacj .and. &
-                                        tl == imp_prm(i)%tack) .or. &
+          if((tj == imp_prm(i)%taci .and. &
+            tk == imp_prm(i)%tacj .and. &
+            tl == imp_prm(i)%tack) .or. &
 
-                                        (tj == imp_prm(i)%taci .and. &
-                                        tk == imp_prm(i)%tack .and. &
-                                        tl == imp_prm(i)%tacj) .or. &
+            (tj == imp_prm(i)%taci .and. &
+            tk == imp_prm(i)%tack .and. &
+            tl == imp_prm(i)%tacj) .or. &
 
-                                        (tj == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tacj .and. &
-                                        ti == imp_prm(i)%tack) .or. &
+            (tj == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tacj .and. &
+            ti == imp_prm(i)%tack) .or. &
 
-                                        (tj == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tack .and. &
-                                        ti == imp_prm(i)%tacj) .or. &
+            (tj == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tack .and. &
+            ti == imp_prm(i)%tacj) .or. &
 
-                                        (tj == imp_prm(i)%taci .and. &
-                                        tk == imp_prm(i)%tacj .and. &
-                                        ti == imp_prm(i)%tack) .or. &
+            (tj == imp_prm(i)%taci .and. &
+            tk == imp_prm(i)%tacj .and. &
+            ti == imp_prm(i)%tack) .or. &
 
-                                        (tj == imp_prm(i)%taci .and. &
-                                        tk == imp_prm(i)%tack .and. &
-                                        ti == imp_prm(i)%tacj)) then
+            (tj == imp_prm(i)%taci .and. &
+            tk == imp_prm(i)%tack .and. &
+            ti == imp_prm(i)%tacj)) then
                                 
-                                        impcode = i
-                                        return
-                                endif
-                        endif
-                enddo
+            impcode = i
+            return
+          end if
+        end if
+      end do
 
-                !find a match with two types (j and  (i or k or l))
-                do i = 1, nimp_prm
+      !find a match with two types (j and  (i or k or l))
+      do i = 1, nimp_prm
 
-                        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tacl =='') then
+        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tacl =='') then
 
-                        if((tj == imp_prm(i)%tacj .and. tl == imp_prm(i)%tack) .or. &
-                           (tj == imp_prm(i)%tack .and. tl == imp_prm(i)%tacj) .or. &
+          if((tj == imp_prm(i)%tacj .and. tl == imp_prm(i)%tack) .or. &
+            (tj == imp_prm(i)%tack .and. tl == imp_prm(i)%tacj) .or. &
 
-                                           (tj == imp_prm(i)%tacj .and. tk == imp_prm(i)%tack) .or. &
-                           (tj == imp_prm(i)%tack .and. tk == imp_prm(i)%tacj) .or. &
+            (tj == imp_prm(i)%tacj .and. tk == imp_prm(i)%tack) .or. &
+            (tj == imp_prm(i)%tack .and. tk == imp_prm(i)%tacj) .or. &
 
-                                           (tj == imp_prm(i)%tacj .and. ti == imp_prm(i)%tack) .or. &
-                           (tj == imp_prm(i)%tack .and. ti == imp_prm(i)%tacj) .or. &
+            (tj == imp_prm(i)%tacj .and. ti == imp_prm(i)%tack) .or. &
+            (tj == imp_prm(i)%tack .and. ti == imp_prm(i)%tacj) .or. &
 
-                                           (tk == imp_prm(i)%tacj .and. tl == imp_prm(i)%tack) .or. &
-                           (tk == imp_prm(i)%tack .and. tl == imp_prm(i)%tacj) .or. &
+            (tk == imp_prm(i)%tacj .and. tl == imp_prm(i)%tack) .or. &
+            (tk == imp_prm(i)%tack .and. tl == imp_prm(i)%tacj) .or. &
 
-                                           (tk == imp_prm(i)%tacj .and. tj == imp_prm(i)%tack) .or. &
-                           (tk == imp_prm(i)%tack .and. tj == imp_prm(i)%tacj) .or. &
+            (tk == imp_prm(i)%tacj .and. tj == imp_prm(i)%tack) .or. &
+            (tk == imp_prm(i)%tack .and. tj == imp_prm(i)%tacj) .or. &
 
-                                           (tk == imp_prm(i)%tacj .and. ti == imp_prm(i)%tack) .or. &
-                           (tk == imp_prm(i)%tack .and. ti == imp_prm(i)%tacj)) then
-
-
-                                
-                                impcode = i
-                                return
-                        endif
-                        endif
-                enddo
-
-                !find a match with only type of j atom
-                do i = 1, nimp_prm
-                        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tack =='' .and. &
-                                imp_prm(i)%tacl =='')then
-                        if(tj == imp_prm(i)%tacj) then
-                                impcode = i
-                                return
-                        endif
-                        endif
-                enddo
+            (tk == imp_prm(i)%tacj .and. ti == imp_prm(i)%tack) .or. &
+            (tk == imp_prm(i)%tack .and. ti == imp_prm(i)%tacj)) then
 
 
-                case (FF_CHARMM)
+            impcode = i
+            return
+          end if
+        end if
+      end do
 
-                !find a match with three types (j and k and l) or
-                !(i and j and k)
-                do i = 1, nimp_prm
-                        if(imp_prm(i)%taci /= '' .and. imp_prm(i)%tacl =='') then
-                                if((ti == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tacj .and. &
-                                        tk == imp_prm(i)%tack) .or. &
+      !find a match with only type of j atom
+      do i = 1, nimp_prm
+        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tack =='' .and. &
+          imp_prm(i)%tacl =='')then
+          if(tj == imp_prm(i)%tacj) then
+            impcode = i
+            return
+          end if
+        end if
+      end do
 
-                                        (ti == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tack .and. &
-                                        tk == imp_prm(i)%tacj) .or. &
 
-                                        (ti == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tacj .and. &
-                                        tl == imp_prm(i)%tack) .or. &
+    case (FF_CHARMM)
 
-                                        (ti == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tack .and. &
-                                        tl == imp_prm(i)%tacj) .or. &
+      !find a match with three types (j and k and l) or
+      !(i and j and k)
+      do i = 1, nimp_prm
+        if(imp_prm(i)%taci /= '' .and. imp_prm(i)%tacl =='') then
+          if((ti == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tacj .and. &
+            tk == imp_prm(i)%tack) .or. &
 
-                                        (ti == imp_prm(i)%taci .and. &
-                                        tk == imp_prm(i)%tacj .and. &
-                                        tl == imp_prm(i)%tack) .or. &
+            (ti == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tack .and. &
+            tk == imp_prm(i)%tacj) .or. &
 
-                                        (ti == imp_prm(i)%taci .and. &
-                                        tk == imp_prm(i)%tack .and. &
-                                        tl == imp_prm(i)%tacj) .or. &
+            (ti == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tacj .and. &
+            tl == imp_prm(i)%tack) .or. &
 
-                                        (tl == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tacj .and. &
-                                        tk == imp_prm(i)%tack) .or. &
+            (ti == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tack .and. &
+            tl == imp_prm(i)%tacj) .or. &
 
-                                        (tl == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tack .and. &
-                                        tk == imp_prm(i)%tacj) .or. &
+            (ti == imp_prm(i)%taci .and. &
+            tk == imp_prm(i)%tacj .and. &
+            tl == imp_prm(i)%tack) .or. &
 
-                                        (tl == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tacj .and. &
-                                        ti == imp_prm(i)%tack) .or. &
+            (ti == imp_prm(i)%taci .and. &
+            tk == imp_prm(i)%tack .and. &
+            tl == imp_prm(i)%tacj) .or. &
 
-                                        (tl == imp_prm(i)%taci .and. &
-                                        tj == imp_prm(i)%tack .and. &
-                                        ti == imp_prm(i)%tacj) .or. &
+            (tl == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tacj .and. &
+            tk == imp_prm(i)%tack) .or. &
 
-                                        (tl == imp_prm(i)%taci .and. &
-                                        tk == imp_prm(i)%tacj .and. &
-                                        ti == imp_prm(i)%tack) .or. &
+            (tl == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tack .and. &
+            tk == imp_prm(i)%tacj) .or. &
 
-                                        (tl == imp_prm(i)%taci .and. &
-                                        tk == imp_prm(i)%tack .and. &
-                                        ti == imp_prm(i)%tacj)) then
-                                
-                                        impcode = i
-                                        return
-                                endif
-                        endif
-                enddo
+            (tl == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tacj .and. &
+            ti == imp_prm(i)%tack) .or. &
 
-                !find a match with two types (j and  (i or k or l))
-                do i = 1, nimp_prm
+            (tl == imp_prm(i)%taci .and. &
+            tj == imp_prm(i)%tack .and. &
+            ti == imp_prm(i)%tacj) .or. &
 
-                        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tacl =='') then
+            (tl == imp_prm(i)%taci .and. &
+            tk == imp_prm(i)%tacj .and. &
+            ti == imp_prm(i)%tack) .or. &
 
-                                if((ti == imp_prm(i)%tacj .and. tl == imp_prm(i)%tack) .or. &
-                                   (ti == imp_prm(i)%tack .and. tl == imp_prm(i)%tacj) .or. &
+            (tl == imp_prm(i)%taci .and. &
+            tk == imp_prm(i)%tack .and. &
+            ti == imp_prm(i)%tacj)) then
 
-                                                   (ti == imp_prm(i)%tacj .and. tk == imp_prm(i)%tack) .or. &
-                                   (ti == imp_prm(i)%tack .and. tk == imp_prm(i)%tacj) .or. &
+            impcode = i
+            return
+          end if
+        end if
+      end do
 
-                                                   (ti == imp_prm(i)%tacj .and. tj == imp_prm(i)%tack) .or. &
-                                   (ti == imp_prm(i)%tack .and. tj == imp_prm(i)%tacj) .or. &
+      !find a match with two types (j and  (i or k or l))
+      do i = 1, nimp_prm
 
-                                   (tl == imp_prm(i)%tacj .and. ti == imp_prm(i)%tack) .or. &
-                                   (tl == imp_prm(i)%tack .and. ti == imp_prm(i)%tacj) .or. &
+        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tacl =='') then
 
-                                                   (tl == imp_prm(i)%tacj .and. tk == imp_prm(i)%tack) .or. &
-                                   (tl == imp_prm(i)%tack .and. tk == imp_prm(i)%tacj) .or. &
+          if((ti == imp_prm(i)%tacj .and. tl == imp_prm(i)%tack) .or. &
+            (ti == imp_prm(i)%tack .and. tl == imp_prm(i)%tacj) .or. &
 
-                                                   (tl == imp_prm(i)%tacj .and. tj == imp_prm(i)%tack) .or. &
-                                   (tl == imp_prm(i)%tack .and. tj == imp_prm(i)%tacj)) then
+            (ti == imp_prm(i)%tacj .and. tk == imp_prm(i)%tack) .or. &
+            (ti == imp_prm(i)%tack .and. tk == imp_prm(i)%tacj) .or. &
 
-                                        impcode = i
-                                        return
-                                endif
-                        endif
-                enddo
+            (ti == imp_prm(i)%tacj .and. tj == imp_prm(i)%tack) .or. &
+            (ti == imp_prm(i)%tack .and. tj == imp_prm(i)%tacj) .or. &
 
-                !find a match with only type of j atom
-                do i = 1, nimp_prm
-                        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tack =='' .and. &
-                                imp_prm(i)%tacl =='')then
-                                if(ti == imp_prm(i)%tacj) then
-                                        impcode = i
-                                        return
-                                endif
-                        endif
-                enddo
+            (tl == imp_prm(i)%tacj .and. ti == imp_prm(i)%tack) .or. &
+            (tl == imp_prm(i)%tack .and. ti == imp_prm(i)%tacj) .or. &
 
-        end select
+            (tl == imp_prm(i)%tacj .and. tk == imp_prm(i)%tack) .or. &
+            (tl == imp_prm(i)%tack .and. tk == imp_prm(i)%tacj) .or. &
 
-        impcode = 0
-        write( * , '(a,4(1x,a8))') '>>> Missing improper type for atom types', &
-                 ti, tj, tk, tl
-        topo_ok = .false.
+            (tl == imp_prm(i)%tacj .and. tj == imp_prm(i)%tack) .or. &
+            (tl == imp_prm(i)%tack .and. tj == imp_prm(i)%tacj)) then
 
-!.......................................................................
+            impcode = i
+            return
+          end if
+        end if
+      end do
+
+      !find a match with only type of j atom
+      do i = 1, nimp_prm
+        if(imp_prm(i)%taci == '' .and. imp_prm(i)%tack =='' .and. &
+          imp_prm(i)%tacl =='')then
+          if(ti == imp_prm(i)%tacj) then
+            impcode = i
+            return
+          end if
+        end if
+      end do
+
+  end select
+
+  impcode = 0
+  write( * , '(a,4(1x,a8))') '>>> Missing improper type for atom types', &
+    ti, tj, tk, tl
+  topo_ok = .false.
+
 end function impcode
 
 
-
 subroutine impr_ene(emax, nlarge, av_ene, mode)
+!!-------------------------------------------------------------------------------
+!!  subroutine: impr_ene
+!!
+!!-------------------------------------------------------------------------------
 ! *** local variables
-        integer i, j, k, l, ip, ic, i3, j3, k3, l3, nlarge, mode
-        real rji(3), rjk(3), rkl(3), rnj(3), rnk(3), bj, bk, scp,       &
-        phi, sgn, pe, dv, rki(3), rlj(3), dp(12), arg, f1, di(3),        &
-        dl(3)
-        real emax, av_ene
+  integer i, j, k, l, ip, ic, i3, j3, k3, l3, nlarge, mode
+  real rji(3), rjk(3), rkl(3), rnj(3), rnk(3), bj, bk, scp,       &
+    phi, sgn, pe, dv, rki(3), rlj(3), dp(12), arg, f1, di(3),        &
+    dl(3)
+  real emax, av_ene
 
-!.......................................................................
+  nlarge = 0
+  av_ene = 0
 
-        nlarge = 0
-        av_ene = 0
+  do ip = 1, nimps
+    i = imp(ip)%i
+    j = imp(ip)%j
+    k = imp(ip)%k
+    l = imp(ip)%l
+    ic = imp(ip)%cod
+    if(ic == 0) then !missing parameter
+      write(*, '(5i5,1x,a)') ip, i, j, k, l, 'MISSING PARAMETERS'
+      cycle
+    end if
+    i3 = i * 3 - 3
+    j3 = j * 3 - 3
+    k3 = k * 3 - 3
+    l3 = l * 3 - 3
+    rji(1) = xtop(i3 + 1) - xtop(j3 + 1)
+    rji(2) = xtop(i3 + 2) - xtop(j3 + 2)
+    rji(3) = xtop(i3 + 3) - xtop(j3 + 3)
+    rjk(1) = xtop(k3 + 1) - xtop(j3 + 1)
+    rjk(2) = xtop(k3 + 2) - xtop(j3 + 2)
+    rjk(3) = xtop(k3 + 3) - xtop(j3 + 3)
+    rkl(1) = xtop(l3 + 1) - xtop(k3 + 1)
+    rkl(2) = xtop(l3 + 2) - xtop(k3 + 2)
+    rkl(3) = xtop(l3 + 3) - xtop(k3 + 3)
+    rnj(1) = rji(2) * rjk(3) - rji(3) * rjk(2)
+    rnj(2) = rji(3) * rjk(1) - rji(1) * rjk(3)
+    rnj(3) = rji(1) * rjk(2) - rji(2) * rjk(1)
+    rnk(1) = - rjk(2) * rkl(3) + rjk(3) * rkl(2)
+    rnk(2) = - rjk(3) * rkl(1) + rjk(1) * rkl(3)
+    rnk(3) = - rjk(1) * rkl(2) + rjk(2) * rkl(1)
+    bj = sqrt(rnj(1) **2 + rnj(2) **2 + rnj(3) **2)
+    bk = sqrt(rnk(1) **2 + rnk(2) **2 + rnk(3) **2)
+    scp =(rnj(1) * rnk(1) + rnj(2) * rnk(2) + rnj(3) * rnk(3) )/(bj * bk)
+    if(scp>1.0) scp = 1.0
+    if(scp< - 1.0) scp = - 1.0
+    phi = acos(scp)
+    sgn = rjk(1) *(rnj(2) * rnk(3) - rnj(3) * rnk(2) ) + rjk(2)&
+      *(rnj(3) * rnk(1) - rnj(1) * rnk(3) ) + rjk(3) *(rnj(1)   &
+      * rnk(2) - rnj(2) * rnk(1) )
+    if(sgn<0) phi = - phi
 
-        do ip = 1, nimps
+    ! ---   energy
+    if(imp_type == 1) then !harmonic
+      arg = phi - implib(ic)%imp0 * pi / 180.
+      arg = arg - 2. * pi * nint(arg /(2. * pi) )
+      dv = implib(ic)%fk * arg
+      pe = 0.5 * dv * arg
+    else !periodic
+      arg = 2*phi - implib(ic)%imp0 * pi / 180.
+      pe = implib(ic)%fk * (1 + cos(arg))
+      dv = -2*implib(ic)%fk * sin(arg)
+    end if
 
-                i = imp(ip)%i
-                j = imp(ip)%j
-                k = imp(ip)%k
-                l = imp(ip)%l
-                ic = imp(ip)%cod
-                if(ic == 0) then !missing parameter
-                        write(*, '(5i5,1x,a)') ip, i, j, k, l, 'MISSING PARAMETERS'
-                        cycle 
-                end if
-                i3 = i * 3 - 3
-                j3 = j * 3 - 3
-                k3 = k * 3 - 3
-                l3 = l * 3 - 3
-                rji(1) = xtop(i3 + 1) - xtop(j3 + 1)
-                rji(2) = xtop(i3 + 2) - xtop(j3 + 2)
-                rji(3) = xtop(i3 + 3) - xtop(j3 + 3)
-                rjk(1) = xtop(k3 + 1) - xtop(j3 + 1)
-                rjk(2) = xtop(k3 + 2) - xtop(j3 + 2)
-                rjk(3) = xtop(k3 + 3) - xtop(j3 + 3)
-                rkl(1) = xtop(l3 + 1) - xtop(k3 + 1)
-                rkl(2) = xtop(l3 + 2) - xtop(k3 + 2)
-                rkl(3) = xtop(l3 + 3) - xtop(k3 + 3)
-                rnj(1) = rji(2) * rjk(3) - rji(3) * rjk(2)
-                rnj(2) = rji(3) * rjk(1) - rji(1) * rjk(3)
-                rnj(3) = rji(1) * rjk(2) - rji(2) * rjk(1)
-                rnk(1) = - rjk(2) * rkl(3) + rjk(3) * rkl(2)
-                rnk(2) = - rjk(3) * rkl(1) + rjk(1) * rkl(3)
-                rnk(3) = - rjk(1) * rkl(2) + rjk(2) * rkl(1)
-                bj = sqrt(rnj(1) **2 + rnj(2) **2 + rnj(3) **2)
-                bk = sqrt(rnk(1) **2 + rnk(2) **2 + rnk(3) **2)
-                scp =(rnj(1) * rnk(1) + rnj(2) * rnk(2) + rnj(3) * rnk(3) )/(bj * bk)
-                if(scp>1.0) scp = 1.0
-                if(scp< - 1.0) scp = - 1.0
-                phi = acos(scp)
-                sgn = rjk(1) *(rnj(2) * rnk(3) - rnj(3) * rnk(2) ) + rjk(2)&
-                *(rnj(3) * rnk(1) - rnj(1) * rnk(3) ) + rjk(3) *(rnj(1)   &
-                * rnk(2) - rnj(2) * rnk(1) )
-                if(sgn<0) phi = - phi
+    av_ene = av_ene+pe
 
-! ---   energy
-                if(imp_type == 1) then !harmonic
-                        arg = phi - implib(ic)%imp0 * pi / 180.
-                        arg = arg - 2. * pi * nint(arg /(2. * pi) )
-                        dv = implib(ic)%fk * arg
-                        pe = 0.5 * dv * arg
-                else !periodic
-                        arg = 2*phi - implib(ic)%imp0 * pi / 180.
-                        pe = implib(ic)%fk * (1 + cos(arg))
-                        dv = -2*implib(ic)%fk * sin(arg)
-                end if
+    if(pe>emax) then
+      nlarge = nlarge+1
+      if(mode==0) write( * , '(6i5,5f8.2)') ip, i, j, k, l, ic, &
+        implib(ic)%fk , implib(ic)%imp0 , phi * 180. / pi, pe
+      if(mode==1) then
+        imp(ip)%i = i
+        imp(ip)%j = j
+        imp(ip)%k = l
+        imp(ip)%l = k
+      end if
+    end if
 
-                av_ene = av_ene+pe
+  end do
 
-                if(pe>emax) then
-                        nlarge = nlarge+1
-                        if(mode==0) write( * , '(6i5,5f8.2)') ip, i, j, k, l, ic, &
-                        implib(ic)%fk , implib(ic)%imp0 , phi * 180. / pi, pe
-                        if(mode==1) then
-                                imp(ip)%i = i
-                                imp(ip)%j = j
-                                imp(ip)%k = l
-                                imp(ip)%l = k
-                        endif
-                endif
+  if(nimps/=0) av_ene = av_ene / real(nimps)
 
-        enddo
-
-        if(nimps/=0) av_ene = av_ene / real(nimps)
-
-!.......................................................................
 end subroutine impr_ene
 
 
-!------------------------------------------------------------------------------!
+subroutine listres
+!-------------------------------------------------------------------------------
 !!  subroutine: listres
 !!  Shows the atom name and atom types corresponding to a residue number
-!------------------------------------------------------------------------------!
-subroutine listres
+!-------------------------------------------------------------------------------
   ! *** local variables
   integer i, iat, ires
-  type(lib_entry_type), pointer:: lp
+  type(lib_entry_type), pointer    :: lp
 
 
   ires = get_int_arg('-----> Residue number: ')
@@ -1231,27 +1220,31 @@ subroutine listres
     iat = res(ires)%start - 1 + i
     write( * , '(i5,1x,a4,a8,f8.4)') iat, lp%atnam(i),&
       lp%tac_lib(i), lp%crg_lib(i)
-  enddo
+  end do
   write( *, * )
 end subroutine listres
 
 
-!------------------------------------------------------------------------------!
+subroutine listseq
+!-------------------------------------------------------------------------------
 !!  subroutine: listseq
 !
-!------------------------------------------------------------------------------!
-subroutine listseq
+!-------------------------------------------------------------------------------
 ! *** local variables
-        integer i
+  integer i
 
-        write( * , '(a,/)') 'Sequence listing:'
-        write( *, 100) (i, res(i)%name, i = 1, nres)
-  100 format(9(i4,'-',a4))
-        write( *, * )
+  write( * , '(a,/)') 'Sequence listing:'
+  write( *, 100) (i, res(i)%name, i = 1, nres)
+100 format(9(i4,'-',a4))
+  write( *, * )
 end subroutine listseq
 
 
 subroutine make14list
+!!-------------------------------------------------------------------------------
+!!  **subroutine: make14list**
+!!
+!!-------------------------------------------------------------------------------
   ! *** local variables
   integer                          :: it, i, j, ioff, l
   n14nbrs = 0
@@ -1268,7 +1261,7 @@ subroutine make14list
           n14nbrs = n14nbrs + 1
           list14(ioff, i) = .true.
         end if
-      ELSE
+      else
         do l = 1, n14long
           if(list14long(1,l) == i .and. list14long(2,l) == j) then
             !it's already in here
@@ -1278,15 +1271,15 @@ subroutine make14list
         n14long = n14long + 1
         list14long(1, n14long) = i
         list14long(2, n14long) = j
-      endif
-    ELSE
+      end if
+    else
       ioff = i - j
       if(ioff<=max_nbr_range) then
         if(.not. list14(ioff, j)) then
           n14nbrs = n14nbrs + 1
           list14(ioff, j) = .true.
         end if
-      ELSE
+      else
         do l = 1, n14long
           if(list14long(1,l) == j .and. list14long(2,l) == i) then
             !it's already in here
@@ -1296,9 +1289,9 @@ subroutine make14list
         n14long = n14long + 1
         list14long(1, n14long) = j
         list14long(2, n14long) = i
-      endif
-    endif
-  enddo itloop
+      end if
+    end if
+  end do itloop
 
   write(*, 100) n14nbrs
   write(*, 110) n14long
@@ -1308,250 +1301,266 @@ subroutine make14list
 end subroutine make14list
 
 
-
 subroutine makeangles
+!!-------------------------------------------------------------------------------
+!!  **subroutine: makeangles**
+!!
+!!-------------------------------------------------------------------------------
 ! *** local variables
-        integer ib, jb, ia, i, j, k, iaci, iacj, iack
-        logical                                         :: used(nang_prm+max_extrabnd)
-        integer                                         :: itrans(nang_prm+max_extrabnd)
 
-!.......................................................................
+  integer ib, jb, ia, i, j, k, iaci, iacj, iack
+  logical                          :: used(nang_prm+max_extrabnd)
+  integer                          :: itrans(nang_prm+max_extrabnd)
 
-        nangles = 0
-        nangles_solute = 0
+  nangles = 0
+  nangles_solute = 0
 
-        do ib = 1, nbonds_solute - 1
-                !skip special bonds used only to specify shake constraints
-                if(bnd(ib)%cod == 0) cycle
-                if(bondlib(bnd(ib)%cod)%fk == 0.) cycle
-                do jb = ib + 1, nbonds_solute
-                        if(bnd(jb)%cod == 0) cycle
-                        if(bondlib(bnd(jb)%cod)%fk == 0.) cycle
+  do ib = 1, nbonds_solute - 1
+    !skip special bonds used only to specify shake constraints
+    if(bnd(ib)%cod == 0) cycle
+    if(bondlib(bnd(ib)%cod)%fk == 0.) cycle
+    do jb = ib + 1, nbonds_solute
+      if(bnd(jb)%cod == 0) cycle
+      if(bondlib(bnd(jb)%cod)%fk == 0.) cycle
 
-                        if(bnd(ib)%i == bnd(jb)%i ) then
-                                nangles = nangles + 1
-                                ang(nangles)%i = bnd(ib)%j
-                                ang(nangles)%j = bnd(ib)%i
-                                ang(nangles)%k = bnd(jb)%j
-                        elseif(bnd(ib)%i ==bnd(jb)%j ) then
-                                nangles = nangles + 1
-                                ang(nangles)%i = bnd(ib)%j
-                                ang(nangles)%j = bnd(ib)%i
-                                ang(nangles)%k = bnd(jb)%i
-                        elseif(bnd(ib)%j ==bnd(jb)%i ) then
-                                nangles = nangles + 1
-                                ang(nangles)%i = bnd(ib)%i
-                                ang(nangles)%j = bnd(ib)%j
-                                ang(nangles)%k = bnd(jb)%j
-                        elseif(bnd(ib)%j ==bnd(jb)%j ) then
-                                nangles = nangles + 1
-                                ang(nangles)%i = bnd(ib)%i
-                                ang(nangles)%j = bnd(ib)%j
-                                ang(nangles)%k = bnd(jb)%i
-                        endif
+      if(bnd(ib)%i == bnd(jb)%i ) then
+        nangles = nangles + 1
+        ang(nangles)%i = bnd(ib)%j
+        ang(nangles)%j = bnd(ib)%i
+        ang(nangles)%k = bnd(jb)%j
+      elseif(bnd(ib)%i ==bnd(jb)%j ) then
+        nangles = nangles + 1
+        ang(nangles)%i = bnd(ib)%j
+        ang(nangles)%j = bnd(ib)%i
+        ang(nangles)%k = bnd(jb)%i
+      elseif(bnd(ib)%j ==bnd(jb)%i ) then
+        nangles = nangles + 1
+        ang(nangles)%i = bnd(ib)%i
+        ang(nangles)%j = bnd(ib)%j
+        ang(nangles)%k = bnd(jb)%j
+      elseif(bnd(ib)%j ==bnd(jb)%j ) then
+        nangles = nangles + 1
+        ang(nangles)%i = bnd(ib)%i
+        ang(nangles)%j = bnd(ib)%j
+        ang(nangles)%k = bnd(jb)%i
+      end if
 
-                enddo
-        enddo
-        nangles_solute = nangles
-        write(*, 100) nangles_solute, 'solute'
-100     format('Made    ',i6,1x,a,' angles.')
+    end do
+  end do
+  nangles_solute = nangles
+  write(*, 100) nangles_solute, 'solute'
+100 format('Made    ',i6,1x,a,' angles.')
 
-        do ib = nbonds_solute+1, nbonds - 1
-                !skip special bonds used only to specify shake constraints
-                if(bondlib(bnd(ib)%cod)%fk == 0.) cycle
-                do jb = ib + 1, nbonds
-                        if(bondlib(bnd(jb)%cod)%fk == 0.) cycle
+  do ib = nbonds_solute+1, nbonds - 1
+    !skip special bonds used only to specify shake constraints
+    if(bondlib(bnd(ib)%cod)%fk == 0.) cycle
+    do jb = ib + 1, nbonds
+      if(bondlib(bnd(jb)%cod)%fk == 0.) cycle
 
-                        if(bnd(ib)%i == bnd(jb)%i ) then
-                                nangles = nangles + 1
-                                ang(nangles)%i = bnd(ib)%j
-                                ang(nangles)%j = bnd(ib)%i
-                                ang(nangles)%k = bnd(jb)%j
-                        elseif(bnd(ib)%i ==bnd(jb)%j ) then
-                                nangles = nangles + 1
-                                ang(nangles)%i = bnd(ib)%j
-                                ang(nangles)%j = bnd(ib)%i
-                                ang(nangles)%k = bnd(jb)%i
-                        elseif(bnd(ib)%j ==bnd(jb)%i ) then
-                                nangles = nangles + 1
-                                ang(nangles)%i = bnd(ib)%i
-                                ang(nangles)%j = bnd(ib)%j
-                                ang(nangles)%k = bnd(jb)%j
-                        elseif(bnd(ib)%j ==bnd(jb)%j ) then
-                                nangles = nangles + 1
-                                ang(nangles)%i = bnd(ib)%i
-                                ang(nangles)%j = bnd(ib)%j
-                                ang(nangles)%k = bnd(jb)%i
-                        endif
-                enddo
-        enddo
-        write(*, 100) nangles-nangles_solute, 'solvent'
+      if(bnd(ib)%i == bnd(jb)%i ) then
+        nangles = nangles + 1
+        ang(nangles)%i = bnd(ib)%j
+        ang(nangles)%j = bnd(ib)%i
+        ang(nangles)%k = bnd(jb)%j
+      elseif(bnd(ib)%i ==bnd(jb)%j ) then
+        nangles = nangles + 1
+        ang(nangles)%i = bnd(ib)%j
+        ang(nangles)%j = bnd(ib)%i
+        ang(nangles)%k = bnd(jb)%i
+      elseif(bnd(ib)%j ==bnd(jb)%i ) then
+        nangles = nangles + 1
+        ang(nangles)%i = bnd(ib)%i
+        ang(nangles)%j = bnd(ib)%j
+        ang(nangles)%k = bnd(jb)%j
+      elseif(bnd(ib)%j ==bnd(jb)%j ) then
+        nangles = nangles + 1
+        ang(nangles)%i = bnd(ib)%i
+        ang(nangles)%j = bnd(ib)%j
+        ang(nangles)%k = bnd(jb)%i
+      end if
+    end do
+  end do
+  write(*, 100) nangles-nangles_solute, 'solvent'
 
-        do ia = 1, nangles
-                ang(ia)%cod = anglecode(tac(iac(ang(ia)%i)), tac(iac(ang(ia)%j)), tac(iac(ang(ia)%k)))
-                if(ang(ia)%cod == 0) then
-                        write( * , * ) 'atoms: ', ang(ia)%i , ang(ia)%j , ang(ia)%k
-                endif
-        enddo
+  do ia = 1, nangles
+    ang(ia)%cod = anglecode(tac(iac(ang(ia)%i)), tac(iac(ang(ia)%j)), tac(iac(ang(ia)%k)))
+    if(ang(ia)%cod == 0) then
+      write( * , * ) 'atoms: ', ang(ia)%i , ang(ia)%j , ang(ia)%k
+    end if
+  end do
 
-! --- Make a list of actual angle types to be used
-        used(:) = .false.
+  ! --- Make a list of actual angle types to be used
+  used(:) = .false.
 
-        nangcod = 0
-        do i = 1, nangles
-        !       workaround to permit missing params
-                if(ang(i)%cod /=0) then
-                        if(.not. used(ang(i)%cod)) then
-                                used(ang(i)%cod ) = .true.
-                                nangcod = nangcod+1
-                                itrans(ang(i)%cod ) = nangcod
-                                !copy all parameters for this angle type from parameter list to top
-                                anglib(nangcod) = ang_prm(ang(i)%cod)
-                                ang(i)%cod = nangcod
-                        ELSE
-                                ang(i)%cod = itrans(ang(i)%cod )
-                        endif
-                endif
-        enddo
+  nangcod = 0
+  do i = 1, nangles
+    !       workaround to permit missing params
+    if(ang(i)%cod /=0) then
+      if(.not. used(ang(i)%cod)) then
+        used(ang(i)%cod ) = .true.
+        nangcod = nangcod+1
+        itrans(ang(i)%cod ) = nangcod
+        !copy all parameters for this angle type from parameter list to top
+        anglib(nangcod) = ang_prm(ang(i)%cod)
+        ang(i)%cod = nangcod
+      else
+        ang(i)%cod = itrans(ang(i)%cod )
+      end if
+    end if
+  end do
 
 end subroutine makeangles
 
 
-
 subroutine make_solute_bonds
-        !make solute bond list
-        !used only by xlink routine to make solute bond list to check new
-        !bonds against
-        
-        !deallocate old bond list
-        if(allocated(bnd)) deallocate(bnd)
+!!-------------------------------------------------------------------------------
+!!  **subroutine: make_solute_bonds**
+!!  make solute bond list
+!!  used only by xlink routine to make solute bond list to check new
+!!  bonds against
+!!-------------------------------------------------------------------------------
+  !deallocate old bond list
+  if(allocated(bnd)) deallocate(bnd)
 
-        !allocate topology arrays (set max_atom etc
-        call topo_set_max(nat_pro, max_lib, max_long) !make space for new topology
-        allocate(bnd(max_bonds), stat=alloc_status)
-        if(alloc_status /= 0) then
-                write(*,*) 'ERROR: Out of memory when allocating bond list'
-                stop 255
-        end if
+  !allocate topology arrays (set max_atom etc
+  call topo_set_max(nat_pro, max_lib, max_long) !make space for new topology
+  allocate(bnd(max_bonds), stat=alloc_status)
+  if(alloc_status /= 0) then
+    write(*,*) 'ERROR: Out of memory when allocating bond list'
+    stop 255
+  end if
 
-        nbonds = 0
-        
-        !make solute bonds
-        nbonds_solute = makesomebonds(1,nres_solute)
-        
+  nbonds = 0
+
+  !make solute bonds
+  nbonds_solute = makesomebonds(1,nres_solute)
+
 end subroutine make_solute_bonds
 
 
-
 subroutine makebonds
-        !locals
-        integer                                         :: nbonds_solvent, nbonds_extra
-        integer                                         :: i
+!!-------------------------------------------------------------------------------
+!!  **subroutine: makebonds**
+!!
+!!-------------------------------------------------------------------------------
+  !locals
+  integer                          :: nbonds_solvent, nbonds_extra
+  integer                          :: i
 
-        !clear bonds
-        nbonds = 0
+  !clear bonds
+  nbonds = 0
         
-        !make solute bonds
-        nbonds_solute = makesomebonds(1,nres_solute)
-        write(*, 100) nbonds_solute, 'solute' 
-100     format('Made    ',i6,1x,a,' bonds.')
+  !make solute bonds
+  nbonds_solute = makesomebonds(1,nres_solute)
+  write(*, 100) nbonds_solute, 'solute'
+100 format('Made    ',i6,1x,a,' bonds.')
         
-        !make extra bonds
-        nbonds_extra = makeextrabonds()
-        !extra bonds count as solute bonds
-        nbonds_solute = nbonds_solute + nbonds_extra
-        write(*, 100) nbonds_extra, 'extra' 
+  !make extra bonds
+  nbonds_extra = makeextrabonds()
+  !extra bonds count as solute bonds
+  nbonds_solute = nbonds_solute + nbonds_extra
+  write(*, 100) nbonds_extra, 'extra'
 
 
-        !make solvent bonds
-        nbonds_solvent = makesomebonds(nres_solute+1, nres)
-        write(*, 100) nbonds_solvent, 'solvent' 
+  !make solvent bonds
+  nbonds_solvent = makesomebonds(nres_solute+1, nres)
+  write(*, 100) nbonds_solvent, 'solvent'
 
 end subroutine makebonds
 
 
-
 integer function makeextrabonds()
-        !locals
-        integer                                         :: ix, ib,iaci, iacj
-        character(len=KEYLENGTH)        :: taci, tacj
+!!-------------------------------------------------------------------------------
+!!  **function: makeextrabonds**
+!!
+!!-------------------------------------------------------------------------------
+  !locals
+  integer                                         :: ix, ib,iaci, iacj
+  character(len=KEYLENGTH)        :: taci, tacj
 
-! --- Add extra bonds like S-S bridges
+  ! --- Add extra bonds like S-S bridges
         
-        makeextrabonds = 0
+  makeextrabonds = 0
 
-extra:do ix = 1, nextrabnd
-                do ib = 1, nbonds
-                        if((bnd(ib)%i==extrabnd(ix)%i .and. bnd(ib)%j==extrabnd(ix)%j) &
-                                .or. (bnd(ib)%j==extrabnd(ix)%i &
-                                .and. bnd(ib)%i==extrabnd(ix)%j)) then
-                                write(*,8) extrabnd(ix)%i, extrabnd(ix)%j
-                                cycle extra
-                        end if
-                end do
-                nbonds = nbonds + 1
-                makeextrabonds=makeextrabonds+1
-                bnd(nbonds)%i = extrabnd(ix)%i
-                bnd(nbonds)%j = extrabnd(ix)%j
-                taci = tac(iac(bnd(nbonds)%i ))
-                tacj = tac(iac(bnd(nbonds)%j ))
+  extra:do ix = 1, nextrabnd
+    do ib = 1, nbonds
+      if((bnd(ib)%i==extrabnd(ix)%i .and. bnd(ib)%j==extrabnd(ix)%j) &
+        .or. (bnd(ib)%j==extrabnd(ix)%i &
+        .and. bnd(ib)%i==extrabnd(ix)%j)) then
+        write(*,8) extrabnd(ix)%i, extrabnd(ix)%j
+        cycle extra
+      end if
+    end do
+    nbonds = nbonds + 1
+    makeextrabonds=makeextrabonds+1
+    bnd(nbonds)%i = extrabnd(ix)%i
+    bnd(nbonds)%j = extrabnd(ix)%j
+    taci = tac(iac(bnd(nbonds)%i ))
+    tacj = tac(iac(bnd(nbonds)%j ))
 
-                bnd(nbonds)%cod = bondcode(taci, tacj)
-        end do extra
+    bnd(nbonds)%cod = bondcode(taci, tacj)
+  end do extra
 
-8       format('>>> WARNING: Atoms',i5,' and',i5,' are already bonded.')
+8 format('>>> WARNING: Atoms',i5,' and',i5,' are already bonded.')
 
 end function makeextrabonds
 
 
-
 subroutine set_bondcodes
-        !locals
-        integer                                         :: ib, iaci, iacj
-        logical                                         :: used(nbnd_prm)
-        integer                                         :: itrans(nbnd_prm)
-        character(len=keylength)        :: taci, tacj
+!!-------------------------------------------------------------------------------
+!!  **subroutine: set_bondcodes**
+!!
+!!-------------------------------------------------------------------------------
+!locals
+  integer                                         :: ib, iaci, iacj
+  logical                                         :: used(nbnd_prm)
+  integer                                         :: itrans(nbnd_prm)
+  character(len=keylength)        :: taci, tacj
 
-        do ib = 1, nbonds
-                iaci = iac(bnd(ib)%i)
-                iacj = iac(bnd(ib)%j)
-                taci = tac(iac(bnd(ib)%i))
-                tacj = tac(iac(bnd(ib)%j))
-                bnd(ib)%cod =  bondcode(taci, tacj)
-                IF(bnd(ib)%cod == 0) then
-                        WRITE( * , * ) 'atoms: ', bnd(ib)%i , bnd(ib)%j 
-                ENDIF
-        end do
+  do ib = 1, nbonds
+    iaci = iac(bnd(ib)%i)
+    iacj = iac(bnd(ib)%j)
+    taci = tac(iac(bnd(ib)%i))
+    tacj = tac(iac(bnd(ib)%j))
+    bnd(ib)%cod =  bondcode(taci, tacj)
+    IF(bnd(ib)%cod == 0) then
+      WRITE( * , * ) 'atoms: ', bnd(ib)%i , bnd(ib)%j
+    END IF
+  end do
 
-        !Make a list of actual bond types to be used
+  !Make a list of actual bond types to be used
 
-        used(:) = .false.
-        nbndcod = 0
-        do ib = 1, nbonds
-        !       workaround to permit missing param's
-                if(bnd(ib)%cod /=0) then
-                        if(.not. used(bnd(ib)%cod)) then
-                                used(bnd(ib)%cod) = .true.
-                                nbndcod = nbndcod+1
-                                itrans(bnd(ib)%cod ) = nbndcod
-                                bondlib(nbndcod) = bnd_prm(bnd(ib)%cod)%prm
-                                SYBYL_bond_type(nbndcod) = bnd_prm(bnd(ib)%cod)%SYBYLtype
-                                bnd(ib)%cod = nbndcod
-                        ELSE
-                                bnd(ib)%cod = itrans(bnd(ib)%cod )
-                        endif
-                endif
-        enddo
+  used(:) = .false.
+  nbndcod = 0
+  do ib = 1, nbonds
+    !       workaround to permit missing param's
+    if(bnd(ib)%cod /=0) then
+      if(.not. used(bnd(ib)%cod)) then
+        used(bnd(ib)%cod) = .true.
+        nbndcod = nbndcod+1
+        itrans(bnd(ib)%cod ) = nbndcod
+        bondlib(nbndcod) = bnd_prm(bnd(ib)%cod)%prm
+        SYBYL_bond_type(nbndcod) = bnd_prm(bnd(ib)%cod)%SYBYLtype
+        bnd(ib)%cod = nbndcod
+      else
+        bnd(ib)%cod = itrans(bnd(ib)%cod )
+      end if
+    end if
+  end do
 
 end subroutine set_bondcodes
 
 
 integer function makesomebonds(startres, endres)
-  !arguments
-  integer                                         :: startres, endres
+!!-------------------------------------------------------------------------------
+!!  **function: makesomebonds**
+!!
+!!-------------------------------------------------------------------------------
+!arguments
+  integer                          :: startres, endres
 
-  ! *** local variables
-  integer                                         :: i, ib, ires, imol
+! *** local variables
+  integer                          :: i, ib, ires, imol
 
   makesomebonds = 0
 
@@ -1580,19 +1589,23 @@ integer function makesomebonds(startres, endres)
       makesomebonds = makesomebonds + 1
       bnd(nbonds)%i = res(ires-1)%start - 1 + lib(res(ires-1)%irc)%tail
       bnd(nbonds)%j = res(ires)%start - 1 + lib(res(ires)%irc)%head
-    endif
+    end if
     ! ---   Build bonds in the residue
     do i = 1, lib(res(ires)%irc)%nbnd
       nbonds = nbonds + 1
       makesomebonds = makesomebonds + 1
       bnd(nbonds)%i = res(ires)%start - 1 + lib(res(ires)%irc)%bnd(i)%i
       bnd(nbonds)%j = res(ires)%start - 1 + lib(res(ires)%irc)%bnd(i)%j
-    enddo
-  enddo
+    end do
+  end do
 end function makesomebonds
 
 
 subroutine makeexlist
+!!-------------------------------------------------------------------------------
+!!  **subroutine: makeexlist**
+!!  Make a list of excluded neighbors
+!!-------------------------------------------------------------------------------
   ! *** local variables
   integer ib, ia, i, j, ioff
 
@@ -1612,7 +1625,7 @@ subroutine makeexlist
         nexlong = nexlong + 1
         listexlong(1, nexlong) = i
         listexlong(2, nexlong) = j
-      endif
+      end if
     else
       ioff = i - j
       if(ioff<=max_nbr_range) then
@@ -1622,9 +1635,9 @@ subroutine makeexlist
         nexlong = nexlong + 1
         listexlong(1, nexlong) = j
         listexlong(2, nexlong) = i
-      endif
-    endif
-  enddo
+      end if
+    end if
+  end do
 
   do ia = 1, nangles
     i = ang(ia)%i
@@ -1638,7 +1651,7 @@ subroutine makeexlist
         nexlong = nexlong + 1
         listexlong(1, nexlong) = i
         listexlong(2, nexlong) = j
-      endif
+      end if
     else
       ioff = i - j
       if(ioff<=max_nbr_range) then
@@ -1648,9 +1661,9 @@ subroutine makeexlist
         nexlong = nexlong + 1
         listexlong(1, nexlong) = j
         listexlong(2, nexlong) = i
-      endif
-    endif
-  enddo
+      end if
+    end if
+  end do
 
   write(*, 100) nexnbrs
   write(*, 110) nexlong
@@ -1662,19 +1675,24 @@ end subroutine makeexlist
 
 
 subroutine makehyds
+!!-------------------------------------------------------------------------------
+!!  **subroutine: makehyds**
+!!  Most likely routine that creates hydrogens not present in input
+!!  structure but present in library definition.
+!!-------------------------------------------------------------------------------
   !local variables
-  integer                                         :: i, nH_solute, nH_solvent, nH_required
-  real                                            :: r
-  integer                                         :: atom, residue
+  integer                          :: i, nH_solute, nH_solvent, nH_required
+  real                             :: r
+  integer                          :: atom, residue
 
   nH_required = 0
-        
+
   !reassign heavy atom flag based on masses from parameter file
   do i = 1, nat_pro
     heavy(i) = .false.
     if(iaclib(iac(i))%mass >=4.0) heavy(i) = .true.
     if(makeH(i)) nH_required = nH_required+1
-  enddo
+  end do
                 
   r=randm(random_seed_solute, seed_only=.true.)
   nH_solute = 0
@@ -1703,8 +1721,11 @@ subroutine makehyds
 end subroutine makehyds
 
 
-
 integer function genh(j, residue)
+!!-------------------------------------------------------------------------------
+!!  **subroutine: genh**
+!!
+!!-------------------------------------------------------------------------------
   !arguments
   integer, intent(in)                     :: j, residue
   !locals
@@ -1756,7 +1777,7 @@ integer function genh(j, residue)
             bnd0 = bondlib(bnd(b)%cod)%bnd0
           else
             bnd0 = 1. !default when missing parameters
-          endif
+          end if
           exit
         end if
       end do
@@ -1857,7 +1878,7 @@ integer function genh(j, residue)
               dVtot(:) = dVtot(:) + dV(:)
             end do
 
-            !torsion
+            !  torsion
             if(rule > 0) then
               rnj(1) = rjH(2) * rjkt(3) - rjH(3) * rjkt(2)
               rnj(2) = rjH(3) * rjkt(1) - rjH(1) * rjkt(3)
@@ -1877,8 +1898,7 @@ integer function genh(j, residue)
               !note changed sign of dVtors to get min (not max) at rule value
               dVtors = +tors_fk*sin(arg)
 
-              ! ---       forces
-
+              !  forces
               f1 = sin ( phi )
               if ( abs(f1) .lt. 1.e-12 ) f1 = 1.e-12
               f1 =  -1.0 / f1
@@ -1892,11 +1912,11 @@ integer function genh(j, residue)
             elseif(VtotLast < Vtot) then
               dx_line = -dx_line !next step back
               flipped = .true.
-            endif
+            end if
             rms_dV = sqrt(abs(dot_product(dVtot, dVLast)))
             if(rms_dV < convergence_criterum / 10) then
               exit !reached a potential minimum along the search line
-            endif
+            end if
 
             !update position in line search
             dx(:) = -dVLast(:) / sqrt(dot_product(dVlast, dVLast)) * dx_line
@@ -1906,7 +1926,6 @@ integer function genh(j, residue)
           end do !lineiter
         
           !                               write(*,*) lineiter
-                                
           rjH(:) = xH(:) - xj(:)
           bond_length = sqrt(dot_product(rjH, rjH))
           rjH(:) = rjH(:) / bond_length * bnd0      !adjust bond length
@@ -1927,7 +1946,6 @@ integer function genh(j, residue)
           gamma = dot_product(dVtot, dVlast) / dot_product(dVlast, dVlast)
           !use conjugate gradient
           dVlast(:) = dVtot(:) - gamma*dVlast(:)
-                                
         end do  !cgiter
 
         !Check if local min -> restart iteration ; problem with conversion
@@ -1958,9 +1976,12 @@ end function genh
 
 
 subroutine makeimps
+!!-------------------------------------------------------------------------------
+!!  **subroutine: makeimps**
+!!
+!!-------------------------------------------------------------------------------
   ! *** local variables
   integer                                         :: i
-
 
   nimps = 0
   nimps_solute = 0
@@ -1974,12 +1995,16 @@ subroutine makeimps
       imp(nimps)%k = iconn(2, i)
       imp(nimps)%l = iconn(3,i)
     end if
-  enddo
+  end do
 
 end subroutine makeimps
 
 
 subroutine imp_params
+!!-------------------------------------------------------------------------------
+!!  **subroutine: imp_params**
+!!
+!!-------------------------------------------------------------------------------
   ! *** local variables
   integer i, ii, iaci, iacj, iack, iacl
   integer iused(nimp_prm+max_extrabnd), itrans(nimp_prm+max_extrabnd)
@@ -1996,7 +2021,7 @@ subroutine imp_params
     if(imp(i)%cod == 0) then
       write(*,20) imp(i)%i, imp(i)%j, imp(i)%k, imp(i)%l
     end if
-  enddo
+  end do
 20 format('Atoms of missing improper:',4i5)
 
   ! --- Make a list of actual angle types to be used
@@ -2016,9 +2041,9 @@ subroutine imp_params
         imp(i)%cod = nimpcod
       else
         imp(i)%cod = itrans(imp(i)%cod )
-      endif
-    endif
-  enddo
+      end if
+    end if
+  end do
 
   write(*, 100) nimps_solute, 'solute'
   write(*, 100) nimps-nimps_solute, 'solvent'
@@ -2028,6 +2053,10 @@ end subroutine imp_params
 
 
 integer function find_atom(ires, atom)
+!!-------------------------------------------------------------------------------
+!!  **function: find_atom**
+!!
+!!-------------------------------------------------------------------------------
   !arguments
   integer                                         :: ires
   character(len=5)                        :: atom
@@ -2087,7 +2116,10 @@ end function find_atom
 
 
 subroutine makeimps_explicit
-  !generate impropers using definitions in library file
+!!-------------------------------------------------------------------------------
+!!  **subroutine: makeimps_explicit**
+!!  generate impropers using definitions in library file
+!!-------------------------------------------------------------------------------
   ! *** local variables
   integer                         :: ires, irc, iimp, i
 
@@ -2116,6 +2148,10 @@ end subroutine makeimps_explicit
 
 
 subroutine maketop
+!!-------------------------------------------------------------------------------
+!!  **subroutine: maketop**
+!!
+!!-------------------------------------------------------------------------------
   !check if library is loaded
   if(.not. check_residues()) return
 
@@ -2144,7 +2180,7 @@ subroutine maketop
   end if
 
   if(.not. have_title) then
-    CALL get_line_arg(title, '-----> Give this topology a title: ')
+    call get_line_arg(title, '-----> Give this topology a title: ')
     have_title = .true.
   end if
   topo_ok = .true. !now hope for the best
@@ -2254,14 +2290,17 @@ subroutine maketop
     write(*, '(/,a,/)') 'ERROR: There are missing parameters!'
     write(*, '(a)') 'You need to add parameters and do readprm + maketop again.'
     write(*, 100) trim(prm_file)
-  endif
+  end if
 100 format('parameter file: ', a)
 end subroutine maketop
 
 
 
 subroutine set_default_mask
-  !make atom mask including all atoms
+!!-------------------------------------------------------------------------------
+!!  **subroutine: set_default_mask**
+!!  make atom mask including all atoms
+!!-------------------------------------------------------------------------------
   !first get rid of old mask
   call mask_finalize(mask)
   !allocate new mask
@@ -2272,6 +2311,10 @@ end subroutine set_default_mask
 
 
 subroutine makeconn
+!!-------------------------------------------------------------------------------
+!!  **subroutine: makeconn**
+!!  make connections to each atom
+!!-------------------------------------------------------------------------------
   !locals
   integer                         :: i, ib
 
@@ -2286,13 +2329,17 @@ subroutine makeconn
       elseif(bnd(ib)%j ==i) then
         nconn(i) = nconn(i) + 1
         iconn(nconn(i), i) = bnd(ib)%i
-      endif
-    enddo
-  enddo
+      end if
+    end do
+  end do
 end subroutine makeconn
 
 
 subroutine maketors
+!!-------------------------------------------------------------------------------
+!!  **subroutine: maketors**
+!!
+!!-------------------------------------------------------------------------------
   ! *** local variables
   integer i, j, ic, jc, ib, it, iaci, iacj, iack, iacl
   integer iused(ntor_prm+max_extrabnd), itrans(ntor_prm+max_extrabnd)
@@ -2322,7 +2369,7 @@ subroutine maketors
               torcodes = torcode(tac(iaci), tac(iacj), tac(iack), tac(iacl))
               if(torcodes%ncod == 0) then
                 write( * , * ) 'atoms: ', i , bnd(ib)%i , bnd(ib)%j, j
-              endif
+              end if
 
               do icod = 1, torcodes%ncod
                 ntors = ntors + 1
@@ -2349,15 +2396,15 @@ subroutine maketors
             !                                                       more_terms = .false.
             !                                                       if(tor_prm(tor(ntors)%cod)%rmult <= -1.0)  &
             !                                                               more_terms = .true.
-            !                                               enddo
-            !                                       endif
-            !                               endif
-            endif
-          endif
-        enddo
-      endif
-    enddo
-  enddo
+            !                                               end do
+            !                                       end if
+            !                               end if
+            end if
+          end if
+        end do
+      end if
+    end do
+  end do
 
 
   ! --- Make a list of actual torsion types to be used
@@ -2374,9 +2421,9 @@ subroutine maketors
         tor(i)%cod = ntorcod
       else
         tor(i)%cod = itrans(tor(i)%cod)
-      endif
-    endif
-  enddo
+      end if
+    end if
+  end do
 
   write(*, 100) ntors_solute, 'solute'
   write(*, 100) ntors-ntors_solute, 'solvent'
@@ -2386,6 +2433,10 @@ end subroutine maketors
 
 
 subroutine prompt(outtxt)
+!!-------------------------------------------------------------------------------
+!!  **subroutine: prompt**
+!!
+!!-------------------------------------------------------------------------------
   ! *** local variables
   character( * ) outtxt
   write( * , '(a,$)') outtxt
@@ -2394,6 +2445,10 @@ end subroutine prompt
 
 
 real function randm(seed, seed_only)
+!!-------------------------------------------------------------------------------
+!!  **subroutine: randm**
+!!
+!!-------------------------------------------------------------------------------
   !arguments
   integer, intent(in), optional:: seed
   logical, intent(in), optional:: seed_only
@@ -2430,6 +2485,10 @@ end function randm
 
 
 subroutine oldreadlib(filnam)
+!!-------------------------------------------------------------------------------
+!!  **subroutine: oldreadlib**
+!!
+!!-------------------------------------------------------------------------------
 !arguments
   character(*)                     :: filnam
 ! *** local variables
@@ -2493,7 +2552,7 @@ subroutine oldreadlib(filnam)
        write(*,*)
        write(*,*) 'Incorrect input!'
        return
-     endif
+     end if
      write(*,3, advance='no') lib(nlibres)%nat
 
      allocate(atnam(lib(nlibres)%nat))
@@ -2510,7 +2569,7 @@ subroutine oldreadlib(filnam)
        read(1, *) iat, lib(nlibres)%atnam(iat), lib(nlibres)%tac_lib(iat), &
          lib(nlibres)%crg_lib(iat)
        qtot = qtot + lib(nlibres)%crg_lib(iat)
-     enddo
+     end do
      write(*, 4, advance='no') qtot
      ! ---      Read no. of bonds, bond list, tail/head connections
 
@@ -2520,7 +2579,7 @@ subroutine oldreadlib(filnam)
      write(*, 5, advance='no') lib(nlibres)%nbnd
      do i = 1, lib(nlibres)%nbnd
        read(1, * ) lib(nlibres)%bnd(i)%i, lib(nlibres)%bnd(i)%j
-     enddo
+     end do
 
      read(1, * ) lib(nlibres)%head, lib(nlibres)%tail
 
@@ -2546,21 +2605,21 @@ subroutine oldreadlib(filnam)
          !The Cray compiler doesn't like lib(nlibres)%crg_lib(lib(nlibres)%atcgp(j, i))
          igp = lib(nlibres)%atcgp(j, i)
          qgrp = qgrp + lib(nlibres)%crg_lib(igp)
-       enddo
+       end do
        !check fractional charges
        if(abs(qgrp - nint(qgrp) ) >0.000001)  then
          write( *, 130) qgrp, i
        end if
        qtot_grp = qtot_grp + qgrp
-     enddo
+     end do
      !check total charge & atom count consistency
      if(ntot /= lib(nlibres)%nat) then
        write(*, 150)
-     endif
+     end if
      if(abs(qtot - qtot_grp)  >0.000001) then
        write(*,160)
      end if
-   enddo
+   end do
    close(1)
 
    write( *, 110) nlibres
@@ -2574,11 +2633,12 @@ subroutine oldreadlib(filnam)
  end subroutine oldreadlib
 
 
-!------------------------------------------------------------------------------!
+
+subroutine readlib(file)
+!!-------------------------------------------------------------------------------
 !!  subroutine: readlib
 !!  Read library files, known as topologies in other MD programs.
-!------------------------------------------------------------------------------!
-subroutine readlib(file)
+!!-------------------------------------------------------------------------------
   ! arguments
   character(*), optional           :: file
   !  character(len=*), optional       :: file
@@ -2733,7 +2793,7 @@ subroutine readlib(file)
       end if
 
       qtot = qtot + lib(nlibres)%crg_lib(iat)
-    enddo
+    end do
     write(*, 4, advance='no') qtot
 
     ! ---      Read bond list
@@ -2755,7 +2815,7 @@ subroutine readlib(file)
       end if
       lib(nlibres)%bnd(i)%i = atno1
       lib(nlibres)%bnd(i)%j = atno2
-    enddo
+    end do
 
     !read head and tail connections, if present
     lib(nlibres)%head = 0
@@ -2846,7 +2906,7 @@ subroutine readlib(file)
       !parameter file conventions
       read(line, * ) lib(nlibres)%imp(i)%i, lib(nlibres)%imp(i)%j, &
         lib(nlibres)%imp(i)%k, lib(nlibres)%imp(i)%l
-    enddo
+    end do
 
     ! ---      Read charge group info
     lib(nlibres)%ncgp = prm_count('charge_groups')
@@ -2902,13 +2962,13 @@ subroutine readlib(file)
           write( *, 130) qgrp, i
         end if
         qtot_grp = qtot_grp + qgrp
-      enddo !charge groups
+      end do !charge groups
     end if !charge groups defined
 
     !check total charge & atom count consistency
     if(ntot /= lib(nlibres)%nat) then
       write(*, 150)
-    endif
+    end if
     if(abs(qtot - qtot_grp)  >0.000001) then
       write(*,160)
     end if
@@ -2935,11 +2995,11 @@ subroutine readlib(file)
 end subroutine readlib
 
 
-!------------------------------------------------------------------------------!
+subroutine check_overload(resnam)
+!!-------------------------------------------------------------------------------
 !!  subroutine: check_overload
 !!
-!------------------------------------------------------------------------------!
-subroutine check_overload(resnam)
+!!-------------------------------------------------------------------------------
   ! arguments
   character(len=80)                :: resnam
   !locals
@@ -2956,11 +3016,11 @@ subroutine check_overload(resnam)
 end subroutine check_overload
 
 
-!------------------------------------------------------------------------------!
+subroutine oldreadparm(flag)
+!!-------------------------------------------------------------------------------
 !!  subroutine: oldreadparm
 !!
-!------------------------------------------------------------------------------!
-subroutine oldreadparm(flag)
+!!-------------------------------------------------------------------------------
   !  arguments
   logical flag
   ! *** local variables
@@ -2996,7 +3056,7 @@ subroutine oldreadparm(flag)
     bnd_types(i)%taci = tac(iaci)
     bnd_types(i)%tacj = tac(iacj)
     bnd_prm(i)%SYBYLtype = '1 ' !set to default
-  enddo
+  end do
   write( * , 110) nbnd_prm, 'bond types'
   CALL skip_comments(2)
   i = 0
@@ -3018,50 +3078,50 @@ subroutine oldreadparm(flag)
     ang_types(i)%tack = tac(iack)
     !accept missing parameters but not read error
     if(filestat > 0) goto 1010
-  enddo
+  end do
   write( * , 110) nang_prm, 'angle types'
 
-  CALL skip_comments(2)
+  call skip_comments(2)
   i = 0
-  READ(2, *, err = 1020) ntor_prm
-  CALL skip_comments(2)
+  read(2, *, err = 1020) ntor_prm
+  call skip_comments(2)
   if(allocated(tor_prm)) deallocate(tor_prm)
   allocate(tor_prm(ntor_prm), stat=alloc_status)
   if(allocated(tor_types)) deallocate(tor_types)
   allocate(tor_types(ntor_prm), stat=alloc_status)
   call check_alloc('torsion parameters')
   do i = 1, ntor_prm
-    READ(2, *, err = 1020) iaci, iacj, iack, iacl, tor_prm(i)
+    read(2, *, err = 1020) iaci, iacj, iack, iacl, tor_prm(i)
     tor_types(i)%taci = tac(iaci)
     tor_types(i)%tacj = tac(iacj)
     tor_types(i)%tack = tac(iack)
     tor_types(i)%tacl = tac(iacl)
-  enddo
+  end do
   write(*, 110) ntor_prm, 'torsion types'
 
-  CALL skip_comments(2)
+  call skip_comments(2)
   i = 0
-  READ(2, *, err = 1030) nimp_prm
-  CALL skip_comments(2)
+  read(2, *, err = 1030) nimp_prm
+  call skip_comments(2)
   if(allocated(imp_prm)) deallocate(imp_prm)
   allocate(imp_prm(nimp_prm), stat=alloc_status)
   call check_alloc('improper parameters')
   do i = 1, nimp_prm
-    READ(2, *, err = 1030) iacj, iack, imp_prm(i)%prm
+    read(2, *, err = 1030) iacj, iack, imp_prm(i)%prm
     imp_prm(i)%taci = '' !not used
     imp_prm(i)%tacj = tac(iacj)
     imp_prm(i)%tack = tac(iack)
     imp_prm(i)%tacl = '' !not used
-  enddo
+  end do
   write( * , 110) nimp_prm, 'improper types'
 
-  CALL skip_comments(2)
+  call skip_comments(2)
   i = 0
-  READ(2, *, err = 1040) natyps
+  read(2, *, err = 1040) natyps
 
-  READ(2, *, err = 1040) ivdw_rule
-  READ(2, *, err = 1040) el14_scale
-  CALL skip_comments(2)
+  read(2, *, err = 1040) ivdw_rule
+  read(2, *, err = 1040) el14_scale
+  call skip_comments(2)
   
   !if no PDB file read (blank topology)
   if(allocated(iaclib)) deallocate(iaclib) 
@@ -3082,7 +3142,7 @@ subroutine oldreadparm(flag)
 
   call index_create(natyps)
   do i = 1, natyps
-    READ(2, *, err = 1040) ityp, iaclib(ityp)%avdw(1), iaclib(ityp)%avdw(2), &
+    read(2, *, err = 1040) ityp, iaclib(ityp)%avdw(1), iaclib(ityp)%avdw(2), &
       iaclib(ityp)%bvdw(1), iaclib(ityp)%avdw(3), iaclib(ityp)%bvdw(3), &
       iaclib(ityp)%mass
     iaclib(ityp)%bvdw(2) = iaclib(ityp)%bvdw(1)
@@ -3091,18 +3151,18 @@ subroutine oldreadparm(flag)
     if(.not. index_add(tac(ityp), ityp)) then
       write(*,130) tac(i)
     end if
-  enddo
+  end do
   write( * , 110) natyps, 'atom types'
 
-  CALL skip_comments(2)
+  call skip_comments(2)
   i = 0
-  READ(2, *, err = 1050) nlj2
-  CALL skip_comments(2)
+  read(2, *, err = 1050) nlj2
+  call skip_comments(2)
   if(allocated(lj2)) deallocate(lj2)
   allocate(lj2(nlj2)) 
   do i = 1, nlj2
-    READ(2, *, err = 1050) lj2(i)%i, lj2(i)%j
-  enddo
+    read(2, *, err = 1050) lj2(i)%i, lj2(i)%j
+  end do
   write( * , 110) nlj2, 'LJ type 2 pairs'
 
   write( * , '(a,/)') 'Force field parameters successfully read.'
@@ -3139,16 +3199,16 @@ subroutine oldreadparm(flag)
 end subroutine oldreadparm
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: readff
-!
-!------------------------------------------------------------------------------!
 subroutine readff
+!!-------------------------------------------------------------------------------
+!!  subroutine: readff
+!!
+!!-------------------------------------------------------------------------------
   !read parameters
   if(.not.have_prm_file_name) then
     call get_string_arg(prm_file, '-----> Name of FF parameter file: ')
     have_prm_file_name = .true.
-  endif
+  end if
   inquire(file=prm_file, exist=have_prm_file_name)
   if(.not. have_prm_file_name) then
     write(*,10) trim(prm_file)
@@ -3168,11 +3228,11 @@ subroutine readff
 end subroutine readff
 
 
-!------------------------------------------------------------------------------!
+subroutine readparm(filnam)
+!!-------------------------------------------------------------------------------
 !!  subroutine: readparm
 !!
-!------------------------------------------------------------------------------!
-subroutine readparm(filnam) 
+!!-------------------------------------------------------------------------------
 ! arguments
   character(*)                      :: filnam
 
@@ -3189,7 +3249,7 @@ subroutine readparm(filnam)
   type(BOND_PRM_TYPE)               :: bnd_prm_tmp
   type(ANGLIB_TYPE)                 :: ang_prm_tmp
   type(TORLIB_TYPE)                 :: tor_prm_tmp
-!.......................................................................
+
   ff_ok = .false.
 
   write(*,10)
@@ -3200,7 +3260,7 @@ subroutine readparm(filnam)
     write(*,*) '    Trying to read old style parameter file:'
     call prm_close()
     if(openit(2, filnam, 'old', 'formatted', 'read') /= 0) return
-    CALL oldreadparm(ff_ok)
+    call oldreadparm(ff_ok)
     close(2)
     return
   end if
@@ -3350,7 +3410,7 @@ subroutine readparm(filnam)
     if(.not. index_add(tac(i), i)) then
       write(*,130) tac(i)
     end if
-  enddo
+  end do
   write( * , 110) natyps, 'atom types'
   if(SYBYL_warn) write(*,'(a)') &
     '>>>>> WARNING: No SYBYL name for one or more atom types.'
@@ -3401,7 +3461,7 @@ subroutine readparm(filnam)
       goto 1050
     end if
     lj2(i)%j = iacj
-  enddo
+  end do
   write( * , 110) nlj2, 'LJ type 2 pairs'
 
 
@@ -3416,9 +3476,6 @@ subroutine readparm(filnam)
   call check_alloc('bond parameters')
         
   bnd_prm_tmp%SYBYLtype = '   '
-
-
-
 
   bondloop: do i = 1, nbnd_types
 
@@ -3441,7 +3498,7 @@ subroutine readparm(filnam)
       if(bnd_prm(j)%prm%fk == bnd_prm_tmp%prm%fk .and. bnd_prm(j)%prm%bnd0 == bnd_prm_tmp%prm%bnd0) then
         bnd_types(i)%cod = j
         cycle bondloop !skip to next
-      endif
+      end if
     end do
     nbnd_prm = nbnd_prm + 1
     bnd_prm(nbnd_prm) = bnd_prm_tmp
@@ -3500,7 +3557,7 @@ subroutine readparm(filnam)
         ang_prm(j)%ureyr0 == ang_prm_tmp%ureyr0) then
         ang_types(i)%cod = j
         cycle angloop !skip to next
-      endif
+      end if
     end do
     nang_prm = nang_prm + 1
     ang_prm(nang_prm) = ang_prm_tmp
@@ -3530,7 +3587,7 @@ subroutine readparm(filnam)
       else
         !wildcard found
         tor_types(i)%taci = ''
-      endif
+      end if
     else
       !atom type not found and not a wildcard => error
       write(*,140) i, trim(section), taci
@@ -3541,7 +3598,7 @@ subroutine readparm(filnam)
         tor_types(i)%tacj = tac(iacj)
       else
         tor_types(i)%tacj = ''
-      endif
+      end if
     else
       write(*,140) i, trim(section), tacj
       goto 1060
@@ -3551,7 +3608,7 @@ subroutine readparm(filnam)
         tor_types(i)%tack = tac(iack)
       else
         tor_types(i)%tack = ''
-      endif
+      end if
     else
       write(*,140) i, trim(section), tack
       goto 1060
@@ -3561,7 +3618,7 @@ subroutine readparm(filnam)
         tor_types(i)%tacl = tac(iacl)
       else
         tor_types(i)%tacl = ''
-      endif
+      end if
     else
       !this field may be 0
       tor_types(i)%tacl = ''
@@ -3573,7 +3630,7 @@ subroutine readparm(filnam)
         tor_prm(j)%paths == tor_prm_tmp%paths) then
         tor_types(i)%cod = j
         cycle torloop !skip to next
-      endif
+      end if
     end do
     ntor_prm = ntor_prm + 1
     tor_prm(ntor_prm) = tor_prm_tmp
@@ -3663,11 +3720,11 @@ subroutine readparm(filnam)
 end subroutine readparm
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: clearpdb
-!
-!------------------------------------------------------------------------------!
 subroutine clearpdb
+!!-------------------------------------------------------------------------------
+!!  subroutine: clearpdb
+!!
+!!-------------------------------------------------------------------------------
   nres = 0
   nres_solute = 0
   nmol = 0
@@ -3682,11 +3739,11 @@ subroutine clearpdb
 end subroutine clearpdb
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: cleartop
-!
-!------------------------------------------------------------------------------!
 subroutine cleartop
+!!-------------------------------------------------------------------------------
+!!  subroutine: cleartop
+!!
+!!-------------------------------------------------------------------------------
   !forget the name of the parameter file
   have_prm_file_name = .false.
   have_solute_sphere = .false.
@@ -3695,11 +3752,11 @@ subroutine cleartop
 end subroutine cleartop
 
 
-!------------------------------------------------------------------------------!
+logical function countpdb(pdb_fileno, atoms, residues, molecules)
+!!-------------------------------------------------------------------------------
 !!  function: countpdb
 !!  count atoms, residues and molecules in a pdb file
-!------------------------------------------------------------------------------!
-logical function countpdb(pdb_fileno, atoms, residues, molecules)
+!!-------------------------------------------------------------------------------
   !arguments
   integer                                 :: pdb_fileno, atoms, residues, molecules
   !locals
@@ -3800,12 +3857,11 @@ logical function countpdb(pdb_fileno, atoms, residues, molecules)
 end function countpdb
 
 
-!------------------------------------------------------------------------------!
+subroutine readpdb()
+!!-------------------------------------------------------------------------------
 !!  subroutine: readpdb
 !!
-!------------------------------------------------------------------------------!
-subroutine readpdb()
-
+!!-------------------------------------------------------------------------------
   ! *** local variables
   character(len=256)        :: pdb_file
   character(len=4)          :: atnam_tmp
@@ -3919,8 +3975,8 @@ subroutine readpdb()
                 makeH(res(nres)%start - 1 + i) = .true.
               end if
             end if
-          enddo
-        endif
+          end do
+        end if
 
         !look up new residue in library
         res_found = .false.
@@ -3932,17 +3988,17 @@ subroutine readpdb()
             res(nres)%name = lib(i)%nam
             res(nres)%irc = i
             exit
-          endif
-        enddo
+          end if
+        end do
         if(.not.res_found) then
           write( * , '(/,a,a,/)') '>>> Residue not found in library: ', &
             resnam_tmp
           goto 210
-        endif
+        end if
         !clear atom read flags
         do i = 1, lib(res(nres)%irc )%nat
           atom_id(i) = 0
-        enddo
+        end do
 
         !check for implicit GAP, i.e. this residue and previous
         !have no tail or head connections, respectively.
@@ -3976,7 +4032,7 @@ subroutine readpdb()
 
         oldnum = resnum_tmp
 
-      endif !new residue
+      end if !new residue
 
       at_found = .false.
       do i = 1, lib(res(nres)%irc )%nat
@@ -3988,17 +4044,17 @@ subroutine readpdb()
           xtop(j * 3 - 1) = xtmp(2)
           xtop(j * 3) = xtmp(3)
           exit
-        endif
-      enddo !i
+        end if
+      end do !i
 
       if(.not.at_found) then
         write( * , '(/,a,a,a,i5,a,a,/)') '>>> Atom ', atnam_tmp, &
           ' in residue no. ', resnum_tmp, ' not found in library entry for ', &
           lib(res(nres)%irc)%nam
         goto 210
-      endif !.not.at_found
+      end if !.not.at_found
     end if !line type
-  enddo
+  end do
 
   !branch here at EOF
 100 close(3)
@@ -4029,11 +4085,11 @@ subroutine readpdb()
       else !it is a hydrogen
         heavy(res(nres)%start - 1 + i) = .false.
         if(atom_id(i) == 0) then
-          !it was not read from the file and should be gerenated
+          !it was not read from the file and should be generated
           makeH(res(nres)%start - 1 + i) = .true.
         end if
       end if
-    enddo
+    end do
   end if
 
   nwat = (nat_pro - nat_solute) / 3
@@ -4059,407 +4115,435 @@ subroutine readpdb()
 end subroutine readpdb
 
 
-
 subroutine readtop
-        ! *** local variables
-        character(len=200)                       :: filnam
-        character(len=200)                      :: files_to_load
-        integer                                         :: i, j, ires
-        logical                                         :: loaded, res_found
-        integer                                         :: fn_start, fn_end, totlen
-        character(len=4)            :: resnam_tmp
+!!-------------------------------------------------------------------------------
+!!  subroutine: readtop
+!!
+!!-------------------------------------------------------------------------------
+! *** local variables
+  character(len=200)               :: filnam
+  character(len=200)               :: files_to_load
+  integer                          :: i, j, ires
+  logical                          :: loaded, res_found
+  integer                          :: fn_start, fn_end, totlen
+  character(len=4)                 :: resnam_tmp
 
-        CALL get_string_arg(filnam, '-----> Give name of(old) topology file: ')
-        if(openit(10, filnam, 'old', 'formatted', 'read') /= 0) return
-        !tell topo_read to allocate some extra space for bonds
-        topo_ok = topo_read(u=10, require_version=2.0, extrabonds=max_extrabnd)
-        close(10)
-        if(.not. topo_ok) return
-        
-        have_title = .true.
-        call set_default_mask
-        
-        !sphere is defined if topology is version 4 or later
-        if(version >= 4) then
-                have_solute_sphere = .true.
-                have_solvent_boundary = .true.
-        end if
+  call get_string_arg(filnam, '-----> Give name of(old) topology file: ')
+  if(openit(10, filnam, 'old', 'formatted', 'read') /= 0) return
+  !tell topo_read to allocate some extra space for bonds
+  topo_ok = topo_read(u=10, require_version=2.0, extrabonds=max_extrabnd)
+  close(10)
+  if(.not. topo_ok) return
 
-        !boundary condition is defined if topology is version 4.30 or later
-        if(version >= 4.30) then
-        boundary_set = .true.
-        end if
-        
-        coord_source = 'topology'
-        auto_name = filnam !for automatic naming of pdb and mol2 files
-        nwat = (nat_pro - nat_solute) / 3
-        !reset makeH - don't need to make any hydrogens
-        deallocate(makeH, stat=alloc_status)
-        allocate(makeH(nat_pro))
-        makeH(:) = .false.
-        
-        if(nlibres == 0) then
-                !auto-load libraries
-                write(*,100) 
-100             format('Auto-loading libraries:')
-                files_to_load = lib_files
-                !clear lib file list
-                lib_files = ''
-                fn_start = 1
-                totlen = len_trim(files_to_load)
-                do while(fn_start < totlen) 
-                        fn_end = string_part(files_to_load, ';', fn_start)
-                        filnam = files_to_load(fn_start:fn_end)
-                        call readlib(trim(filnam))
-                        fn_start = fn_end + 2
-                end do
-        end if
-        
-        !Annotate irc to residues to find atoms in residues. 
-        do ires = 1, nres
-                res_found = .false.
-                resnam_tmp = res(ires)%name
-                do i = 1, nlibres
-                        if(resnam_tmp==lib(i)%nam ) then
-                                res_found = .true.
-                                res(ires)%irc = i
-                                exit
-                        end if
-                enddo
-                if(.not.res_found) then
-                        write( * , '(/,a,a,/)') '>>> ERROR Residue not found in loaded libraries: ', &
-                                resnam_tmp
-                end if
-        end do
+  have_title = .true.
+  call set_default_mask
+
+  !sphere is defined if topology is version 4 or later
+  if(version >= 4) then
+    have_solute_sphere = .true.
+    have_solvent_boundary = .true.
+  end if
+
+  !boundary condition is defined if topology is version 4.30 or later
+  if(version >= 4.30) then
+    boundary_set = .true.
+  end if
+
+  coord_source = 'topology'
+  auto_name = filnam !for automatic naming of pdb and mol2 files
+  nwat = (nat_pro - nat_solute) / 3
+  !reset makeH - don't need to make any hydrogens
+  deallocate(makeH, stat=alloc_status)
+  allocate(makeH(nat_pro))
+  makeH(:) = .false.
+
+  if(nlibres == 0) then
+    !auto-load libraries
+    write(*,100)
+100 format('Auto-loading libraries:')
+    files_to_load = lib_files
+    !clear lib file list
+    lib_files = ''
+    fn_start = 1
+    totlen = len_trim(files_to_load)
+    do while(fn_start < totlen)
+      fn_end = string_part(files_to_load, ';', fn_start)
+      filnam = files_to_load(fn_start:fn_end)
+      call readlib(trim(filnam))
+      fn_start = fn_end + 2
+    end do
+  end if
+
+  !Annotate irc to residues to find atoms in residues.
+  do ires = 1, nres
+    res_found = .false.
+    resnam_tmp = res(ires)%name
+    do i = 1, nlibres
+      if(resnam_tmp==lib(i)%nam ) then
+        res_found = .true.
+        res(ires)%irc = i
+        exit
+      end if
+    end do
+    if(.not.res_found) then
+      write( * , '(/,a,a,/)') '>>> ERROR Residue not found in loaded libraries: ', &
+        resnam_tmp
+    end if
+  end do
 
 end subroutine readtop
 
 
-
 subroutine readx
+!!-------------------------------------------------------------------------------
+!!  subroutine: readx
+!!
+!!-------------------------------------------------------------------------------
 ! *** local variables
-        CHARACTER(len=80)                       :: filnam
-        integer                                         :: i
-        integer(4)                                      :: nat3
-        integer                                         :: u
+  character(len=80)               :: filnam
+  integer                         :: i
+  integer(4)                      :: nat3
+  integer                         :: u
 
 
-        CALL get_string_arg(filnam, '-----> Give name of Q-coordinate file: ')
-        u = freefile()
-        if(openit(u, filnam, 'old', 'unformatted', 'read') /= 0) return
+  call get_string_arg(filnam, '-----> Give name of Q-coordinate file: ')
+  u = freefile()
+  if(openit(u, filnam, 'old', 'unformatted', 'read') /= 0) return
 
-        !read number of coordinates (=3*natom)
-        READ(u) nat3
-        rewind(u)
-        natom = nat3 / 3
-        if(natom/=nat_pro) then
-                write(*, 20) natom
-20              format('>>> Error:',i6,' atoms in restart file does not match topology.')
-                close(u)
-                return
-        endif
-        READ(u) nat3,xtop(1:nat3)
+  !read number of coordinates (=3*natom)
+  read(u) nat3
+  rewind(u)
+  natom = nat3 / 3
+  if(natom/=nat_pro) then
+    write(*, 20) natom
+20  format('>>> Error:',i6,' atoms in restart file does not match topology.')
+    close(u)
+    return
+  end if
+  read(u) nat3,xtop(1:nat3)
 
-        write( * , '(a,/)') 'Coordinate file successfully read.'
-        close(u)
-        write(coord_source, 100) trim(filnam)
-        auto_name = filnam
+  write( * , '(a,/)') 'Coordinate file successfully read.'
+  close(u)
+  write(coord_source, 100) trim(filnam)
+  auto_name = filnam
 
-100     format('restart file ', a)
+100 format('restart file ', a)
 end subroutine readx
 
 
-
 subroutine readnext
-        integer                                         :: filestat, nat3
-        logical                                         :: isopen
-        character(len=10)                       :: buf
+!!-------------------------------------------------------------------------------
+!!  subroutine: readnext
+!!
+!!-------------------------------------------------------------------------------
+  integer                          :: filestat, nat3
+  logical                          :: isopen
+  character(len=10)                :: buf
 
-        !trj_frame is the number of the record about to be read
-        if(.not. trj_read(xtop)) then
-                call trj_close
-                trj_frame = 0
-                write(*,900)
-900             format('>>>>> ERROR: Trajectory read failure')
-        else
-                write(buf,'(i8)') trj_frame
-                write( * , '(a,a)') 'Loaded trajectory frame ',trim(buf)
-                write(coord_source, 100) trim(trj_filnam), trj_frame
-                write(auto_name, 110) trim(trj_filnam),trim(adjustl(buf))
-                trj_frame = trj_frame + 1
-        end if
+  !trj_frame is the number of the record about to be read
+  if(.not. trj_read(xtop)) then
+    call trj_close
+    trj_frame = 0
+    write(*,900)
+900 format('>>>>> ERROR: Trajectory read failure')
+  else
+    write(buf,'(i8)') trj_frame
+    write( * , '(a,a)') 'Loaded trajectory frame ',trim(buf)
+    write(coord_source, 100) trim(trj_filnam), trj_frame
+    write(auto_name, 110) trim(trj_filnam),trim(adjustl(buf))
+    trj_frame = trj_frame + 1
+  end if
 
-100     format('trajectrory file ', a,' frame ',i6)
-110     format(a,'.',a) !for auto file naming trj_filnam.frame
+100 format('trajectory file ', a,' frame ',i6)
+110 format(a,'.',a) !for auto file naming trj_filnam.frame
 end subroutine readnext
 
 
-
 subroutine readframe
+!!-------------------------------------------------------------------------------
+!!  subroutine: readframe
+!!
+!!-------------------------------------------------------------------------------
 ! *** local variables
-        integer                                         :: frame
-
-        frame = get_int_arg('-----> Give frame number: ')
-        
-        if(trj_seek(frame)) then
-                trj_frame = frame
-                call readnext   
-        end if
-
+  integer                          :: frame
+  frame = get_int_arg('-----> Give frame number: ')
+  if(trj_seek(frame)) then
+    trj_frame = frame
+    call readnext
+  end if
 end subroutine readframe
 
 
 subroutine trajectory
+!!-------------------------------------------------------------------------------
+!!  subroutine: trajectory
+!!
+!!-------------------------------------------------------------------------------
 !locals
-        character(len=80)                       :: reply
+  character(len=80)                       :: reply
 
-        if(.not. topo_ok) then
-                !can't do this without a topology
-                return
-        end if
+  if(.not. topo_ok) then
+    !can't do this without a topology
+    return
+  end if
 
-        CALL get_string_arg(trj_filnam, '-----> Give name of trajectory file: ')
+  call get_string_arg(trj_filnam, '-----> Give name of trajectory file: ')
         
-        if(trj_open(trj_filnam)) then
-                call get_string_arg(reply, '-----> Use the trajectory atom mask (y/n)? ')
-                if(reply == 'y' .or. reply == 'Y') then
-                        call trj_clone_mask(mask)
-                        write(*,100) mask%included
-                else
-                        write(*,110) trj_count(), trj_intersection(mask)
-                end if
-        end if
-        trj_frame = 1
-100     format('There are',i6,' atoms in the trajectory.')
-110     format('There are',i6,' atoms in the trajectory.',i6,&
-                ' of these are in the mask')
+  if(trj_open(trj_filnam)) then
+    call get_string_arg(reply, '-----> Use the trajectory atom mask (y/n)? ')
+    if(reply == 'y' .or. reply == 'Y') then
+      call trj_clone_mask(mask)
+      write(*,100) mask%included
+    else
+      write(*,110) trj_count(), trj_intersection(mask)
+    end if
+  end if
+  trj_frame = 1
+100 format('There are',i6,' atoms in the trajectory.')
+110 format('There are',i6,' atoms in the trajectory.',i6,&
+    ' of these are in the mask')
 end subroutine trajectory
 
 
-
 subroutine modify_mask
-!locals
-        character(len=80)                       :: mask_def
-        integer                                         :: atoms_added
+!!-------------------------------------------------------------------------------
+!!  subroutine: modify_mask
+!!
+!!-------------------------------------------------------------------------------
+  !locals
+  character(len=80)                :: mask_def
+  integer                          :: atoms_added
 
-        if(.not. topo_ok) then
-                write(*,900) 
-900             format('>>>>> ERROR: Cannot define mask without topology.')
-        else
-                write(*,120) mask%included
-120             format('The current mask contains',i6,' atoms.')
-                call get_line_arg(mask_def, &
-                        '-----> Enter atom mask (''none'' to clear):')
-                call upcase(mask_def)
-                if(mask_def == 'NONE' .or. mask_def == '0') then
-                        call mask_clear(mask)
-                        write(*,110)
-110                     format('Mask cleared.')
-                else
-                        atoms_added = mask_add(mask, mask_def)
-                        write(*,100) atoms_added, mask%included
-100                     format(i6,' atoms added to mask which now contains',i6,' atoms.')
-                end if
-        end if
+  if(.not. topo_ok) then
+    write(*,900)
+900 format('>>>>> ERROR: Cannot define mask without topology.')
+  else
+    write(*,120) mask%included
+120 format('The current mask contains',i6,' atoms.')
+    call get_line_arg(mask_def, &
+      '-----> Enter atom mask (''none'' to clear):')
+    call upcase(mask_def)
+    if(mask_def == 'NONE' .or. mask_def == '0') then
+      call mask_clear(mask)
+      write(*,110)
+110   format('Mask cleared.')
+    else
+      atoms_added = mask_add(mask, mask_def)
+      write(*,100) atoms_added, mask%included
+100   format(i6,' atoms added to mask which now contains',i6,' atoms.')
+    end if
+  end if
 end subroutine modify_mask
 
 
-
 subroutine set_cgp
-! *** local variables
-        integer ires, igp, i, ntot, ntot_solute, i3
-        integer                                         :: switchatom, ia, ncgp_skipped = 0
-        real                                            :: r2
-        real(8)                                         :: cgp_cent(3)
-        integer                                         :: nheavy
+!!-------------------------------------------------------------------------------
+!!  subroutine: set_cgp
+!!
+!!-------------------------------------------------------------------------------
+  ! *** local variables
+  integer ires, igp, i, ntot, ntot_solute, i3
+  integer                          :: switchatom, ia, ncgp_skipped = 0
+  real                             :: r2
+  real(8)                          :: cgp_cent(3)
+  integer                          :: nheavy
 
-        ntot = 0
-        ntot_solute = 0
-        ncgp = 0
-        ncgp_solute = 0
+  ntot = 0
+  ntot_solute = 0
+  ncgp = 0
+  ncgp_solute = 0
 
-        !do exclusions here as well
-        nexats = 0
-        nexwat = 0
-        if (.not. use_PBC) excl(:) = .false.
+  !do exclusions here as well
+  nexats = 0
+  nexwat = 0
+  if (.not. use_PBC) excl(:) = .false.
         
-        !set chargegroups for all atoms!
-        do ires = 1, nres
-                do igp = 1, lib(res(ires)%irc)%ncgp
-                        if(use_PBC ) then
-                                r2 = -1 !do not exclude
-                        elseif(iuse_switch_atom == 1) then
-                                !exclude on basis of switching atom
-                                switchatom = res(ires)%start - 1 + lib(res(ires)%irc)%switch(igp)
-                                if(.not. heavy(switchatom)) then
-                                        topo_ok = .false.
-                                        write(*,900) igp, lib(res(ires)%irc)%nam
-900     format('>>>>> ERROR: Switching atom of charged group',i2,' of residue type ',a4,' is not a heavy atom.')
-                                        cycle !continue looping, do not exclude
-                                endif
-                                i3 = 3*switchatom-3
-                                r2 = ( xtop(i3+1) - xpcent(1) )**2 &
-                                        +( xtop(i3+2) - xpcent(2) )**2 &
-                                        +( xtop(i3+3) - xpcent(3) )**2
-                        else
-                                !exclude by charge group center
-          cgp_cent(:) = 0
-                                  do i = 1, lib(res(ires)%irc)%natcgp(igp)
-                                ia = res(ires)%start - 1 + lib(res(ires)%irc)%atcgp(i, igp)
-                                          i3 = ia*3
-                                          cgp_cent(:) = cgp_cent(:) + xtop(i3-2:i3)
-                                  end do
-          cgp_cent(:) = cgp_cent(:)/real(lib(res(ires)%irc)%natcgp(igp))
-          r2 = dot_product(cgp_cent(:)-xpcent(:),cgp_cent(:)-xpcent(:))
-                        endif
+  !set chargegroups for all atoms!
+  do ires = 1, nres
+    do igp = 1, lib(res(ires)%irc)%ncgp
+      if(use_PBC ) then
+        r2 = -1 !do not exclude
+      elseif(iuse_switch_atom == 1) then
+        !exclude on basis of switching atom
+        switchatom = res(ires)%start - 1 + lib(res(ires)%irc)%switch(igp)
+        if(.not. heavy(switchatom)) then
+          topo_ok = .false.
+          write(*,900) igp, lib(res(ires)%irc)%nam
+900       format('>>>>> ERROR: Switching atom of charged group',i2,' of residue type ',a4,' is not a heavy atom.')
+          cycle !continue looping, do not exclude
+        end if
+        i3 = 3*switchatom-3
+        r2 = ( xtop(i3+1) - xpcent(1) )**2 &
+          +( xtop(i3+2) - xpcent(2) )**2 &
+          +( xtop(i3+3) - xpcent(3) )**2
+      else
+        !exclude by charge group center
+        cgp_cent(:) = 0
+        do i = 1, lib(res(ires)%irc)%natcgp(igp)
+          ia = res(ires)%start - 1 + lib(res(ires)%irc)%atcgp(i, igp)
+          i3 = ia*3
+          cgp_cent(:) = cgp_cent(:) + xtop(i3-2:i3)
+        end do
+        cgp_cent(:) = cgp_cent(:)/real(lib(res(ires)%irc)%natcgp(igp))
+        r2 = dot_product(cgp_cent(:)-xpcent(:),cgp_cent(:)-xpcent(:))
+      end if
 
-                        if( (r2 < rexcl_o**2) .or. &
-                                (ires > nres_solute .and. r2 < (rexcl_o + 2.)**2)) then
-                                !is it inside? For solvent include up to 2� outside rexcl_o too
-                                ncgp = ncgp + 1
-                                if(ires <= nres_solute) then
-                                        ncgp_solute = ncgp_solute + 1
-                                        ntot_solute = ntot_solute + lib(res(ires)%irc)%natcgp(igp)
-                                endif
-                                cgp(ncgp)%first = ntot + 1
-                                cgp(ncgp)%last = ntot + lib(res(ires)%irc)%natcgp(igp)
-                                cgp(ncgp)% iswitch = res(ires)%start - 1 + lib(res(ires)%irc)%switch(igp)
-                                do i = 1, cgp(ncgp)%last - cgp(ncgp)%first + 1
-                                        ntot = ntot + 1
-                                        cgpatom(ntot) = res(ires)%start - 1 + lib(res(ires)%irc)%atcgp(i, igp)
-                                enddo
-                        else
-                                nexats = nexats + lib(res(ires)%irc)%natcgp(igp)
-                                if(ires > nres_solute) then
-                                        nexwat = nexwat + 1
-                                endif
-                                ncgp_skipped = ncgp_skipped + 1
-                                do i = 1, lib(res(ires)%irc)%natcgp(igp)
-                                        excl(res(ires)%start - 1 + lib(res(ires)%irc)%atcgp(i, igp)) = .true.
-                                enddo
-                        endif
-                enddo
-        enddo
+      if( (r2 < rexcl_o**2) .or. &
+        (ires > nres_solute .and. r2 < (rexcl_o + 2.)**2)) then
+        !is it inside? For solvent include up to 2� outside rexcl_o too
+        ncgp = ncgp + 1
+        if(ires <= nres_solute) then
+          ncgp_solute = ncgp_solute + 1
+          ntot_solute = ntot_solute + lib(res(ires)%irc)%natcgp(igp)
+        end if
+        cgp(ncgp)%first = ntot + 1
+        cgp(ncgp)%last = ntot + lib(res(ires)%irc)%natcgp(igp)
+        cgp(ncgp)% iswitch = res(ires)%start - 1 + lib(res(ires)%irc)%switch(igp)
+        do i = 1, cgp(ncgp)%last - cgp(ncgp)%first + 1
+          ntot = ntot + 1
+          cgpatom(ntot) = res(ires)%start - 1 + lib(res(ires)%irc)%atcgp(i, igp)
+        end do
+      else
+        nexats = nexats + lib(res(ires)%irc)%natcgp(igp)
+        if(ires > nres_solute) then
+          nexwat = nexwat + 1
+        end if
+        ncgp_skipped = ncgp_skipped + 1
+        do i = 1, lib(res(ires)%irc)%natcgp(igp)
+          excl(res(ires)%start - 1 + lib(res(ires)%irc)%atcgp(i, igp)) = .true.
+        end do
+      end if
+    end do
+  end do
 
-        if(ntot + nexats /= nat_pro) then
-        write( * , '(/,a,/)') '>>> Error in set_cgp: ntot+nexats /= nat_pro.'
-                STOP
-        endif
+  if(ntot + nexats /= nat_pro) then
+    write( * , '(/,a,/)') '>>> Error in set_cgp: ntot+nexats /= nat_pro.'
+    STOP
+  end if
 
-        write(*, 100) 'Made', ncgp_solute, ' solute', ntot_solute
-        write(*, 100) 'Made', ncgp-ncgp_solute, ' solvent', ntot - ntot_solute
-        if(nexats > 0) then
-                write(*, 100) 'Skipped', ncgp_skipped, 'excluded', nexats
-        endif
-        if(nexwat > 0) then
-                write(*, 110) nexwat
-        endif
+  write(*, 100) 'Made', ncgp_solute, ' solute', ntot_solute
+  write(*, 100) 'Made', ncgp-ncgp_solute, ' solvent', ntot - ntot_solute
+  if(nexats > 0) then
+    write(*, 100) 'Skipped', ncgp_skipped, 'excluded', nexats
+  end if
+  if(nexwat > 0) then
+    write(*, 110) nexwat
+  end if
 
-        if (.not. use_PBC) then
-                rwat = rwat_eff()
-                write(*,140) rwat
-        endif
+  if (.not. use_PBC) then
+    rwat = rwat_eff()
+    write(*,140) rwat
+  end if
 
 100 format(a,t8,i6,a,t23,'charge groups comprising a total of ', i6,' atoms.')
 110 format('Excluded ',i6,' water molecules.')
-140     format('Effective water radius                     :',f6.2)
+140 format('Effective water radius                     :',f6.2)
 end subroutine set_cgp
 
 
 
 subroutine set_crg
+!!-------------------------------------------------------------------------------
+!!  subroutine: set_cgp
+!!
+!!-------------------------------------------------------------------------------
 ! *** local variables
-        integer ires, i, ntot
+  integer ires, i, ntot
 
-        ntot = 0
+  ntot = 0
 
-        do ires = 1, nres
-        do i = 1, lib(res(ires)%irc )%nat
+  do ires = 1, nres
+    do i = 1, lib(res(ires)%irc )%nat
+      ntot = ntot + 1
+      crg(ntot) = lib(res(ires)%irc )%crg_lib(i)
+    end do
+  end do
 
-        ntot = ntot + 1
-        crg(ntot) = lib(res(ires)%irc )%crg_lib(i)
+  if(ntot/=nat_pro) then
+    write( * , '(/,a,/)') '>>> Error in set_crg: ntot /= nat_pro.'
+    stop
+  end if
 
-        enddo
-        enddo
-
-        if(ntot/=nat_pro) then
-        write( * , '(/,a,/)') '>>> Error in set_crg: ntot /= nat_pro.'
-                STOP
-        endif
-
-        write(*, 100) ntot
+  write(*, 100) ntot
 100 format('Assigned',i6,' atomic charges.')
 end subroutine set_crg
 
 
-
 subroutine set_iac
+!!-------------------------------------------------------------------------------
+!!  subroutine: set_iac
+!!
+!!-------------------------------------------------------------------------------
 ! *** local variables
-        integer                                         :: ires, i, ntot, iaci
-        logical                                         :: used(max_atyps)         
+  integer                                         :: ires, i, ntot, iaci
+  logical                                         :: used(max_atyps)
 
-        used(:) = .false.
-        ntot = 0
-        !set atom types 
-        do ires = 1, nres
-                do i = 1, lib(res(ires)%irc )%nat
-                        ntot = ntot + 1
-                        if(.not. index_get(lib(res(ires)%irc)%tac_lib(i), iaci)) then
-                                write(*,110) lib(res(ires)%irc)%tac_lib(i), i, ires
-                                topo_ok = .false.
-                        else
-                                used(iaci) = .true.
-                                iac(ntot) = iaci
-                        end if
-                enddo
-        enddo
+  used(:) = .false.
+  ntot = 0
+  !set atom types
+  do ires = 1, nres
+    do i = 1, lib(res(ires)%irc )%nat
+      ntot = ntot + 1
+      if(.not. index_get(lib(res(ires)%irc)%tac_lib(i), iaci)) then
+        write(*,110) lib(res(ires)%irc)%tac_lib(i), i, ires
+        topo_ok = .false.
+      else
+        used(iaci) = .true.
+        iac(ntot) = iaci
+      end if
+    end do
+  end do
 
-        !this should never happen
-        if(ntot/=nat_pro) then
-                write( * , '(/,a,/)') '>>>>> ERROR in set_iac: ntot /= nat_pro.'
-                topo_ok = .false.
-        endif
+  !this should never happen
+  if(ntot/=nat_pro) then
+    write( * , '(/,a,/)') '>>>>> ERROR in set_iac: ntot /= nat_pro.'
+    topo_ok = .false.
+  end if
 
-        do i=1, natyps
-                if(used(i) .and. iaclib(i)%mass <= 0) then
-                        write(*, 120) tac(i), iaclib(i)%mass
-                        topo_ok = .false.
-                end if
-        end do
+  do i=1, natyps
+    if(used(i) .and. iaclib(i)%mass <= 0) then
+      write(*, 120) tac(i), iaclib(i)%mass
+      topo_ok = .false.
+    end if
+  end do
 
-        if(topo_ok) write(*, 100) nat_pro
-100     format('Assigned',i6,' atom types.')
+  if(topo_ok) write(*, 100) nat_pro
+100 format('Assigned',i6,' atom types.')
 
-110     format('>>>>> ERROR: Atom type ',a8,' not defined (atom',i3,' of residue',i5,'.)')
-120     format('>>>>> ERROR: Atom type ',a8,' has mass ',f6.2)
+110 format('>>>>> ERROR: Atom type ',a8,' not defined (atom',i3,' of residue',i5,'.)')
+120 format('>>>>> ERROR: Atom type ',a8,' has mass ',f6.2)
 end subroutine set_iac
 
 
-
 logical function set_irc_solvent()
+!!-------------------------------------------------------------------------------
+!!  function: set_irc_solvent
+!!
+!!-------------------------------------------------------------------------------
+  set_irc_solvent = .false.
 
-        set_irc_solvent = .false.
+  do irc_solvent = 1, nlibres
+    if(lib(irc_solvent)%nam == solvent_name) exit
+  end do
+  if(irc_solvent > nlibres) then
+    write(*,90) solvent_name
+90  format('>>>>> ERROR: No solvent library entry named ',a,&
+      ' has been loaded.')
+    return
+  end if
+  write(*,95) solvent_name
+95 format('Library entry used to generate solvent  = ',a10)
 
-        do irc_solvent = 1, nlibres
-                if(lib(irc_solvent)%nam == solvent_name) exit
-        end do
-        if(irc_solvent > nlibres) then
-                write(*,90) solvent_name
-90              format('>>>>> ERROR: No solvent library entry named ',a,&
-                        ' has been loaded.')
-                return
-        end if
-        write(*,95) solvent_name
-95      format('Library entry used to generate solvent  = ',a10)
-
-        set_irc_solvent = .true.
+  set_irc_solvent = .true.
 
 end function set_irc_solvent
 
 
 subroutine set_solvent_type
-  !set solvent type (SPC-like, TIP3P-like or general)
-
+!!-------------------------------------------------------------------------------
+!!  subroutine: set_solvent_type
+!!  set solvent type (SPC-like, TIP3P-like or general)
+!!-------------------------------------------------------------------------------
   !locals
   integer                                         :: irc_solvent
   integer                                         :: i, iac_H1, iac_H2
@@ -4473,7 +4557,7 @@ subroutine set_solvent_type
   irc_solvent = res(nres_solute + 1)%irc
   !is it a 3-atom molecule?
   if(lib(irc_solvent)%nat /= 3) return
-  !check if all solvent molecules are of same type
+  !check if all solvent molecules are of the same type
   do i=nres_solute + 2, nres
     if(res(i)%irc /= irc_solvent) return
   end do
@@ -4481,7 +4565,7 @@ subroutine set_solvent_type
   !now we know all solvent molecules are the same type of 3-atomic molecules
   solvent_type = SOLVENT_3ATOM
         
-  !further checks for SPC water, for which special optimisations can be used
+  !further checks for SPC water, for which special optimizations can be used
   !check if atoms 2 and 3 are hydrogens
   if(lib(irc_solvent)%atnam(2)(1:1) /= 'H' .or.  &
     lib(irc_solvent)%atnam(3)(1:1) /= 'H') return
@@ -4498,225 +4582,226 @@ subroutine set_solvent_type
 end subroutine set_solvent_type
 
 
-!------------------------------------------------------------------------------!
+integer function get_atom_from_descriptor(aid)
+!!------------------------------------------------------------------------------
 !!  function: get_atom_from_descriptor
 !!
-!------------------------------------------------------------------------------!
-integer function get_atom_from_descriptor(aid)
-        !arguments
-        character(*), intent(in)        :: aid     !string=residue_number:atom_name
-        
-        !locals
-        integer                                         :: separator_pos
-        character(len=20)                       :: res_str
-        character(len=5)                        :: atom_str
-        integer                                         :: filestat
-        integer                                         :: resnum, atnum
+!!------------------------------------------------------------------------------
+  !arguments
+  character(*), intent(in)         :: aid     !string=residue_number:atom_name
 
-        get_atom_from_descriptor = 0
+  !locals
+  integer                          :: separator_pos
+  character(len=20)                :: res_str
+  character(len=5)                 :: atom_str
+  integer                          :: filestat
+  integer                          :: resnum, atnum
 
-        separator_pos = scan(aid, ':')
-        if(separator_pos < 2 .or. separator_pos == len_trim(aid)) return !no valid colon found
-        res_str = aid(1:separator_pos-1)
-        atom_str = aid(separator_pos+1:len_trim(aid))
-        read(res_str, *, iostat=filestat) resnum
-        if(filestat > 0) return
-        get_atom_from_descriptor = find_atom(resnum, atom_str)
+  get_atom_from_descriptor = 0
+
+  separator_pos = scan(aid, ':')
+  if(separator_pos < 2 .or. separator_pos == len_trim(aid)) return !no valid colon found
+  res_str = aid(1:separator_pos-1)
+  atom_str = aid(separator_pos+1:len_trim(aid))
+  read(res_str, *, iostat=filestat) resnum
+  if(filestat > 0) return
+  get_atom_from_descriptor = find_atom(resnum, atom_str)
 
 end function get_atom_from_descriptor
 
 
-
 !Routine to call from other modules
 subroutine define_boundary_condition
-   if (.not. set_boundary_condition()) then 
-          call parse_reset ! clear command line
-          return
-   end if
+!------------------------------------------------------------------------------!
+!!  subroutine: define_boundary_condition
+!!
+!------------------------------------------------------------------------------!
+  if (.not. set_boundary_condition()) then
+    call parse_reset ! clear command line
+    return
+  end if
 end subroutine define_boundary_condition
 
 
 
 !Set the boundary condition & read parameterts connected to the boundary. 
 logical function set_boundary_condition()
+!------------------------------------------------------------------------------!
+!!  function: set_boundary_condition
+!!
+!------------------------------------------------------------------------------!
+  !locals
+  character(len=80)                :: kind_of_boundary
 
-        !locals
-        character(len=80)               :: kind_of_boundary
+  !ask if to use simulation sphere or periodic box
+  call get_string_arg(kind_of_boundary, &
+    '-----> Select kind of boundary: simulation sphere(1) or periodic box(2):')
+  call upcase(kind_of_boundary)
+  select case(kind_of_boundary)
 
-        !ask if to use simulation sphere or periodic box
-        call get_string_arg(kind_of_boundary, &
-                        '-----> Select kind of boundary: simulation sphere(1) or periodic box(2):')
-        call upcase(kind_of_boundary)
-        select case(kind_of_boundary)
+    !sphere selected
+    case('SPHERE', '1')
+      use_PBC = .false. !set the flag
+      !set the center and radius of the sphere
+      if(.not. set_simulation_sphere()) then
+        call parse_reset !clear command line
+        return
+      end if
+      boundary_set = .true.
 
-        !sphere selected
-        case('SPHERE', '1') 
-                use_PBC = .false. !set the flag
-                !set the center and radius of the sphere
-                if(.not. set_simulation_sphere()) then
-                        call parse_reset !clear command line
-                        return
-                end if
-                boundary_set = .true.
+    !box selected
+    case('BOX', '2')
+      use_PBC = .true.
+      !set the center and radius of the box
+      if(.not. set_solvent_box()) then
+        call parse_reset !clear command line
+        return
+      end if
+      boundary_set = .true.
 
-        !box selected
-        case('BOX', '2')
-                use_PBC = .true.
-                !set the center and radius of the box
-                if(.not. set_solvent_box()) then
-                        call parse_reset !clear command line
-                        return
-                end if
-                boundary_set = .true.
+    case default
+      write(*,'(a)') '>>>>> ERROR: Unknown boundary'
+      set_boundary_condition = .false.
+      return
+  end select
 
-        case default
-                write(*,'(a)') '>>>>> ERROR: Unknown boundary'
-                set_boundary_condition = .false.
-                return
-        end select
-
-        set_boundary_condition = .true.
+  set_boundary_condition = .true.
 
 end function set_boundary_condition
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: set_simulation_sphere
-!!
-!------------------------------------------------------------------------------!
 logical function set_simulation_sphere()
-                
-        !get center coordinates
-        !as residue_number:atom_name or x y z
-        
-        !locals
-        character(len=80)           :: line
-        integer                     :: filestat
-        integer                     :: center_atom
-        real                        :: rwat_in, xwat_in
+!!-------------------------------------------------------------------------------
+!!  subroutine: set_simulation_sphere
+!!  get center coordinates
+!!  as residue_number:atom_name or x y z
+!!-------------------------------------------------------------------------------
+!locals
+  character(len=80)           :: line
+  integer                     :: filestat
+  integer                     :: center_atom
+  real                        :: rwat_in, xwat_in
 
-        set_simulation_sphere = .false.
+  set_simulation_sphere = .false.
 
-        call get_string_arg(line, '-----> Sphere center (<x y z> or <residue_number:atom_name> or <"mass">): ')
-        if(scan(line, ':') > 0) then !got res:at
-                center_atom=get_atom_from_descriptor(line)
-                if(center_atom == 0) then
-                        write(*,900) trim(line)
-900                     format('>>>>> ERROR: Could not find center atom ',a)
-                        return
-                end if
-                xpcent(:) = xtop(3*center_atom-2:3*center_atom)
-        elseif(scan(line, 'mass') > 0) then   !define center by center of mass 
-                if (.not. get_center_by_mass(xpcent(:))) then
-                        write(*,*) ('>>>>> ERROR: Could not create center ')
-                        return
-                end if
-        else !got x
-                read(line, *, iostat=filestat) xpcent(1)
-                if(filestat > 0) then !invalid x coordinate
-                        return
-                end if
-                xwat_in=get_real_arg('-----> Sphere center y: ')
-                xpcent(2) = xwat_in
-                xwat_in=get_real_arg('-----> Sphere center z: ')
-                xpcent(3) = xwat_in
-        end if
+  call get_string_arg(line, '-----> Sphere center (<x y z> or <residue_number:atom_name> or <"mass">): ')
+  if(scan(line, ':') > 0) then !got res:at
+    center_atom=get_atom_from_descriptor(line)
+    if(center_atom == 0) then
+      write(*,900) trim(line)
+900   format('>>>>> ERROR: Could not find center atom ',a)
+      return
+    end if
+    xpcent(:) = xtop(3*center_atom-2:3*center_atom)
+  elseif(scan(line, 'mass') > 0) then   !define center by center of mass
+    if (.not. get_center_by_mass(xpcent(:))) then
+      write(*,*) ('>>>>> ERROR: Could not create center ')
+      return
+    end if
+  else !got x
+    read(line, *, iostat=filestat) xpcent(1)
+    if(filestat > 0) then !invalid x coordinate
+      return
+    end if
+    xwat_in=get_real_arg('-----> Sphere center y: ')
+    xpcent(2) = xwat_in
+    xwat_in=get_real_arg('-----> Sphere center z: ')
+    xpcent(3) = xwat_in
+  end if
 
-        rwat_in = get_real_arg('-----> Simulation sphere radius: ')
-        rexcl_o = rwat_in
-        if(rexcl_o <= 0.) then
-                write(*,800) rexcl_o
-800             format('>>>>> ERROR: Invalid radius ',f8.2)
-                return
-        end if
+  rwat_in = get_real_arg('-----> Simulation sphere radius: ')
+  rexcl_o = rwat_in
+  if(rexcl_o <= 0.) then
+    write(*,800) rexcl_o
+800 format('>>>>> ERROR: Invalid radius ',f8.2)
+    return
+  end if
 
-    write(*,*)
-    write(*,100) xpcent(:)
-    write(*,110) rexcl_o
+  write(*,*)
+  write(*,100) xpcent(:)
+  write(*,110) rexcl_o
 100 format('Simulation sphere center                =   ',3f8.3)
 110 format('Simulation radius                       =   ',f8.3)
-    set_simulation_sphere = .true.
+  set_simulation_sphere = .true.
 
 end function set_simulation_sphere
 
 
-!------------------------------------------------------------------------------!
+logical function set_solvent_box()
+!!-------------------------------------------------------------------------------
 !!  subroutine: set_solvent_box
 !!
-!------------------------------------------------------------------------------!
-logical function set_solvent_box()
-
-        !locals
-        integer                                 :: i !loop index
-        character(len=80)               :: line
-        integer                                 :: center_atom
-        integer                                 :: filestat
-        real                                    :: xwat_in, coord_in
+!!-------------------------------------------------------------------------------
+  !locals
+  integer                          :: i !loop index
+  character(len=80)                :: line
+  integer                          :: center_atom
+  integer                          :: filestat
+  real                             :: xwat_in, coord_in
         
-        have_solvent_boundary = .false.
-        set_solvent_box = .false.
+  have_solvent_boundary = .false.
+  set_solvent_box = .false.
 
 
-        !the center of the PCB-box
-        call get_string_arg(line, '-----> Periodic box center (<x y z> or <residue_number:atom_name> or <"mass">): ')
-        call upcase(line)
-        if(scan(line, ':') > 0) then !got res:at
-                center_atom=get_atom_from_descriptor(line)
-                if(center_atom == 0) then
-                        write(*,900) trim(line)
-900                     format('>>>>> ERROR: Could not find center atom ',a)
-                        return
-                end if
-                boxcenter(:) = xtop(3*center_atom-2:3*center_atom)
-        elseif(line == 'MASS') then   !define center by center of mass 
-                if (.not. get_center_by_mass(boxcenter(:))) then
-                        write(*,*) ('>>>>> ERROR: Could not create center ')
-                        return
-                end if
-        else !got x
-                read(line, *, iostat=filestat) boxcenter(1)
-                if(filestat > 0) then !invalid x coordinate
-                        return
-                end if
-                xwat_in=get_real_arg('-----> Box center y: ')
-                boxcenter(2) = xwat_in
-                xwat_in=get_real_arg('-----> Box center z: ')
-                boxcenter(3) = xwat_in
-        end if
+  !the center of the PCB-box
+  call get_string_arg(line, '-----> Periodic box center (<x y z> or <residue_number:atom_name> or <"mass">): ')
+  call upcase(line)
+  if(scan(line, ':') > 0) then !got res:at
+    center_atom=get_atom_from_descriptor(line)
+    if(center_atom == 0) then
+      write(*,900) trim(line)
+900   format('>>>>> ERROR: Could not find center atom ',a)
+      return
+    end if
+    boxcenter(:) = xtop(3*center_atom-2:3*center_atom)
+  elseif(line == 'MASS') then   !define center by center of mass
+    if (.not. get_center_by_mass(boxcenter(:))) then
+      write(*,*) ('>>>>> ERROR: Could not create center ')
+      return
+    end if
+  else !got x
+    read(line, *, iostat=filestat) boxcenter(1)
+    if(filestat > 0) then !invalid x coordinate
+      return
+    end if
+    xwat_in=get_real_arg('-----> Box center y: ')
+    boxcenter(2) = xwat_in
+    xwat_in=get_real_arg('-----> Box center z: ')
+    boxcenter(3) = xwat_in
+  end if
 
+  !read the size of the box
+  coord_in = get_real_arg('-----> Boxlength x-direction: ')
+  boxlength(1) = coord_in
+  coord_in = get_real_arg('-----> Boxlength y-direction: ')
+  boxlength(2) = coord_in
+  coord_in = get_real_arg('-----> Boxlength z-direction: ')
+  boxlength(3) = coord_in
 
-        !read the size of the box
-        coord_in = get_real_arg('-----> Boxlength x-direction: ')
-        boxlength(1) = coord_in
-        coord_in = get_real_arg('-----> Boxlength y-direction: ')
-        boxlength(2) = coord_in
-        coord_in = get_real_arg('-----> Boxlength z-direction: ')
-        boxlength(3) = coord_in
+  if( any(boxlength(:) == 0.0) ) then
+    inv_boxl(:) = 0.0
+  else
+    inv_boxl(:) = 1.0/boxlength(:)
+  end if
 
-        if( any(boxlength(:) == 0.0) ) then
-                inv_boxl(:) = 0.0
-        else
-                inv_boxl(:) = 1.0/boxlength(:)
-        end if
+  do i=1,3
+    if( boxlength(i) < 0 ) then
+      write(*, '(a)') '>>>>> WARNING: Boxlength with negative sign. Converting to positive.'
+      boxlength(i) = -boxlength(i)
+    end if
+  end do
 
-        do i=1,3
-                if( boxlength(i) < 0 ) then
-                        write(*, '(a)') '>>>>> WARNING: Boxlength with negative sign. Converting to positive.'
-                        boxlength(i) = -boxlength(i)
-                end if
-        end do
-                
-        have_solvent_boundary = .true.
-        set_solvent_box = .true.
+  have_solvent_boundary = .true.
+  set_solvent_box = .true.
 
 end function set_solvent_box
 
 
-!------------------------------------------------------------------------------!
+subroutine solvate
+!!-------------------------------------------------------------------------------
 !!  subroutine: solvate
 !!
-!------------------------------------------------------------------------------!
-subroutine solvate
+!!-------------------------------------------------------------------------------
   ! Make sure boundary condition is set.
   if (.not. boundary_set) then
     write(*,'(a)') '>>>>> ERROR Boundary unknown'
@@ -4731,17 +4816,17 @@ subroutine solvate
 end subroutine solvate
 
 
+subroutine solvate_box
 !------------------------------------------------------------------------------!
 !!  subroutine: solvate_box
 !
 !------------------------------------------------------------------------------!
-subroutine solvate_box
   character(len=80)                :: solvate_mode
 
   write(*,'(a)') 'Using predefined boxcenter and boxlengths.'
   write(*,101) boxcenter
   write(*,102) boxlength
-101 format('Boxcenter (x,y,z)                :  ',3f8.3)                 
+101 format('Boxcenter (x,y,z)                :  ',3f8.3)
 102 format('Boxlengths (x,y,z)               :  ',3f8.3)
 
   !chose solvation mode
@@ -4768,11 +4853,11 @@ subroutine solvate_box
 end subroutine solvate_box
 
 
-!------------------------------------------------------------------------------!
+subroutine solvate_box_grid
+!!-------------------------------------------------------------------------------
 !!  subroutine: solvate_box_grid
 !!  solvate box using grid
-!------------------------------------------------------------------------------!
-subroutine solvate_box_grid
+!!-------------------------------------------------------------------------------
   !locals
   real(8)                          :: xmin, xmax, ymin, ymax, zmin, zmax
   real(8)                          :: xgrid, ygrid, zgrid
@@ -4796,7 +4881,6 @@ subroutine solvate_box_grid
 900 format('>>>>> ERROR: Density not set in library entry ',a)
     return
   end if
-        
 
       !Make sure boxsize is consistent with the periodic boundary condition
       !changed to nearest integer (nint) from truncation (int)  /M.A.
@@ -4810,14 +4894,13 @@ subroutine solvate_box_grid
   allocate(xw(3,lib(irc_solvent)%nat,max_wat), keep(max_wat), stat=alloc_status)
   call check_alloc('water sphere coordinate array')
 
-
   xmin = boxcenter(1) - boxlength(1)/2 + solvent_grid/2
   xmax = boxcenter(1) + boxlength(1)/2 - solvent_grid/2
   ymin = boxcenter(2) - boxlength(2)/2 + solvent_grid/2
   ymax = boxcenter(2) + boxlength(2)/2 - solvent_grid/2
   zmin = boxcenter(3) - boxlength(3)/2 + solvent_grid/2
   zmax = boxcenter(3) + boxlength(3)/2 - solvent_grid/2
-        
+
   write(*,100) boxlength(1), boxlength(2), boxlength(3), solvent_grid
 100 format('New boxlength                     = ',3f8.2,' A',/ &
            'Grid spacing                      = ',f10.2,' A ')
@@ -4851,11 +4934,11 @@ subroutine solvate_box_grid
 end subroutine solvate_box_grid
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: solvate_box_file
-!
-!------------------------------------------------------------------------------!
 subroutine solvate_box_file
+!!-------------------------------------------------------------------------------
+!!  subroutine: solvate_box_file
+!!
+!!-------------------------------------------------------------------------------
 !local variables
   character(len=80)                 :: xwat_file
   integer                           :: fstat
@@ -4883,9 +4966,9 @@ subroutine solvate_box_file
   open (unit=13, file=xwat_file, status='old', form='formatted', action='read', iostat=fstat)
   
   if( fstat /= 0 ) then
-          write(*,'(a)') '>>>>> ERROR: Could not open water coordinate file.'
-          call parse_reset
-          return
+    write(*,'(a)') '>>>>> ERROR: Could not open water coordinate file.'
+    call parse_reset
+    return
   end if
 
 !read the size of the waterbox
@@ -4920,73 +5003,73 @@ subroutine solvate_box_file
   waterbox_v = boxl**3
   write(*, '(a, f10.3)') 'Boxlength of solvent file               =', waterbox(1)
 
-!Determine residue name to use for solvent molecule
+  !Determine residue name to use for solvent molecule
   read(13,1) atomnames(1:1), solvent_name
   backspace(13)
   if( .not. set_irc_solvent() ) then
-          close(13)
-          call parse_reset
-          return
+    close(13)
+    call parse_reset
+    return
   else if( lib(irc_solvent)%nat /= 3 ) then
-          write(*,'(a)') '>>>>> ERROR: Solvate only works for 3-atom solvents (in this version).'
-          close(13)
-          call parse_reset
-          return
+    write(*,'(a)') '>>>>> ERROR: Solvate only works for 3-atom solvents (in this version).'
+    close(13)
+    call parse_reset
+    return
   else if( lib(irc_solvent)%density <= 0. ) then
-          write(*, '(a, a)' ) '>>>>> ERROR: Density not set in library entry ', lib(irc_solvent)%nam
-          close(13)
-          call parse_reset
-          return
+    write(*, '(a, a)' ) '>>>>> ERROR: Density not set in library entry ', lib(irc_solvent)%nam
+    close(13)
+    call parse_reset
+    return
   end if
 
-! Estimate amount of memory to allocate for temporary waters
+  ! Estimate amount of memory to allocate for temporary waters
   if( all(boxlength(:)<waterbox(1)) ) then ! don't need to replicate. 5% margin
-          replicate = .false.
-          nwat_allocate = int( lib(irc_solvent)%density*1.05*waterbox_v )
+    replicate = .false.
+    nwat_allocate = int( lib(irc_solvent)%density*1.05*waterbox_v )
   
   else ! the waterbox is not big enough 
-          replicate = .true.
-          ! find out in wich direction replication is needed
-          extension(:) = ceiling( boxlength(:)/boxl )
-          extensionbox_v = extension(1)*extension(2)*extension(3)*waterbox_v
-          nwat_allocate = int( lib(irc_solvent)%density*1.05*extensionbox_v )
+    replicate = .true.
+    ! find out in wich direction replication is needed
+    extension(:) = ceiling( boxlength(:)/boxl )
+    extensionbox_v = extension(1)*extension(2)*extension(3)*waterbox_v
+    nwat_allocate = int( lib(irc_solvent)%density*1.05*extensionbox_v )
   end if
 
   allocate( xw(3, lib(irc_solvent)%nat, nwat_allocate), keep(nwat_allocate), stat=alloc_status )
   call check_alloc('temporary solvent coord. arrays')
         
-! Coordinate reading.
+  ! Coordinate reading.
 1 format(13x, a1, 3x, a4, i5, 4x, 3f8.3)
 
   nw = 0
 
   do i = 1, nwat_allocate-1
-          read(13, 1, iostat=filestat, end=10) &
-                  atomnames(1:1), resnam(1), resno(1), xw(:, 1, nw+1), &
-                  & atomnames(2:2), resnam(2), resno(2), xw(:, 2, nw+1), &
-                  & atomnames(3:3),       resnam(3), resno(3), xw(:, 3, nw+1)
-          !checking the read info
-          if(filestat > 0) then 
-                  write(*, 7) nw
-                  close(13)
-                  call parse_reset
-                  deallocate(xw, keep)
-                  return
-          else if ( any( resnam(:)/=solvent_name ) ) then
-                  write(*, 8) solvent_name, nw
-                  close(13)
-                  call parse_reset
-                  deallocate(xw, keep)
-                  return
-          else if ( any( resno(:)/=resno(1) ) ) then
-                  write(*, 9) nw
-                  close(13)
-                  call parse_reset
-                  deallocate(xw, keep)
-                  return
-          else
-                  nw = nw + 1 
-          end if
+    read(13, 1, iostat=filestat, end=10) &
+      atomnames(1:1), resnam(1), resno(1), xw(:, 1, nw+1), &
+      & atomnames(2:2), resnam(2), resno(2), xw(:, 2, nw+1), &
+      & atomnames(3:3),       resnam(3), resno(3), xw(:, 3, nw+1)
+    !checking the read info
+    if(filestat > 0) then
+      write(*, 7) nw
+      close(13)
+      call parse_reset
+      deallocate(xw, keep)
+      return
+    else if ( any( resnam(:)/=solvent_name ) ) then
+      write(*, 8) solvent_name, nw
+      close(13)
+      call parse_reset
+      deallocate(xw, keep)
+      return
+    else if ( any( resno(:)/=resno(1) ) ) then
+      write(*, 9) nw
+      close(13)
+      call parse_reset
+      deallocate(xw, keep)
+      return
+    else
+      nw = nw + 1
+    end if
   end do
 
 7 format('>>>>> ERROR: Read failure at molecule', i6)
@@ -4997,7 +5080,7 @@ subroutine solvate_box_file
 
   nnw = nw
 
-!Replicate if necessary
+  !Replicate if necessary
   if(replicate) then
     write(*, '(a)') 'Replicating box of water...'
     ext(:,1) = (/boxl, 0._8, 0._8/)
@@ -5006,19 +5089,19 @@ subroutine solvate_box_file
 
     nbox = 0
     do k=1,3 !the three coordinates
-            if( .not. extension(k) > 1) cycle
+      if( .not. extension(k) > 1) cycle
             
-            do i = 1,extension(k)-1
-                    nbox = nbox + 1
-                    do j = 1,nw
-                            nnw = nnw + 1
-                            xw(:,1,nnw) = xw(:,1,j) + i*ext(k,:)
-                            xw(:,2,nnw) = xw(:,2,j) + i*ext(k,:)
-                            xw(:,3,nnw) = xw(:,3,j) + i*ext(k,:)            
-                    end do
-                    waterbox(k) = waterbox(k) + boxl
-                    end do
-    nw = nnw
+      do i = 1,extension(k)-1
+        nbox = nbox + 1
+        do j = 1,nw
+          nnw = nnw + 1
+          xw(:,1,nnw) = xw(:,1,j) + i*ext(k,:)
+          xw(:,2,nnw) = xw(:,2,j) + i*ext(k,:)
+          xw(:,3,nnw) = xw(:,3,j) + i*ext(k,:)
+        end do
+        waterbox(k) = waterbox(k) + boxl
+      end do
+      nw = nnw
     end do
 
     nw = nnw
@@ -5027,47 +5110,47 @@ subroutine solvate_box_file
   end if
 
 
-!Compute the center coordinates for the waterbox
+  !Compute the center coordinates for the waterbox
   xcm(:) = sum( sum(xw, dim=3), dim=2) / (nw*lib(irc_solvent)%nat)
   wshift(:) = boxcenter(:) - xcm(:)
 
-!Remove water molecules outside of periodic box
+  !Remove water molecules outside of periodic box
   nwat_keep = 0
 
   do i = 1,nw
-          temp = xw(:,1,i)
+    temp = xw(:,1,i)
           
-          if(all(temp(:)<xcm(:)+0.5*boxlength(:)) &
-                  .and. all(temp(:)>xcm(:)-0.5*boxlength(:))) then
-                  !keep this molecule
-                  nwat_keep = nwat_keep + 1
-                  keep(i) = .true.
-                  !shift to periodic box center
-                  do j = 1, lib(irc_solvent)%nat
-                          xw(:, j, i) = xw(:, j, i) + wshift(:)
-                  end do
+    if(all(temp(:)<xcm(:)+0.5*boxlength(:)) &
+      .and. all(temp(:)>xcm(:)-0.5*boxlength(:))) then
+      !keep this molecule
+      nwat_keep = nwat_keep + 1
+      keep(i) = .true.
+      !shift to periodic box center
+      do j = 1, lib(irc_solvent)%nat
+        xw(:, j, i) = xw(:, j, i) + wshift(:)
+      end do
           
-          else !do not keep this molecule
-                  keep(i) = .false.
+    else !do not keep this molecule
+      keep(i) = .false.
           
-          end if
+    end if
 
-        end do
+  end do
 
-!Add solvent to topology
-        call add_solvent_to_topology(waters_in_sphere=nwat_keep, max_waters=nw, &
-                make_hydrogens=.false., pack=solvent_pack)
+  !Add solvent to topology
+  call add_solvent_to_topology(waters_in_sphere=nwat_keep, max_waters=nw, &
+    make_hydrogens=.false., pack=solvent_pack)
 
-        close(13)
-        deallocate(xw, keep)
+  close(13)
+  deallocate(xw, keep)
 end subroutine solvate_box_file
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: solvate_sphere
-!
-!------------------------------------------------------------------------------!
 subroutine solvate_sphere
+!!-------------------------------------------------------------------------------
+!!  subroutine: solvate_sphere
+!!
+!!-------------------------------------------------------------------------------
   character(len=80)                :: solvate_mode
 
   if(.not. set_solvent_sphere()) then
@@ -5096,11 +5179,12 @@ subroutine solvate_sphere
   end select
 end subroutine solvate_sphere
 
-!------------------------------------------------------------------------------!
-!!  function: set_solvent_sphere
-!
-!------------------------------------------------------------------------------!
+
 logical function set_solvent_sphere()
+!!-------------------------------------------------------------------------------
+!!  function: set_solvent_sphere
+!!
+!!-------------------------------------------------------------------------------
   !locals
   character(len=80)                :: line
   integer                          :: filestat
@@ -5163,11 +5247,11 @@ logical function set_solvent_sphere()
 end function set_solvent_sphere
 
 
-!------------------------------------------------------------------------------!
+subroutine solvate_sphere_grid
+!!-------------------------------------------------------------------------------
 !!  subroutine: solvate_sphere_grid
 !!  solvate sphere using grid
-!------------------------------------------------------------------------------!
-subroutine solvate_sphere_grid
+!!-------------------------------------------------------------------------------
   !locals
   real(8)                          :: xmin, xmax, ymin, ymax, zmin, zmax
   real(8)                          :: xgrid, ygrid, zgrid
@@ -5191,7 +5275,7 @@ subroutine solvate_sphere_grid
 900 format('>>>>> ERROR: Density not set in library entry ',a)
     return
   end if
-        
+
   max_wat = (2*rwat+solvent_grid)**3 / solvent_grid**3
   radius2 = rwat**2
 
@@ -5227,7 +5311,7 @@ subroutine solvate_sphere_grid
           xw(3,1,waters_in_sphere) = zgrid
           !all the molecules inside are inside
           keep(waters_in_sphere) = .true.
-        endif
+        end if
         zgrid = zgrid + solvent_grid
       end do
       ygrid = ygrid + solvent_grid
@@ -5242,14 +5326,13 @@ subroutine solvate_sphere_grid
 end subroutine solvate_sphere_grid
 
 
-
-!------------------------------------------------------------------------------!
-!!  subroutine: solvate_sphere_file
-!
-!------------------------------------------------------------------------------!
 subroutine solvate_sphere_file(shift)
+!!-------------------------------------------------------------------------------
+!!  subroutine: solvate_sphere_file
+!!
+!!-------------------------------------------------------------------------------
   ! parameters
-  logical, intent(in), optional:: shift
+  logical, intent(in), optional    :: shift
 
   ! local variables
   integer                          :: i,j,nw,nnw
@@ -5286,7 +5369,6 @@ subroutine solvate_sphere_file(shift)
 3 format('Radius of sphere in solvent file        = ',f10.3)
 
   ! --> water coordinate file for initial generation (13)
-
   read (13,'(a80)') line
   read(line,*, iostat=fstat) boxl
   if(fstat /=0 ) then
@@ -5337,7 +5419,7 @@ subroutine solvate_sphere_file(shift)
     return
   else !its a sufficiently big sphere
     nwat_allocate = int(lib(irc_solvent)%density*1.05*volume)
-  endif
+  end if
   allocate(xw(3,lib(irc_solvent)%nat,nwat_allocate), keep(nwat_allocate), &
     stat=alloc_status)
   call check_alloc('temporary solvent coord. arrays')
@@ -5376,7 +5458,7 @@ subroutine solvate_sphere_file(shift)
   if (is_box .and.  abs(rwat) .gt. boxl/2. ) then
     do while ( abs(rwat) .gt. boxl/2. )
       write (*,'(a)') 'Replicating periodic box...'
-                
+
       xwshift(:,1) = (/boxl, 0._8, 0._8/)
       xwshift(:,2) = (/0._8, boxl, 0._8/)
       xwshift(:,3) = (/0._8, 0._8, boxl/)
@@ -5436,9 +5518,7 @@ subroutine solvate_sphere_file(shift)
         keep(i) = .false.
       end if
     end do
-  endif
-
-
+  end if
 
   call add_solvent_to_topology(waters_in_sphere=nwat_keep, &
     max_waters=nw, make_hydrogens=.false., pack=solvent_pack)
@@ -5449,11 +5529,11 @@ subroutine solvate_sphere_file(shift)
 end subroutine solvate_sphere_file
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: solvate_restart
-!
-!------------------------------------------------------------------------------!
 subroutine solvate_restart
+!!-------------------------------------------------------------------------------
+!!  subroutine: solvate_restart
+!!
+!!-------------------------------------------------------------------------------
   !locals
   integer(4)                       :: natom, nat3, waters_added
   character(len=80)                :: xfile
@@ -5511,11 +5591,11 @@ subroutine solvate_restart
 end subroutine solvate_restart
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: add_solvent_to_topology
-!
-!------------------------------------------------------------------------------!
 subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens, pack)
+!!-------------------------------------------------------------------------------
+!!  subroutine: add_solvent_to_topology
+!!
+!!-------------------------------------------------------------------------------
   !arguments
   integer                          :: waters_in_sphere
   integer                          :: max_waters
@@ -5587,7 +5667,7 @@ subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens,
         end if
       end do ploop
 
-      !***** PWadded new loop checking water-water distance
+      !***** Petra Wennerstrom added new loop checking water-water distance
       if(use_PBC) then
         do next_wat = w_mol+1, max_waters
           if(.not. keep(next_wat) ) cycle
@@ -5645,364 +5725,357 @@ subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens,
 end subroutine add_solvent_to_topology
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: grow_arrays_for_solvent
-!
-!------------------------------------------------------------------------------!
 subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
-!make space for nmore more water molecules
-!arguments
-        integer, intent(in)                     :: nmore, atoms_per_molecule
-!locals
-        real(8), allocatable            :: r8temp(:)
-        logical, allocatable            :: ltemp(:)
-        integer, allocatable            :: itemp(:)
-        integer                                         :: new_nat, nat3old
-        type(residue_type), allocatable :: restemp(:)
+!!-------------------------------------------------------------------------------
+!!  subroutine: grow_arrays_for_solvent
+!!  make space for nmore more water molecules
+!!-------------------------------------------------------------------------------
+  !arguments
+  integer, intent(in)              :: nmore, atoms_per_molecule
+  !locals
+  real(8), allocatable             :: r8temp(:)
+  logical, allocatable             :: ltemp(:)
+  integer, allocatable             :: itemp(:)
+  integer                          :: new_nat, nat3old
+  type(residue_type), allocatable  :: restemp(:)
 
-        if(nmore == 0) return
+  if(nmore == 0) return
 
-        new_nat = nat_pro + nmore*atoms_per_molecule
-        nat3old = nat_pro*3
-        if(allocated(xtop)) then        
-                allocate(r8temp(nat3old), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                r8temp(1:nat3old) = xtop(1:nat3old)
-                deallocate(xtop)
-                allocate(xtop(new_nat*3),  stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                xtop(1:nat3old) = r8temp(1:nat3old)
-                deallocate(r8temp)
-        else
-                allocate(xtop(new_nat*3),  stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-        end if
+  new_nat = nat_pro + nmore*atoms_per_molecule
+  nat3old = nat_pro*3
+  if(allocated(xtop)) then
+    allocate(r8temp(nat3old), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    r8temp(1:nat3old) = xtop(1:nat3old)
+    deallocate(xtop)
+    allocate(xtop(new_nat*3),  stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    xtop(1:nat3old) = r8temp(1:nat3old)
+    deallocate(r8temp)
+  else
+    allocate(xtop(new_nat*3),  stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+  end if
 
-        if(allocated(makeH)) then       
-                allocate(ltemp(nat_pro), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                ltemp(1:nat_pro) = makeH(1:nat_pro)
-                deallocate(makeH)
-                allocate(makeH(new_nat), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                makeH(1:nat_pro) = ltemp(1:nat_pro)
-                makeH(nat_pro+1:new_nat) = .false.
-                ltemp(1:nat_pro) = heavy(1:nat_pro)
-                deallocate(heavy)
-                allocate(heavy(new_nat), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                heavy(1:nat_pro) = ltemp(1:nat_pro)
-                heavy(nat_pro+1:new_nat) = .false.
-                deallocate(ltemp)
-        else
-                allocate(makeH(new_nat), heavy(new_nat), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                makeH(1:new_nat) = .false.
-                heavy(1:new_nat) = .false.
-        end if
+  if(allocated(makeH)) then
+    allocate(ltemp(nat_pro), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    ltemp(1:nat_pro) = makeH(1:nat_pro)
+    deallocate(makeH)
+    allocate(makeH(new_nat), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    makeH(1:nat_pro) = ltemp(1:nat_pro)
+    makeH(nat_pro+1:new_nat) = .false.
+    ltemp(1:nat_pro) = heavy(1:nat_pro)
+    deallocate(heavy)
+    allocate(heavy(new_nat), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    heavy(1:nat_pro) = ltemp(1:nat_pro)
+    heavy(nat_pro+1:new_nat) = .false.
+    deallocate(ltemp)
+  else
+    allocate(makeH(new_nat), heavy(new_nat), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    makeH(1:new_nat) = .false.
+    heavy(1:new_nat) = .false.
+  end if
         
-        if(allocated(res)) then
-                allocate(restemp(nres), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                restemp(1:nres) = res(1:nres)
-                deallocate(res)
-                allocate(res(nres + nmore), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                res(1:nres) = restemp(1:nres)
-                deallocate(restemp)
-        else
-                allocate(res(nres + nmore), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-        end if
+  if(allocated(res)) then
+    allocate(restemp(nres), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    restemp(1:nres) = res(1:nres)
+    deallocate(res)
+    allocate(res(nres + nmore), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    res(1:nres) = restemp(1:nres)
+    deallocate(restemp)
+  else
+    allocate(res(nres + nmore), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+  end if
         
-        if(allocated(istart_mol)) then
-                allocate(itemp(nmol), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                itemp(1:nmol) = istart_mol(1:nmol)
-                deallocate(istart_mol)
-                allocate(istart_mol(nmol+nmore), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-                istart_mol(1:nmol) = itemp(1:nmol)
-                deallocate(itemp)
-        else
-                allocate(istart_mol(nmol+nmore), stat=alloc_status)
-                call check_alloc('reallocating topology atom array')
-        end if          
+  if(allocated(istart_mol)) then
+    allocate(itemp(nmol), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    itemp(1:nmol) = istart_mol(1:nmol)
+    deallocate(istart_mol)
+    allocate(istart_mol(nmol+nmore), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+    istart_mol(1:nmol) = itemp(1:nmol)
+    deallocate(itemp)
+  else
+    allocate(istart_mol(nmol+nmore), stat=alloc_status)
+    call check_alloc('reallocating topology atom array')
+  end if
 end subroutine grow_arrays_for_solvent
 
 
-!------------------------------------------------------------------------------!
-!!  function: rwat_eff
-!
-!------------------------------------------------------------------------------!
 real function rwat_eff()
+!!-------------------------------------------------------------------------------
+!!  function: rwat_eff
+!!
+!!-------------------------------------------------------------------------------
   ! local variables
-  integer                           :: i,kr,isort,bins
-  real(8)                           :: rc,rnwat
-  integer, allocatable              :: npro_of_r(:)
-  real(8)                           :: rho_ratio, solvent_volume, rho_solvent
+  integer                          :: i,kr,isort,bins
+  real(8)                          :: rc,rnwat
+  integer, allocatable             :: npro_of_r(:)
+  real(8)                          :: rho_ratio, solvent_volume, rho_solvent
 
-        rwat_eff = 0
-        if ( nwat .eq. 0 ) return
+  rwat_eff = 0
+  if ( nwat .eq. 0 ) return
 
-        !make sure to include all waters in topology
+  !make sure to include all waters in topology
   bins = int(max(abs(rwat), rexcl_o)*100)+1000
   allocate(npro_of_r(bins), stat=alloc_status)
   call check_alloc('protein radial distribution array')
 
-
-        npro_of_r(:) = 0
-        do i = 1, nat_solute
-                rc    = sqrt(dot_product(xtop(3*i-2:3*i)-xwcent(:),&
-                        xtop(3*i-2:3*i)-xwcent(:)))
-                isort = int ( 100. * rc )
-                if ( isort .eq. 0 ) isort = 1
-                if ( isort .le. bins ) then
-                        if(heavy(i) .and. (.not. excl(i)))  &
-                                npro_of_r(isort) = npro_of_r(isort) + 1
-                end if
-        end do
+  npro_of_r(:) = 0
+  do i = 1, nat_solute
+    rc    = sqrt(dot_product(xtop(3*i-2:3*i)-xwcent(:),&
+      xtop(3*i-2:3*i)-xwcent(:)))
+    isort = int ( 100. * rc )
+    if ( isort .eq. 0 ) isort = 1
+    if ( isort .le. bins ) then
+      if(heavy(i) .and. (.not. excl(i)))  &
+        npro_of_r(isort) = npro_of_r(isort) + 1
+    end if
+  end do
         
-        !calc solvent density
-        solvent_volume = 0.
-        do i = nres_solute + 1, nres
-                if(lib(res(i)%irc)%density > 0) then
-                        solvent_volume = solvent_volume + 1./lib(res(i)%irc)%density
-                end if
-        end do
-        rho_solvent = nwat/solvent_volume
-        ! --- rho_ratio (0.577) comes from dividing the average volume of
-        !     protein atoms (17.26 A**3) by the volume of a water molecule (29.9 A**3).
-        rho_ratio = rho_solvent/rho_solute
-        rnwat = 0.0
-        do kr = 1, bins
-                rc = real(kr)*0.01 
-                rnwat = rnwat + 4.*pi*rc*rc*rho_solvent &
-                        *0.01-rho_ratio*npro_of_r(kr)
-                if ( int(rnwat) >= nwat - nexwat ) exit
-        end do
-        rwat_eff = rc
+  !calc solvent density
+  solvent_volume = 0.
+  do i = nres_solute + 1, nres
+    if(lib(res(i)%irc)%density > 0) then
+      solvent_volume = solvent_volume + 1./lib(res(i)%irc)%density
+    end if
+  end do
+  rho_solvent = nwat/solvent_volume
+  ! --- rho_ratio (0.577) comes from dividing the average volume of
+  !     protein atoms (17.26 A**3) by the volume of a water molecule (29.9 A**3).
+  rho_ratio = rho_solvent/rho_solute
+  rnwat = 0.0
+  do kr = 1, bins
+    rc = real(kr)*0.01
+    rnwat = rnwat + 4.*pi*rc*rc*rho_solvent &
+      *0.01-rho_ratio*npro_of_r(kr)
+    if ( int(rnwat) >= nwat - nexwat ) exit
+  end do
+  rwat_eff = rc
 
-        deallocate(npro_of_r)
+  deallocate(npro_of_r)
 end function rwat_eff
 
 
-!------------------------------------------------------------------------------!
+type(tor_codes) function torcode(taci, tacj, tack, tacl)
+!!-------------------------------------------------------------------------------
 !!  function: torcode
-!
-!------------------------------------------------------------------------------!
-type(TOR_CODES) function torcode(taci, tacj, tack, tacl)
-!arguments
-        character(KEYLENGTH)                    :: taci, tacj, tack, tacl
-! *** local variables
-        integer i
-        character(KEYLENGTH)                    :: ti, tj, tk, tl
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  character(keylength)             :: taci, tacj, tack, tacl
+  ! *** local variables
+  integer i
+  character(keylength)             :: ti, tj, tk, tl
 
-        ti = wildcard_tac(taci)
-        tj = wildcard_tac(tacj)
-        tk = wildcard_tac(tack)
-        tl = wildcard_tac(tacl)
+  ti = wildcard_tac(taci)
+  tj = wildcard_tac(tacj)
+  tk = wildcard_tac(tack)
+  tl = wildcard_tac(tacl)
 
-        torcode%ncod = 0
-        torcode%cod(:) = 0
+  torcode%ncod = 0
+  torcode%cod(:) = 0
 
-        !search for exact match first
-        do i = 1, ntor_types
-                if((ti == tor_types(i)%taci .and. tj == tor_types(i)%tacj &
-                        .and. tk == tor_types(i)%tack .and. tl == tor_types(i)%tacl) &
-                        .or. &
-                        (ti == tor_types(i)%tacl .and. tj == tor_types(i)%tack .and. tk == tor_types(i)%tacj &
-                        .and. tl == tor_types(i)%taci)) then
+  !search for exact match first
+  do i = 1, ntor_types
+    if((ti == tor_types(i)%taci .and. tj == tor_types(i)%tacj &
+      .and. tk == tor_types(i)%tack .and. tl == tor_types(i)%tacl) &
+      .or. &
+      (ti == tor_types(i)%tacl .and. tj == tor_types(i)%tack .and. tk == tor_types(i)%tacj &
+      .and. tl == tor_types(i)%taci)) then
                         
-                        torcode%ncod = torcode%ncod + 1
-                        torcode%cod(torcode%ncod) = tor_types(i)%cod
-                endif
-        enddo
-        if(torcode%ncod > 0) return !stop looking if something was found
+      torcode%ncod = torcode%ncod + 1
+      torcode%cod(torcode%ncod) = tor_types(i)%cod
+    end if
+  end do
+  if(torcode%ncod > 0) return !stop looking if something was found
 
-        !then search with wildcard at i 
-        do i = 1, ntor_types
-                if(tor_types(i)%taci == '') then 
-                    if((tj == tor_types(i)%tacj .and. tk == tor_types(i)%tack .and. tl == tor_types(i)%tacl) .or. &
-                            (ti == tor_types(i)%tacl .and. tj == tor_types(i)%tack .and. tk == tor_types(i)%tacj)) then
+  !then search with wildcard at i
+  do i = 1, ntor_types
+    if(tor_types(i)%taci == '') then
+      if((tj == tor_types(i)%tacj .and. tk == tor_types(i)%tack .and. tl == tor_types(i)%tacl) .or. &
+        (ti == tor_types(i)%tacl .and. tj == tor_types(i)%tack .and. tk == tor_types(i)%tacj)) then
 
-                                torcode%ncod = torcode%ncod + 1
-                                torcode%cod(torcode%ncod) = tor_types(i)%cod
-                    endif
-                endif
-        enddo
-        if(torcode%ncod > 0) return !stop looking if something was found
+        torcode%ncod = torcode%ncod + 1
+        torcode%cod(torcode%ncod) = tor_types(i)%cod
+      end if
+    end if
+  end do
+  if(torcode%ncod > 0) return !stop looking if something was found
 
-        !then search with wildcard at l
-        do i = 1, ntor_types
-                if(tor_types(i)%tacl == '') then 
-                    if((ti == tor_types(i)%taci .and. tj == tor_types(i)%tacj .and. tk == tor_types(i)%tack) .or. &
-                            (tj == tor_types(i)%tack .and. tk == tor_types(i)%tacj .and. tl == tor_types(i)%taci)) then
+  !then search with wildcard at l
+  do i = 1, ntor_types
+    if(tor_types(i)%tacl == '') then
+      if((ti == tor_types(i)%taci .and. tj == tor_types(i)%tacj .and. tk == tor_types(i)%tack) .or. &
+        (tj == tor_types(i)%tack .and. tk == tor_types(i)%tacj .and. tl == tor_types(i)%taci)) then
 
-                                torcode%ncod = torcode%ncod + 1
-                                torcode%cod(torcode%ncod) = tor_types(i)%cod
-                    endif
-                endif
-        enddo
-        if(torcode%ncod > 0) return !stop looking if something was found
+        torcode%ncod = torcode%ncod + 1
+        torcode%cod(torcode%ncod) = tor_types(i)%cod
+      end if
+    end if
+  end do
+  if(torcode%ncod > 0) return !stop looking if something was found
 
-        !then search with wildcards at i & l
-        do i = 1, ntor_types
-                if(tor_types(i)%taci == '' .and. tor_types(i)%tacl == '') then 
-                    if((tj == tor_types(i)%tacj .and. tk == tor_types(i)%tack) .or. &
-                            (tj == tor_types(i)%tack .and. tk == tor_types(i)%tacj)) then
+  !then search with wildcards at i & l
+  do i = 1, ntor_types
+    if(tor_types(i)%taci == '' .and. tor_types(i)%tacl == '') then
+      if((tj == tor_types(i)%tacj .and. tk == tor_types(i)%tack) .or. &
+        (tj == tor_types(i)%tack .and. tk == tor_types(i)%tacj)) then
 
-                                torcode%ncod = torcode%ncod + 1
-                                torcode%cod(torcode%ncod) = tor_types(i)%cod
-                    endif
-                endif
-        enddo
-        if(torcode%ncod > 0) return !stop looking if something was found
+        torcode%ncod = torcode%ncod + 1
+        torcode%cod(torcode%ncod) = tor_types(i)%cod
+      end if
+    end if
+  end do
+  if(torcode%ncod > 0) return !stop looking if something was found
 
-        !then search with wildcards at i & j or k & l
-        do i = 1, ntor_types
-                if(tor_types(i)%taci == '' .and. tor_types(i)%tacj == '') then 
-                    if((tk == tor_types(i)%tack .and. tl == tor_types(i)%tacl) .or. &
-                            (ti == tor_types(i)%tacl .and. tj == tor_types(i)%tack)) then
+  !then search with wildcards at i & j or k & l
+  do i = 1, ntor_types
+    if(tor_types(i)%taci == '' .and. tor_types(i)%tacj == '') then
+      if((tk == tor_types(i)%tack .and. tl == tor_types(i)%tacl) .or. &
+        (ti == tor_types(i)%tacl .and. tj == tor_types(i)%tack)) then
 
-                                torcode%ncod = torcode%ncod + 1
-                                torcode%cod(torcode%ncod) = tor_types(i)%cod
-                    endif
-                ELSEif(tor_types(i)%tack == '' .and. tor_types(i)%tacl == '') then 
-                    if((ti == tor_types(i)%taci .and. tj == tor_types(i)%tacj) .or. &
-                            (tl == tor_types(i)%taci .and. tk == tor_types(i)%tacj)) then
+        torcode%ncod = torcode%ncod + 1
+        torcode%cod(torcode%ncod) = tor_types(i)%cod
+      end if
+    else if(tor_types(i)%tack == '' .and. tor_types(i)%tacl == '') then
+      if((ti == tor_types(i)%taci .and. tj == tor_types(i)%tacj) .or. &
+        (tl == tor_types(i)%taci .and. tk == tor_types(i)%tacj)) then
 
-                                torcode%ncod = torcode%ncod + 1
-                                torcode%cod(torcode%ncod) = tor_types(i)%cod
-                    endif
-                endif
-        enddo
-        if(torcode%ncod > 0) return !stop looking if something was found
+        torcode%ncod = torcode%ncod + 1
+        torcode%cod(torcode%ncod) = tor_types(i)%cod
+      end if
+    end if
+  end do
+  if(torcode%ncod > 0) return !stop looking if something was found
 
-        write( * , '(a,4(1x,a8))') '>>> Missing torsion type for atom types', &
-                 ti, tj, tk, tl
-        topo_ok = .false.
+  write( * , '(a,4(1x,a8))') '>>> Missing torsion type for atom types', &
+    ti, tj, tk, tl
+  topo_ok = .false.
 
-!.......................................................................
 end function torcode
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: tors_ene
-!
-!------------------------------------------------------------------------------!
 subroutine tors_ene(emax, nlarge, av_ene)
-! *** local variables
-        integer i, j, k, l, ip, ic, i3, j3, k3, l3, nlarge
-        real rji(3), rjk(3), rkl(3), rnj(3), rnk(3), bj, bk, scp,       &
-        phi, sgn, pe, dv, rki(3), rlj(3), dp(12), arg, f1, di(3),        &
-        dl(3)
-        real emax, av_ene
+!!-------------------------------------------------------------------------------
+!!  subroutine: tors_ene
+!!
+!!-------------------------------------------------------------------------------
+  ! *** local variables
+  integer i, j, k, l, ip, ic, i3, j3, k3, l3, nlarge
+  real rji(3), rjk(3), rkl(3), rnj(3), rnk(3), bj, bk, scp,       &
+    phi, sgn, pe, dv, rki(3), rlj(3), dp(12), arg, f1, di(3),        &
+    dl(3)
+  real emax, av_ene
 
-!.......................................................................
+  nlarge = 0
+  av_ene = 0
 
-        nlarge = 0
-        av_ene = 0
+  do ip = 1, ntors
 
-        do ip = 1, ntors
+    i = tor(ip)%i
+    j = tor(ip)%j
+    k = tor(ip)%k
+    l = tor(ip)%l
+    ic = tor(ip)%cod
+    if(ic == 0) then !missing parameter
+      write(*, '(5i5,1x,a)') ip, i, j, k, l, 'MISSING PARAMETERS'
+      cycle
+    end if
+    i3 = i * 3 - 3
+    j3 = j * 3 - 3
+    k3 = k * 3 - 3
+    l3 = l * 3 - 3
+    rji(1) = xtop(i3 + 1) - xtop(j3 + 1)
+    rji(2) = xtop(i3 + 2) - xtop(j3 + 2)
+    rji(3) = xtop(i3 + 3) - xtop(j3 + 3)
+    rjk(1) = xtop(k3 + 1) - xtop(j3 + 1)
+    rjk(2) = xtop(k3 + 2) - xtop(j3 + 2)
+    rjk(3) = xtop(k3 + 3) - xtop(j3 + 3)
+    rkl(1) = xtop(l3 + 1) - xtop(k3 + 1)
+    rkl(2) = xtop(l3 + 2) - xtop(k3 + 2)
+    rkl(3) = xtop(l3 + 3) - xtop(k3 + 3)
+    rnj(1) = rji(2) * rjk(3) - rji(3) * rjk(2)
+    rnj(2) = rji(3) * rjk(1) - rji(1) * rjk(3)
+    rnj(3) = rji(1) * rjk(2) - rji(2) * rjk(1)
+    rnk(1) = - rjk(2) * rkl(3) + rjk(3) * rkl(2)
+    rnk(2) = - rjk(3) * rkl(1) + rjk(1) * rkl(3)
+    rnk(3) = - rjk(1) * rkl(2) + rjk(2) * rkl(1)
+    bj = sqrt(rnj(1) **2 + rnj(2) **2 + rnj(3) **2)
+    bk = sqrt(rnk(1) **2 + rnk(2) **2 + rnk(3) **2)
+    scp =(rnj(1) * rnk(1) + rnj(2) * rnk(2) + rnj(3) * rnk(3) )&
+      /(bj * bk)
+    if(scp>1.0) scp = 1.0
+    if(scp< - 1.0) scp = - 1.0
+    phi = acos(scp)
+    sgn = rjk(1) *(rnj(2) * rnk(3) - rnj(3) * rnk(2) ) + rjk(2)&
+      *(rnj(3) * rnk(1) - rnj(1) * rnk(3) ) + rjk(3) *(rnj(1)   &
+      * rnk(2) - rnj(2) * rnk(1) )
+    if(sgn<0) phi = - phi
 
-        i = tor(ip)%i
-        j = tor(ip)%j
-        k = tor(ip)%k
-        l = tor(ip)%l
-        ic = tor(ip)%cod
-        if(ic == 0) then !missing parameter
-                write(*, '(5i5,1x,a)') ip, i, j, k, l, 'MISSING PARAMETERS'
-                cycle 
-        end if
-        i3 = i * 3 - 3
-        j3 = j * 3 - 3
-        k3 = k * 3 - 3
-        l3 = l * 3 - 3
-        rji(1) = xtop(i3 + 1) - xtop(j3 + 1)
-        rji(2) = xtop(i3 + 2) - xtop(j3 + 2)
-        rji(3) = xtop(i3 + 3) - xtop(j3 + 3)
-        rjk(1) = xtop(k3 + 1) - xtop(j3 + 1)
-        rjk(2) = xtop(k3 + 2) - xtop(j3 + 2)
-        rjk(3) = xtop(k3 + 3) - xtop(j3 + 3)
-        rkl(1) = xtop(l3 + 1) - xtop(k3 + 1)
-        rkl(2) = xtop(l3 + 2) - xtop(k3 + 2)
-        rkl(3) = xtop(l3 + 3) - xtop(k3 + 3)
-        rnj(1) = rji(2) * rjk(3) - rji(3) * rjk(2)
-        rnj(2) = rji(3) * rjk(1) - rji(1) * rjk(3)
-        rnj(3) = rji(1) * rjk(2) - rji(2) * rjk(1)
-        rnk(1) = - rjk(2) * rkl(3) + rjk(3) * rkl(2)
-        rnk(2) = - rjk(3) * rkl(1) + rjk(1) * rkl(3)
-        rnk(3) = - rjk(1) * rkl(2) + rjk(2) * rkl(1)
-        bj = sqrt(rnj(1) **2 + rnj(2) **2 + rnj(3) **2)
-        bk = sqrt(rnk(1) **2 + rnk(2) **2 + rnk(3) **2)
-        scp =(rnj(1) * rnk(1) + rnj(2) * rnk(2) + rnj(3) * rnk(3) )&
-        /(bj * bk)
-        if(scp>1.0) scp = 1.0
-        if(scp< - 1.0) scp = - 1.0
-        phi = acos(scp)
-        sgn = rjk(1) *(rnj(2) * rnk(3) - rnj(3) * rnk(2) ) + rjk(2)&
-        *(rnj(3) * rnk(1) - rnj(1) * rnk(3) ) + rjk(3) *(rnj(1)   &
-        * rnk(2) - rnj(2) * rnk(1) )
-        if(sgn<0) phi = - phi
+    ! ---   energy
+    arg = torlib(ic)%rmult * phi - torlib(ic)%deltor * pi / 180.
+    pe = torlib(ic)%fk *(1.0 + cos(arg) ) / real(torlib(ic)%paths )
+    av_ene = av_ene+pe
 
-! ---   energy
+    if(pe>emax) then
+      nlarge = nlarge+1
+      write( * , '(6i5,5f8.2)') ip, i, j, k, l, ic, torlib(ic)%fk ,   &
+        torlib(ic)%rmult , torlib(ic)%deltor , phi * 180. / pi, pe
+    end if
 
-        arg = torlib(ic)%rmult * phi - torlib(ic)%deltor * pi / 180.
-        pe = torlib(ic)%fk *(1.0 + cos(arg) ) / real(torlib(ic)%paths )
+  end do
 
-        av_ene = av_ene+pe
-
-        if(pe>emax) then
-                nlarge = nlarge+1
-                write( * , '(6i5,5f8.2)') ip, i, j, k, l, ic, torlib(ic)%fk ,   &
-                torlib(ic)%rmult , torlib(ic)%deltor , phi * 180. / pi, pe
-        endif
-
-        enddo
-
-        if(ntors/=0) av_ene = av_ene / real(ntors)
+  if(ntors/=0) av_ene = av_ene / real(ntors)
 
 end subroutine tors_ene
 
 
-!------------------------------------------------------------------------------!
+logical function check_residues()
+!!-------------------------------------------------------------------------------
 !!  function: check_residues
 !!
-!------------------------------------------------------------------------------!
-logical function check_residues()
-!locals
-        integer                                         :: i,j
+!!-------------------------------------------------------------------------------
+  !locals
+  integer                          :: i,j
 
-        !stop immediately if no library
-        if(nlibres == 0 .and. nat_pro > 0) then
-                check_residues = .false.
-                write(*, '(a)') '>>>>>ERROR: No library loaded.'
-                return
-        end if
+  !stop immediately if no library
+  if(nlibres == 0 .and. nat_pro > 0) then
+    check_residues = .false.
+    write(*, '(a)') '>>>>>ERROR: No library loaded.'
+    return
+  end if
 
-        check_residues = .true.
-        !check that all residues are in the library
-resloop:do i = 1, nres
-libloop:do j = 1, nlibres
-                        if(res(i)%name ==lib(j)%nam ) then
-                                res(i)%irc = j
-                                cycle resloop
-                        endif
-                enddo libloop
-                !if we reach here then the library entry was not found
-                write(*,'(a,i3,a)') '>>> Residue ',i, ' not found in library: ',        &
-                        res(i)%name
-                check_residues = .false.
-        enddo resloop
+  check_residues = .true.
+  !check that all residues are in the library
+  resloop:do i = 1, nres
+    libloop:do j = 1, nlibres
+      if(res(i)%name ==lib(j)%nam ) then
+        res(i)%irc = j
+        cycle resloop
+      end if
+    end do libloop
+    !if we reach here then the library entry was not found
+    write(*,'(a,i3,a)') '>>> Residue ',i, ' not found in library: ',        &
+      res(i)%name
+    check_residues = .false.
+  end do resloop
 end function check_residues
 
 
-!------------------------------------------------------------------------------!
+subroutine writepdb
+!!-------------------------------------------------------------------------------
 !!  subroutine: writepdb
 !!
-!------------------------------------------------------------------------------!
-subroutine writepdb
+!!-------------------------------------------------------------------------------
 ! *** local variables
   character(len=80)                :: filnam
   character(len=1)                 :: reply
@@ -6034,13 +6107,12 @@ subroutine writepdb
   end if
   rewind(3)
 
-
   call get_string_arg(reply, '-----> Write out TER cards [y/n] ? ')
   select case(reply)
   case('y', 'Y')
-          iwrite_g = 1
+    iwrite_g = 1
   case default
-          iwrite_g = 0
+    iwrite_g = 0
   end select      
 
 
@@ -6096,7 +6168,7 @@ subroutine writepdb
           i,xtop(iat*3-2:iat*3)
         wrote_atom_in_molecule = .true.
       end if
-    enddo
+    end do
     if(i < nres_solute .and. imol < nmol) then
       if(istart_mol(imol + 1) ==iat + 1) then
         imol = imol + 1
@@ -6104,9 +6176,9 @@ subroutine writepdb
           write(3, 11)  ter, res(i)%name, i
         end if
         wrote_atom_in_molecule = .false.
-      endif
+      end if
     end if
-  enddo
+  end do
 
   !now write connect records for HETATM groups
   do i = 1, nres_solute !loop over all solute residues
@@ -6140,11 +6212,11 @@ subroutine writepdb
 end subroutine writepdb
 
 
-!------------------------------------------------------------------------------!
+subroutine writemol2
+!!-------------------------------------------------------------------------------
 !!  subroutine: writemol2
 !!
-!------------------------------------------------------------------------------!
-subroutine writemol2
+!!-------------------------------------------------------------------------------
   ! *** local variables
   character(len=80)                :: filnam
   character(len=1)                 :: reply
@@ -6252,8 +6324,8 @@ subroutine writemol2
           xtop(iat*3-2:iat*3), SYBYL_atom_type(iac(iat)), &
           new_resnum(i), res(i)%name, crg(iat)
       end if
-    enddo
-  enddo
+    end do
+  end do
 
   !Write bond records
   write(u,'(a)') '@<TRIPOS>BOND'
@@ -6297,11 +6369,10 @@ subroutine writemol2
 end subroutine writemol2
 
 
-
-!------------------------------------------------------------------------------!
+!!-------------------------------------------------------------------------------
 !!  subroutine: writetop
-!
-!------------------------------------------------------------------------------!
+!!
+!!-------------------------------------------------------------------------------
 subroutine writetop
   ! *** local variables
   character(len=80)     :: filnam
@@ -6317,29 +6388,28 @@ subroutine writetop
     call get_string_arg(answer, '-----> Write _ERRONENOUS_ topology [yes/NO] ? ')
     if(answer/='yes') then
       return
-    endif
-  endif
+    end if
+  end if
   write( *, * )
   call get_string_arg(filnam, '-----> Give name of new topology file: ')
   call topo_save(filnam)
 end subroutine writetop
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: listprefs
-!!
-!------------------------------------------------------------------------------!
 subroutine listprefs
+!!-------------------------------------------------------------------------------
+!!  **subroutine: listprefs**
+!!
+!!-------------------------------------------------------------------------------
   call pref_list('Preferences (use set command to change):')
 end subroutine listprefs
 
 
-
-!------------------------------------------------------------------------------!
-!!  subroutine: set
-!!
-!------------------------------------------------------------------------------!
 subroutine set
+!!------------------------------------------------------------------------------
+!!  **subroutine: set**
+!!
+!!------------------------------------------------------------------------------
   !locals
   character(len=PREF_LEN)         :: name, value
   logical                         :: l
@@ -6351,14 +6421,15 @@ subroutine set
 end subroutine set
 
 
-!------------------------------------------------------------------------------!
-!!  subroutine: make_shell2
-!
+subroutine make_shell2
+!!------------------------------------------------------------------------------
+!!  **subroutine: make_shell2**
+!!
 !!  Sort out atoms in restrained shell. Use protein center to calculate distance.
 !!  Use coordinates from topology unless 'implicit_rstr_from_file' is specified
-!!  Swiped from md.f90, needed when using atom masks "not restrained"
-!------------------------------------------------------------------------------!
-subroutine make_shell2
+!!  Copied from md.f90, needed when using atom masks "not restrained"
+!!
+!!------------------------------------------------------------------------------
 ! *** Local variables
   integer                          :: i,ig,i3,k
   real(8)                          :: rout2,rin2,r2
@@ -6395,13 +6466,14 @@ subroutine make_shell2
 end subroutine make_shell2
 
 
-!------------------------------------------------------------------------------!
-!!  function: get_center_by_mass
-!
+logical function get_center_by_mass(center)
+!!------------------------------------------------------------------------------
+!!  **function: get_center_by_mass**
+!!
 !!  Returns true if center of mass can be assigned
 !!  and returns center of mass for a mask of atoms in the vector 'center'
-!------------------------------------------------------------------------------!
-logical function get_center_by_mass(center)
+!!
+!!------------------------------------------------------------------------------
   real(8), intent(out)             :: center(3)
   type(mask_type)                  :: mask
   integer                          :: ats, imaskat, iat
@@ -6425,6 +6497,8 @@ logical function get_center_by_mass(center)
   center = center/totmass  
   get_center_by_mass = .true.
 end function get_center_by_mass
+
+
 
 
 end module prep

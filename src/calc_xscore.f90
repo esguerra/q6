@@ -1,14 +1,14 @@
-!------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
-!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
-!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
-!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
-!  latest update: August 29, 2017                                              !
-!------------------------------------------------------------------------------!
+!------------------------------------------------------------------------------
+!  Q version 5.7
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,
+!  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,
+!  Miha Purg, Irek Szeler, Mauricio Esguerra
+!  latest update: August 29, 2017
+!------------------------------------------------------------------------------
 
-!------------------------------------------------------------------------------!
+!------------------------------------------------------------------------------
 !>  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
 !!  calc_xscore.f90
@@ -19,7 +19,7 @@
 !! structure from the original xscore source code is ported to f90.
 !! Before scoring, protein and ligand data structures are translated to
 !! xscore format.
-!------------------------------------------------------------------------------!
+!------------------------------------------------------------------------------
 module calc_xscore
 
   use CALC_BASE
@@ -295,29 +295,29 @@ module calc_xscore
 
   type tXAtom
     integer                                                 :: topindex                     !  topology index
-    integer                                                 :: id           !* atom id
-    integer                                                 :: valid                                !* valid indicator
+    integer                                                 :: id           ! atom id
+    integer                                                 :: valid                                ! valid indicator
     integer                                                 :: mask                                 !  mask flag
     character(len=10)               :: name         !  atom name
-    character(len=10)               :: ttype                                !* basic atom type
-    character(len=10)               :: xtype        !* xtool atom type
+    character(len=10)               :: ttype                                ! basic atom type
+    character(len=10)               :: xtype        ! xtool atom type
     character(len=10)               :: type2        !  another atom type when necessary
-    character(len=10)               :: residue      !* residue name
+    character(len=10)               :: residue      ! residue name
     character(len=10)               :: old_residue  !  old residue name, helps debugging force field translations
     character(len=10)               :: res_id       !  residue id: must be a string for PDB
     integer                                                 :: atom_res_id  !        atom number within residue
     integer                                                 :: iscofactor           !  flag indicating if atom is part of a cofactor (1) or not (0)
     character                                               :: chain        !  chain label
-    real,dimension(0:2)     :: coor                                 !* coordinates
-    real,dimension(0:2)     :: root                                 !* HB root's coordinates
-    real                                                            :: weight       !* atomic weight
-    real                                                            :: r            !* vdw radius
-    real                                                            :: eps          !* vdw epsilon value
-    real                                                            :: q                                            !* partial atomic charge
+    real,dimension(0:2)     :: coor                                 ! coordinates
+    real,dimension(0:2)     :: root                                 ! HB root's coordinates
+    real                                                            :: weight       ! atomic weight
+    real                                                            :: r            ! vdw radius
+    real                                                            :: eps          ! vdw epsilon value
+    real                                                            :: q                                            ! partial atomic charge
     real                                                            :: XR                                           !  X radius
-    real                                                            :: logp         !* atomic hydrophobic scale
-    real                                                            :: solv                                 !* atomic solvation parameter
-    character(len=3)                :: hb           !* HB property
+    real                                                            :: logp         ! atomic hydrophobic scale
+    real                                                            :: solv                                 ! atomic solvation parameter
+    character(len=3)                :: hb           ! HB property
     real                                                            :: occupancy            !  occupancy probability, for protein atoms
     real                                                            :: bfactor                      !  B-factor, for protein atoms
     real                                                            :: score        !  atomic binding score
@@ -8238,6 +8238,7 @@ subroutine Protein_Detect_Connections(protein,lite_run)
 
                         protein%atom(i)%num_nonh=count
                         12 end do
+
 end subroutine Protein_Detect_Connections
 
 end module calc_xscore

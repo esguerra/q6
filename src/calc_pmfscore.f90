@@ -99,15 +99,15 @@ module calc_pmf
     integer                                                                 :: nonzero_score        ! flag indicating if atom ever got a non zero score
                 
     ! XScore members
-    integer                                                                 :: id           !* atom id
-    integer                                                                 :: valid                                !* valid indicator
+    integer                                                                 :: id           ! atom id
+    integer                                                                 :: valid                                ! valid indicator
     integer                                                                 :: mask                                 !  mask flag
-    character(len=10)                               :: residue      !* residue name
+    character(len=10)                               :: residue      ! residue name
     character(len=10)                               :: res_id       !  residue id: must be a string for PDB
     integer                                                                 :: atom_res_id  !        atom number within residue
     integer                                                                 :: iscofactor           !  flag indicating if atom is part of a cofactor (1) or not (0)
     character                                                               :: chain        !  chain label
-    real                                                                            :: q                                            !* partial atomic charge
+    real                                                                            :: q                                            ! partial atomic charge
     real                                                                            :: weight
     integer                                                                 :: origin                               !  atom origin indicator: 1=ligand 2=protein
     integer                                                                 :: part                                 !  component indicator: for protein atoms: 1=ATOM 2=HETATM
