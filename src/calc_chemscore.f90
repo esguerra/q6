@@ -35,8 +35,8 @@ module calc_chemscore
   character*80            :: top_file, fep_file
 
   type score_precalc_type
-    character(len=80)       :: chFilename           ! name of re file if one is given
-    integer                                         :: iType                                ! 1 = top calculation, 2 = restart calculation
+    character(len=80)     :: chFilename ! name of re file if one is given
+    integer               :: iType      ! 1 = top calculation, 2 = restart calculation
   end type score_precalc_type
 
   type score_type                                                                                 ! structure tp keep track of scoring data
@@ -282,42 +282,40 @@ subroutine calc_metals                          !in subroutine calc_scores
 
 end subroutine calc_metals
 
-subroutine calc_rot                                     !in subroutine calc_scores
-        integer                 :: i,nfrozen
-        real                            :: pa,pb,hrot,sum
+subroutine calc_rot      !in subroutine calc_scores
+  integer                 :: i,nfrozen
+  real                    :: pa,pb,hrot,sum
 
-        nfrozen = 0
-        sum = 0
+  nfrozen = 0
+  sum = 0
 
-        do i = 1,nqbonds
-                if (q_bonds(i)%acontact .and. q_bonds(i)%bcontact) then  !if the bond is rotatable and frozen
-                                nfrozen = nfrozen + 1
-                                pa = real(q_bonds(i)%a_nonlip)/(q_bonds(i)%a_nonlip + q_bonds(i)%a_lip) ! % non-lipophilic heavy atoms on a-side
-                                pb = real(q_bonds(i)%b_nonlip)/(q_bonds(i)%b_nonlip + q_bonds(i)%b_lip)
-                                sum = sum + ((pa + pb)/2)               !add to sum with weight according to pa and pb
-                                write(*,*) 'qbond ', i, ', atoms ', q_bonds(i)%a%top_nr, q_bonds(i)%b%top_nr, ', contrib = ', ((pa + pb)/2)
-                end if
-        end do
-        if(nfrozen == 0) then
-                hrot = 0
-        else
-                hrot = 1 + (1-1.0/nfrozen)*sum
-        end if
+  do i = 1,nqbonds
+    if (q_bonds(i)%acontact .and. q_bonds(i)%bcontact) then  !if the bond is rotatable and frozen
+      nfrozen = nfrozen + 1
+      pa = real(q_bonds(i)%a_nonlip)/(q_bonds(i)%a_nonlip + q_bonds(i)%a_lip) ! % non-lipophilic heavy atoms on a-side
+      pb = real(q_bonds(i)%b_nonlip)/(q_bonds(i)%b_nonlip + q_bonds(i)%b_lip)
+      sum = sum + ((pa + pb)/2)  ! add to sum with weight according to pa and pb
+      write(*,*) 'qbond ', i, ', atoms ', q_bonds(i)%a%top_nr, q_bonds(i)%b%top_nr, ', contrib = ', ((pa + pb)/2)
+    end if
+  end do
+  if(nfrozen == 0) then
+    hrot = 0
+  else
+    hrot = 1 + (1-1.0/nfrozen)*sum
+  end if
 
-        rot_term = hrot
+  rot_term = hrot
 end subroutine calc_rot
 
+
 subroutine calc_scores
-        call set_waters                         ! does calcs on waters
-        call calc_hbonds                        ! calc contribution from hbond interaction between ligand and receptor
-
-        call calc_metals                        ! calc contrib from metals in rec interacting with h-bond acceptors in ligand
-
-        call calc_lipo                          ! calc lipophilic contrib
-
-        call q_contacts                         ! set contact parameter =.true. for qatoms in contact with receptor
-        call frozen                                             ! checks if rotatable bonds are frozen
-        call calc_rot                                   ! calcs contrib from frozen rotatable bonds
+  call set_waters                         ! does calcs on waters
+  call calc_hbonds                        ! calc contribution from hbond interaction between ligand and receptor
+  call calc_metals                        ! calc contrib from metals in rec interacting with h-bond acceptors in ligand
+  call calc_lipo                          ! calc lipophilic contrib
+  call q_contacts                         ! set contact parameter =.true. for qatoms in contact with receptor
+  call frozen                             ! checks if rotatable bonds are frozen
+  call calc_rot                           ! calcs contrib from frozen rotatable bonds
 end subroutine calc_scores
 
 subroutine count_qlipo

@@ -22,14 +22,14 @@
 !------------------------------------------------------------------------------
 module calc_xscore
 
-  use CALC_BASE
-  use MASKMANIP
-  use TRJ
-  use TOPO
-  use PRMFILE
-  use INDEXER
-  use QATOM
-  use MISC
+  use calc_base
+  use maskmanip
+  use trj
+  use topo
+  use prmfile
+  use indexer
+  use qatom
+  use misc
 
   implicit none
 
@@ -103,8 +103,8 @@ module calc_xscore
     type(tXMolecule)        :: mol          ! member inherited from molecule class
   end type tXLigand
 
-  type bond_pointer                                                                       !pointer to the datatype q_bond
-    type(q_bond),pointer            ::      qb                              !needed for array of q_bonds in type q_atom
+  type bond_pointer                           !pointer to the datatype q_bond
+    type(q_bond),pointer            :: qb                              !needed for array of q_bonds in type q_atom
   end type bond_pointer
 
   type q_atom
@@ -550,9 +550,9 @@ module calc_xscore
   integer,pointer                                                                                 :: top2prot(:)                          ! topology atom index -> protein atom index translation matrix, used in bond translations
 
   ! Mask
-  integer, public,parameter                                               ::      MAX_MASKS = 10
+  integer, public,parameter                       ::      MAX_MASKS = 10
   type(MASK_TYPE), public, target                 ::      masks(MAX_MASKS)
-  integer, public                                                                                 ::      Nmasks = 0
+  integer, public                                 ::      Nmasks = 0
 
   ! Results
   type(tXScore), pointer                  :: xscores(:)           ! xscoring stats for each frame
@@ -564,15 +564,15 @@ module calc_xscore
   character(len=20)       :: chTranslationKey
   character(len=80)       :: chInput
   character(len=80),allocatable   :: cofactor_def(:)
-  integer                                                                                         :: num_cofactor
+  integer                                  :: num_cofactor
 
   ! Conversion
   type(ATOM_TYPE_CONVERSION), allocatable :: atomtypetable(:)
-  integer                                                                                                                                 :: num_atomtype
+  integer                                                                 :: num_atomtype
   type(PATOM_NAME_CONVERSION), pointer            :: patomnametable(:)
-  integer                                                                                                                                 :: num_patomrestype
+  integer                                                            :: num_patomrestype
   type(RESIDUE_NAME_CONVERSION), pointer  :: residuetable(:)
-  integer                                                                                                                                 :: num_residue
+  integer                                                                 :: num_residue
 
   ! Consts, params and misc
   integer :: MAX_BOND_NEIB = 10
@@ -596,10 +596,10 @@ module calc_xscore
   real ::  LAYER_DEPTH = 3.00
 
   integer, parameter              ::      max_atlib = 500
-  real                                                                    ::  PI = 3.1416
+  real                            ::  PI = 3.1416
 
-  integer,public                          :: err                                                          ! public allocation error indicator
-  integer, private                        :: warn                                                         ! flag to inidacte if warnings were displayd
+  integer,public                          :: err                  ! public allocation error indicator
+  integer, private                        :: warn                   ! flag to inidacte if warnings were displayd
 
 contains
 
@@ -676,1312 +676,1313 @@ integer function xscore_add(desc)
 end function xscore_add
 
 subroutine xsort_bonds          !identify pairs of atoms involved in q-bonds and/or hydrogen bonding !in start 
-        integer                                         ::      atom1,atom2
-        integer                                         ::      i,j,k
-        logical                                         ::      polar
+  integer                                         ::      atom1,atom2
+  integer                                         ::      i,j,k
+  logical                                         ::      polar
 
-        !allokera listor
-        allocate (q_atoms(nqat))
-        allocate (q_bonds(nqat*5))              ! worst case?
-        allocate (hbd_r(nat_solute),hbd_l(nqat))
-        allocate (pol_con(nat_solute))
+  !allocate lists
+  allocate (q_atoms(nqat))
+  allocate (q_bonds(nqat*5))              ! worst case?
+  allocate (hbd_r(nat_solute),hbd_l(nqat))
+  allocate (pol_con(nat_solute))
 
-        nhbd_l = 0
-        nhbd_r = 0
-        q_atoms(:)%n = 0
-        nqbonds = 0
-        pol_con(:) = 0
+  nhbd_l = 0
+  nhbd_r = 0
+  q_atoms(:)%n = 0
+  nqbonds = 0
+  pol_con(:) = 0
 
-        do i = 1,nbonds_solute          ! loop over all bonds between solute atoms
-                polar = .false. 
-                atom1 = bnd(i)%i                
-                atom2 = bnd(i)%j
+  do i = 1,nbonds_solute          ! loop over all bonds between solute atoms
+    polar = .false.
+    atom1 = bnd(i)%i
+    atom2 = bnd(i)%j
                 
-                !store all bonds between q-atoms, pointers relating arrays q_atoms and q_bonds 
-                if ((iqatom(atom1) /= 0) .and. (iqatom(atom2) /= 0)) then
-                        j = iqatom(atom1)
-                        k = iqatom(atom2)  
+    !store all bonds between q-atoms, pointers relating arrays q_atoms and q_bonds
+    if ((iqatom(atom1) /= 0) .and. (iqatom(atom2) /= 0)) then
+      j = iqatom(atom1)
+      k = iqatom(atom2)
 
-                        nqbonds = nqbonds+1
-                        q_bonds(nqbonds)%a => q_atoms(j)                
-                        q_bonds(nqbonds)%b => q_atoms(k)        ! pointer to atom in q_atoms
-                        q_bonds(nqbonds)%cod = bnd(i)%cod       ! some sort of bond type
+      nqbonds = nqbonds+1
+      q_bonds(nqbonds)%a => q_atoms(j)
+      q_bonds(nqbonds)%b => q_atoms(k)        ! pointer to atom in q_atoms
+      q_bonds(nqbonds)%cod = bnd(i)%cod       ! some sort of bond type
 
-                        q_atoms(j)%n = q_atoms(j)%n +1          ! number of bonds to atom j
-                        q_atoms(j)%bd(q_atoms(j)%n)%qb => q_bonds(nqbonds)      !pointer to bond in q_bonds
+      q_atoms(j)%n = q_atoms(j)%n +1          ! number of bonds to atom j
+      q_atoms(j)%bd(q_atoms(j)%n)%qb => q_bonds(nqbonds)      !pointer to bond in q_bonds
                                 
-                        q_atoms(k)%n = q_atoms(k)%n +1
-                        q_atoms(k)%bd(q_atoms(k)%n)%qb => q_bonds(nqbonds)
-                end if
-                        
-        end do
+      q_atoms(k)%n = q_atoms(k)%n +1
+      q_atoms(k)%bd(q_atoms(k)%n)%qb => q_bonds(nqbonds)
+    end if
+
+  end do
 end subroutine xsort_bonds
 
 subroutine XReadAtomTypeConversions(filename, chType)
-        character(len=256)      :: filename
-        character(len=20)               :: chType
-        integer                                                 :: fp, p,p2, num_heading = 0, column, count = 0,filestat,mark,i,j
-        character(len=256)      :: buf,buf2
-        character(len=12),allocatable           :: tmp(:)               
+  character(len=256)      :: filename
+  character(len=20)               :: chType
+  integer                                                 :: fp, p,p2, num_heading = 0, column, count = 0,filestat,mark,i,j
+  character(len=256)      :: buf,buf2
+  character(len=12),allocatable           :: tmp(:)
 
-        fp = freefile()
-        open(unit=fp,file=filename,err=999,action='READ')
-                do
-                        ! First, find the right section
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                call locase(buf)
-                                if(trim(buf).eq.'') then
-                                        goto 11                                 !       skip blank line
-                                elseif(trim(buf(1:1)).eq.'#') then
-                                        goto 11         ! skip comment
-                                elseif(trim(buf).eq.'{ligand atom type translations}') then
-                                        exit
-                                end if
-                        else
-                                write(*,'(a,a)') 'Fatal: Unable to read ligand atom type translations from ', trim(filename)
-                                stop
-                        end if
-11      end do
+  fp = freefile()
+  open(unit=fp,file=filename,err=999,action='READ')
+  do
+    ! First, find the right section
+    read(fp,'(a256)',iostat=filestat) buf
+    if(filestat.eq.0) then
+      call locase(buf)
+      if(trim(buf).eq.'') then
+        goto 11                                 !       skip blank line
+      elseif(trim(buf(1:1)).eq.'#') then
+        goto 11         ! skip comment
+      elseif(trim(buf).eq.'{ligand atom type translations}') then
+        exit
+      end if
+    else
+      write(*,'(a,a)') 'Fatal: Unable to read ligand atom type translations from ', trim(filename)
+      stop
+    end if
+    11      end do
 
-                do
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                call locase(buf)
-                                if(trim(buf).eq.'') then
-                                        goto 1                                  !       skip blank line
-                                elseif(trim(buf(1:1)).eq.'#') then
-                                        goto 1          ! skip comment
-                                elseif(buf(1:5).eq.'sybyl') then
-                                        p = index(buf,'#')
-                                        if(p.ne.0) buf = buf(1:p-1)                                                     ! remove traling comment
+    do
+      read(fp,'(a256)',iostat=filestat) buf
+      if(filestat.eq.0) then
+        call locase(buf)
+        if(trim(buf).eq.'') then
+          goto 1                                  !       skip blank line
+        elseif(trim(buf(1:1)).eq.'#') then
+          goto 1          ! skip comment
+        elseif(buf(1:5).eq.'sybyl') then
+          p = index(buf,'#')
+          if(p.ne.0) buf = buf(1:p-1)                                                     ! remove traling comment
 
-                                        ! First find out how many headings (including xscore) are present
-                                        p = 7
-                                        num_heading = 1
-                                        do
-                                                read(buf(p:256),*,iostat=filestat) buf2
-                                                if(filestat.eq.0) then
-                                                        num_heading = num_heading +1
-                                                        p2 = index(buf(p:255),buf2(1:len(trim(buf2))))
-                                                        if(buf2(1:len(trim(buf2))).eq.chType) then
-                                                                column = num_heading
-                                                        end if
-                                                        p = p + p2 +len(trim(buf2))
-                                                else
-                                                        exit
-                                                end if
-                                        end do
-                                elseif(buf(1:1).eq.'{') then
-                                        exit
-                                else
-                                        count = count +1
-                                end if
-                        else
-                                exit
-                        end if
-1               end do
+          ! First find out how many headings (including xscore) are present
+          p = 7
+          num_heading = 1
+          do
+            read(buf(p:256),*,iostat=filestat) buf2
+            if(filestat.eq.0) then
+              num_heading = num_heading +1
+              p2 = index(buf(p:255),buf2(1:len(trim(buf2))))
+              if(buf2(1:len(trim(buf2))).eq.chType) then
+                column = num_heading
+              end if
+              p = p + p2 +len(trim(buf2))
+            else
+              exit
+            end if
+          end do
+        elseif(buf(1:1).eq.'{') then
+          exit
+        else
+          count = count +1
+        end if
+      else
+        exit
+      end if
+      1               end do
 
-                rewind(fp) 
+      rewind(fp)
 
-                if(column.eq.0) then
-                        write(*,'(a,a,a,a)') 'Fatal error: Column ', adjustl(trim(chType)), ' not found in ', adjustl(trim(filename))
-                        stop
-                end if
+      if(column.eq.0) then
+        write(*,'(a,a,a,a)') 'Fatal error: Column ', adjustl(trim(chType)), ' not found in ', adjustl(trim(filename))
+        stop
+      end if
 
-                num_atomtype = count
-                allocate(atomtypetable(1:num_atomtype))
-                allocate(tmp(1:num_heading))
+      num_atomtype = count
+      allocate(atomtypetable(1:num_atomtype))
+      allocate(tmp(1:num_heading))
 
-                count = 0
-                do
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.ne.0) goto 10
-                        if(trim(buf).eq.'') goto 2              ! skip blank line
-                        if(buf(1:1).eq.'#') goto 2              ! skip REM
+      count = 0
+      do
+        read(fp,'(a256)',iostat=filestat) buf
+        if(filestat.ne.0) goto 10
+        if(trim(buf).eq.'') goto 2              ! skip blank line
+        if(buf(1:1).eq.'#') goto 2              ! skip REM
                 
-                        call locase(buf)
-                        if(trim(buf).eq.'{ligand atom type translations}') then
-                                do
-                                        read(fp,'(a256)',iostat=filestat) buf
-                                        if(filestat.ne.0) goto 10
+        call locase(buf)
+        if(trim(buf).eq.'{ligand atom type translations}') then
+          do
+            read(fp,'(a256)',iostat=filestat) buf
+            if(filestat.ne.0) goto 10
 
-                                        buf = adjustl(trim(buf))
-                                        if(buf.eq.'') goto 3            ! skip blank line
-                                        if(buf(1:1).eq.'#') goto 3              ! skip REM
+            buf = adjustl(trim(buf))
+            if(buf.eq.'') goto 3            ! skip blank line
+            if(buf(1:1).eq.'#') goto 3              ! skip REM
 
-                                        if(buf(1:5).eq.'SYBYL') then
-                                                mark = 1
-                                                goto 3
-                                        end if
+            if(buf(1:5).eq.'SYBYL') then
+              mark = 1
+              goto 3
+            end if
 
-                                        p = index(buf,'#')
-                                        buf = adjustl(buf(1:p-1))                       ! remove traling comment
+            p = index(buf,'#')
+            buf = adjustl(buf(1:p-1))                       ! remove traling comment
 
-                                        if(mark.ne.0) then                                                                      ! read translation table
-                                                tmp(1) = ''
-                                                tmp(column) = ''
-                                                read(buf,*,iostat=filestat) tmp(1:column)
-                                                if(filestat.ne.0) goto 10
+            if(mark.ne.0) then                                                                      ! read translation table
+              tmp(1) = ''
+              tmp(column) = ''
+              read(buf,*,iostat=filestat) tmp(1:column)
+              if(filestat.ne.0) goto 10
 
-                                                if(buf(1:1).eq.'{') then
-                                                 goto 10
-                                                elseif(tmp(column)(1:12).ne.'') then    
-                                                        count = count +1
-                                                        atomtypetable(count)%xscore = tmp(1)
-                                                        atomtypetable(count)%other  = tmp(column)
-                                                end if
-                                        end if
-3                               end do
-                        end if
-2               end do
-10 close(fp)
+              if(buf(1:1).eq.'{') then
+                goto 10
+              elseif(tmp(column)(1:12).ne.'') then
+                count = count +1
+                atomtypetable(count)%xscore = tmp(1)
+                atomtypetable(count)%other  = tmp(column)
+              end if
+            end if
+            3                               end do
+          end if
+          2               end do
+10        close(fp)
 
-        do i = 1, size(atomtypetable)
-                if(atomtypetable(i)%other.eq.'.') cycle
-                do j = i,size(atomtypetable)
-                        if(atomtypetable(j)%other.eq.'.') cycle
-                        if(trim(atomtypetable(i)%other).eq.trim(atomtypetable(j)%other) &
-                        .and.trim(atomtypetable(i)%xscore).ne.trim(atomtypetable(j)%xscore)) then
-                                write(*,'(a,a,a,a,a,a,a,a)') &
-                                'Fatal: Ambiguous entries in type translation matrix (file ', &
-                                trim(adjustl(filename)), '). ', &
-                                trim(adjustl(atomtypetable(j)%other)), &
-                                ' maps to both ', &
-                                adjustl(trim(atomtypetable(i)%xscore)), &
-                                ' and ', &
-                                adjustl(trim(atomtypetable(j)%xscore))
-                                stop
-                        end if
-                end do
-        end do
-
-
-        write(*,'(a,i4,a,a,a)') 'Read ', count, ' atom translations for force field ', adjustl(trim(chType)), '.'
-        return
-
-999 write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
+          do i = 1, size(atomtypetable)
+            if(atomtypetable(i)%other.eq.'.') cycle
+            do j = i,size(atomtypetable)
+              if(atomtypetable(j)%other.eq.'.') cycle
+              if(trim(atomtypetable(i)%other).eq.trim(atomtypetable(j)%other) &
+                .and.trim(atomtypetable(i)%xscore).ne.trim(atomtypetable(j)%xscore)) then
+                write(*,'(a,a,a,a,a,a,a,a)') &
+                  'Fatal: Ambiguous entries in type translation matrix (file ', &
+                  trim(adjustl(filename)), '). ', &
+                  trim(adjustl(atomtypetable(j)%other)), &
+                  ' maps to both ', &
+                  adjustl(trim(atomtypetable(i)%xscore)), &
+                  ' and ', &
+                  adjustl(trim(atomtypetable(j)%xscore))
                 stop
+              end if
+            end do
+          end do
+
+
+          write(*,'(a,i4,a,a,a)') 'Read ', count, ' atom translations for force field ', adjustl(trim(chType)), '.'
+          return
+
+999       write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
+          stop
 end subroutine XReadAtomTypeConversions
 
+
 subroutine XReadResidueConversions(filename, chType)
-        character(len=256)      :: filename
-        character(len=20)               :: chType
-        integer                                                 :: fp, p, filestat
-        character(len=256)      :: buf
-        type(RESIDUE_NAME_CONVERSION),pointer           :: tmp(:)               
+  character(len=256)      :: filename
+  character(len=20)               :: chType
+  integer                                                 :: fp, p, filestat
+  character(len=256)      :: buf
+  type(RESIDUE_NAME_CONVERSION),pointer           :: tmp(:)
 
-        fp = freefile()
-        open(unit=fp,file=filename,err=999,action='READ')
-                do
-                        ! First, find the right section
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                call locase(buf)
-                                if(trim(buf).eq.'') then
-                                        goto 11                                 !       skip blank line
-                                elseif(trim(buf(1:1)).eq.'#') then
-                                        goto 11         ! skip comment
-                                elseif(trim(buf).eq.'{residue type translations}') then
-                                        exit
-                                end if
-                        else
-                                write(*,'(a,a)') 'Fatal: Unable to read residue translations from ', trim(filename)
-                                stop
-                        end if
-11      end do
+  fp = freefile()
+  open(unit=fp,file=filename,err=999,action='READ')
+  do
+    ! First, find the right section
+    read(fp,'(a256)',iostat=filestat) buf
+    if(filestat.eq.0) then
+      call locase(buf)
+      if(trim(buf).eq.'') then
+        goto 11                                 !       skip blank line
+      elseif(trim(buf(1:1)).eq.'#') then
+        goto 11         ! skip comment
+      elseif(trim(buf).eq.'{residue type translations}') then
+        exit
+      end if
+    else
+      write(*,'(a,a)') 'Fatal: Unable to read residue translations from ', trim(filename)
+      stop
+    end if
+    11      end do
 
-                num_residue = 0
-                do
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                if(trim(buf).eq.'') then                                                !       skip blank line
-                                        goto 12                                 
-                                elseif(trim(buf(1:1)).eq.'#') then      ! skip comment
-                                        goto 12                                 
-                                elseif(buf(1:1).eq.'{') then
-                                        exit
-                                else
-                                        p = index(buf,'#')
-                                        if(p.ne.0) buf = buf(1:p-1)                             ! remove traling comment
+    num_residue = 0
+    do
+      read(fp,'(a256)',iostat=filestat) buf
+      if(filestat.eq.0) then
+        if(trim(buf).eq.'') then                                                !       skip blank line
+          goto 12
+        elseif(trim(buf(1:1)).eq.'#') then      ! skip comment
+          goto 12
+        elseif(buf(1:1).eq.'{') then
+          exit
+        else
+          p = index(buf,'#')
+          if(p.ne.0) buf = buf(1:p-1)                             ! remove traling comment
 
-                                        num_residue = num_residue +1
-                                        ! Make sure storage has been allocated
-                                        if(.not. associated(residuetable)) allocate(residuetable(9))
+          num_residue = num_residue +1
+          ! Make sure storage has been allocated
+          if(.not. associated(residuetable)) allocate(residuetable(9))
                                         
-                                        ! Expand table if it's too small
-                                        if(num_residue>size(residuetable)) then                  
-                                                allocate(tmp(size(residuetable)+4))                             
-                                                tmp(1:size(residuetable)) = residuetable(1:size(residuetable))
-                                                deallocate(residuetable)
-                                                residuetable => tmp
-                                        end if
+          ! Expand table if it's too small
+          if(num_residue>size(residuetable)) then
+            allocate(tmp(size(residuetable)+4))
+            tmp(1:size(residuetable)) = residuetable(1:size(residuetable))
+            deallocate(residuetable)
+            residuetable => tmp
+          end if
 
-                                        ! Read table
-                                        read(buf,*) residuetable(num_residue)%xscore,residuetable(num_residue)%other
-                                end if
-                        else
-                                exit
-                        end if
-12      end do
+          ! Read table
+          read(buf,*) residuetable(num_residue)%xscore,residuetable(num_residue)%other
+        end if
+      else
+        exit
+      end if
+      12      end do
 
-        close(fp)
-        return
+      close(fp)
+      return
 
-999 write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
-                stop
+999   write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
+      stop
 end subroutine XReadResidueConversions
 
 subroutine XPAtomNameConversions(filename, chType)
-        character(len=256)      :: filename
-        character(len=20)               :: chType,name1,name2
-        integer                                                 :: fp, p, i,  filestat, mark
-        character(len=256)      :: buf
-        character(len=10)               :: head
-        character(len=10)               :: section(1:5)
-        integer                                                 :: stackpointer,current_res
-        !type(RESIDUE_NAME_CONVERSION),pointer          :: tmp(:)               
+  character(len=256)      :: filename
+  character(len=20)               :: chType,name1,name2
+  integer                                                 :: fp, p, i,  filestat, mark
+  character(len=256)      :: buf
+  character(len=10)               :: head
+  character(len=10)               :: section(1:5)
+  integer                                                 :: stackpointer,current_res
+  !type(RESIDUE_NAME_CONVERSION),pointer          :: tmp(:)
 
-        call locase(chType)
+  call locase(chType)
 
-        fp = freefile()
-        open(unit=fp,file=filename,err=999,action='READ')
-                do
-                        ! First, find the right section
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                call locase(buf)
-                                if(trim(buf).eq.'') then                                                !       skip blank line
-                                        goto 1                                  
-                                elseif(trim(buf(1:1)).eq.'#') then      ! skip comment
-                                        goto 1          
-                                elseif(trim(buf).eq.'{protein atom name translations}') then
+  fp = freefile()
+  open(unit=fp,file=filename,err=999,action='READ')
+  do
+    ! First, find the right section
+    read(fp,'(a256)',iostat=filestat) buf
+    if(filestat.eq.0) then
+      call locase(buf)
+      if(trim(buf).eq.'') then                 !       skip blank line
+        goto 1
+      elseif(trim(buf(1:1)).eq.'#') then      ! skip comment
+        goto 1
+      elseif(trim(buf).eq.'{protein atom name translations}') then
 
-                                        ! Read and make corrections
-                                        mark = 0
-                                        stackpointer = 0
-                                        do
-                                                read(fp,'(a256)',iostat=filestat) buf
-                                                if(filestat.eq.0) then
-                                                        if(trim(buf).eq.'') then                                                !       skip blank line
-                                                                goto 2                                  
-                                                        elseif(trim(buf(1:1)).eq.'#') then      ! skip comment
-                                                                goto 2                                  
-                                                        elseif(buf(1:1).eq.'{'.and.mark.eq.1) then
-                                                                exit
-                                                        else
-                                                                p = index(buf,'#')
-                                                                if(p.ne.0) buf = buf(1:p-1)                             ! remove traling comment
+        ! Read and make corrections
+        mark = 0
+        stackpointer = 0
+        do
+          read(fp,'(a256)',iostat=filestat) buf
+          if(filestat.eq.0) then
+            if(trim(buf).eq.'') then                                                !       skip blank line
+              goto 2
+            elseif(trim(buf(1:1)).eq.'#') then      ! skip comment
+              goto 2
+            elseif(buf(1:1).eq.'{'.and.mark.eq.1) then
+              exit
+            else
+              p = index(buf,'#')
+              if(p.ne.0) buf = buf(1:p-1)                             ! remove traling comment
 
-                                                                ! Prepare buffer
-                                                                call locase(buf)
-                                                                read(buf,*), head
+              ! Prepare buffer
+              call locase(buf)
+              read(buf,*), head
 
-                                                                if(head(1:1).eq.'<') then
-                                                                        p = index(head,'>')
-                                                                        head = head(2:p-1)                                                      ! extract head
+              if(head(1:1).eq.'<') then
+                p = index(head,'>')
+                head = head(2:p-1)                                                      ! extract head
                                                                         
-                                                                        if(head(1:1).eq.'.') then                               ! end of section
-                                                                                head = head(2:len(head))
-                                                                                if(head.ne.section(stackpointer)) then
-                                                                                        write(*,*) 'Syntax error in ', filename
-                                                                                        stop
-                                                                                else
-                                                                                        section(stackpointer) = ''
-                                                                                        stackpointer = stackpointer -1
+                if(head(1:1).eq.'.') then                               ! end of section
+                  head = head(2:len(head))
+                  if(head.ne.section(stackpointer)) then
+                    write(*,*) 'Syntax error in ', filename
+                    stop
+                  else
+                    section(stackpointer) = ''
+                    stackpointer = stackpointer -1
 
-                                                                                        if(stackpointer.eq.0.and.mark.ne.0) goto 3
-                                                                                end if
-                                                                        else                                                                                                            ! beginning of section
-                                                                                stackpointer = stackpointer +1
-                                                                                section(stackpointer) = head
+                    if(stackpointer.eq.0.and.mark.ne.0) goto 3
+                  end if
+                else                                                    ! beginning of section
+                  stackpointer = stackpointer +1
+                  section(stackpointer) = head
 
-                                                                                if(stackpointer.eq.2) then              ! residue name
-                                                                                        do i = 1,num_patomrestype
-                                                                                                call upcase(head)
-                                                                                                if(patomnametable(i)%res.eq.head) then
-                                                                                                        current_res = i
-                                                                                                        exit
-                                                                                                end if
-                                                                                        end do
-                                                                                elseif(stackpointer.eq.1) then  ! forcefield name
-                                                                                        if(head.eq.chType) mark = 1
-                                                                                end if
-                                                                        end if
-                                                                else
-                                                                        if((mark.ne.0).and.(current_res.ne.0)) then
-                                                                                read(buf,*) name1, name2
-                                                                                call upcase(name1)
-                                                                                call upcase(name2)
-                                                                                do i = 1,patomnametable(current_res)%natom
-                                                                                        if(name1.eq.patomnametable(current_res)%xname(i)) then
-                                                                                                patomnametable(current_res)%xname(i) = name2
-                                                                                                exit
-                                                                                        end if
-                                                                                end do
-                                                                        end if
-                                                                end if
-                                                        end if
-                                                else
-                                                        exit
-                                                end if
-2                                       end do                          
-                                        exit
-                                end if
-                        else
-                                write(*,'(a,a)') 'Fatal: Unable to read residue translations from ', trim(filename)
-                                stop
-                        end if
-1               end do
+                  if(stackpointer.eq.2) then              ! residue name
+                    do i = 1,num_patomrestype
+                      call upcase(head)
+                      if(patomnametable(i)%res.eq.head) then
+                        current_res = i
+                        exit
+                      end if
+                    end do
+                  elseif(stackpointer.eq.1) then  ! forcefield name
+                    if(head.eq.chType) mark = 1
+                  end if
+                end if
+              else
+                if((mark.ne.0).and.(current_res.ne.0)) then
+                  read(buf,*) name1, name2
+                  call upcase(name1)
+                  call upcase(name2)
+                  do i = 1,patomnametable(current_res)%natom
+                    if(name1.eq.patomnametable(current_res)%xname(i)) then
+                      patomnametable(current_res)%xname(i) = name2
+                      exit
+                    end if
+                  end do
+                end if
+              end if
+            end if
+          else
+            exit
+          end if
+          2            end do
+          exit
+        end if
+      else
+        write(*,'(a,a)') 'Fatal: Unable to read residue translations from ', trim(filename)
+        stop
+      end if
+      1               end do
 
-3       close(fp)
-        return
+3     close(fp)
+      return
 
-999 write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
-                stop
+999   write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
+stop
 end subroutine XPAtomNameConversions
 
 character(len=12) function XTranslateAtomType(othertype)
-        character       :: othertype, buf  !removed (len=12) to compile on linux
-        integer                                         :: i
+  character       :: othertype, buf  !removed (len=12) to compile on linux
+  integer                                         :: i
 
-        read(othertype, *, iostat=i) buf
+  read(othertype, *, iostat=i) buf
         
-        do i = 1,num_atomtype
-                if(atomtypetable(i)%other.eq.buf) then
-                        XTranslateAtomType = atomtypetable(i)%xscore
-                        return
-                end if
-        end do
+  do i = 1,num_atomtype
+    if(atomtypetable(i)%other.eq.buf) then
+      XTranslateAtomType = atomtypetable(i)%xscore
+      return
+    end if
+  end do
 
-        XTranslateAtomType = 'Un'
+  XTranslateAtomType = 'Un'
 end function XTranslateAtomType
 
 subroutine XReadLib(filename)
-        character(len=256)      :: filename
-        integer                                                 :: i,fp, filestat,p,count,b_atomsection
-        character(len=6)                :: slask
-        character(len=256)      :: buf
-        integer                                                 :: atom_count(1:200)                                            ! worst case
-        type(PATOM_NAME_CONVERSION), pointer :: tmp_table(:)
+  character(len=256)      :: filename
+  integer                                                 :: i,fp, filestat,p,count,b_atomsection
+  character(len=6)                :: slask
+  character(len=256)      :: buf
+  integer                                                 :: atom_count(1:200)                                            ! worst case
+  type(PATOM_NAME_CONVERSION), pointer :: tmp_table(:)
 
-        fp = freefile()
-        count = 0
-        open(unit=fp,file=filename,err=999,action='READ')
-                do
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                if(trim(buf).eq.'') then
-                                        goto 1                                                                                                                  !       skip blank line
-                                elseif(trim(buf(1:1)).eq.'#') then
-                                        goto 1                                                                                                                  ! skip comment
-                                elseif(trim(buf(1:1)).eq.'*') then
-                                        goto 1                                                                                                                  ! skip comment
-                                elseif(trim(buf(1:1)).eq.'!') then
-                                        goto 1                                                                                                                  ! skip comment
-                                else
-                                        p = index(buf,'!')
-                                        if(p.ne.0) buf = buf(1:p-1)                                                                             ! remove traling comment
+  fp = freefile()
+  count = 0
+  open(unit=fp,file=filename,err=999,action='READ')
+  do
+    read(fp,'(a256)',iostat=filestat) buf
+    if(filestat.eq.0) then
+      if(trim(buf).eq.'') then
+        goto 1                                                                           !       skip blank line
+      elseif(trim(buf(1:1)).eq.'#') then
+        goto 1                                                                                                                  ! skip comment
+      elseif(trim(buf(1:1)).eq.'*') then
+        goto 1                                                                                                                  ! skip comment
+      elseif(trim(buf(1:1)).eq.'!') then
+        goto 1                                                                                                                  ! skip comment
+      else
+        p = index(buf,'!')
+        if(p.ne.0) buf = buf(1:p-1)                                         ! remove traling comment
 
-                                        if(buf(1:1).eq.'{') then
-                                                count = count +1
+        if(buf(1:1).eq.'{') then
+          count = count +1
 
-                                                ! now count the number of atoms in this residue
-                                                b_atomsection = 0
-                                                do
-                                                        read(fp,'(a256)',iostat=filestat) buf
-                                                        if(filestat.ne.0) then
-                                                                exit
-                                                        elseif(trim(buf).eq.'') then
-                                                                goto 2                                                                                                                  !       skip blank line
-                                                        elseif(trim(buf(1:1)).eq.'#') then
-                                                                goto 2                                                                                                                  ! skip comment
-                                                        elseif(trim(buf(1:1)).eq.'*') then
-                                                                goto 2                                                                                                                  ! skip comment
-                                                        elseif(trim(buf(1:1)).eq.'!') then
-                                                                goto 2                                                                                                                  ! skip comment
-                                                        elseif(index(buf,'[atoms]').ne.0) then
-                                                                b_atomsection = 1                                                                               ! set flag 
-                                                        elseif(index(buf,'[').ne.0.and.b_atomsection.ne.0) then                 ! reach end of [atoms]-section
-                                                                b_atomsection = 0
-                                                                exit
-                                                        else
-                                                                if(b_atomsection.ne.0) atom_count(count) = atom_count(count) +1 ! if no rules triggered, this is an atom line
-                                                        end if
-        2                                       end do
-                                        end if
-                                end if
-                        else
-                                exit
-                        end if
-1               end do
+          ! now count the number of atoms in this residue
+          b_atomsection = 0
+          do
+            read(fp,'(a256)',iostat=filestat) buf
+            if(filestat.ne.0) then
+              exit
+            elseif(trim(buf).eq.'') then
+              goto 2                                                                                                                  !       skip blank line
+            elseif(trim(buf(1:1)).eq.'#') then
+              goto 2                                                                                                                  ! skip comment
+            elseif(trim(buf(1:1)).eq.'*') then
+              goto 2                                                                                                                  ! skip comment
+            elseif(trim(buf(1:1)).eq.'!') then
+              goto 2                                                                                                                  ! skip comment
+            elseif(index(buf,'[atoms]').ne.0) then
+              b_atomsection = 1                                                                               ! set flag
+            elseif(index(buf,'[').ne.0.and.b_atomsection.ne.0) then                 ! reach end of [atoms]-section
+              b_atomsection = 0
+              exit
+            else
+              if(b_atomsection.ne.0) atom_count(count) = atom_count(count) +1 ! if no rules triggered, this is an atom line
+            end if
+            2  end do
+          end if
+        end if
+      else
+        exit
+      end if
+      1  end do
 
-                rewind(fp) 
+      rewind(fp)
 
-                if(.not. associated(patomnametable)) allocate(patomnametable(1:count))
+      if(.not. associated(patomnametable)) allocate(patomnametable(1:count))
                 
-                if(size(patomnametable)<num_patomrestype+count) then                                                                    ! increase table size
-                        allocate(tmp_table(1:num_patomrestype+count))
-                        tmp_table(1:num_patomrestype) = patomnametable(1:num_patomrestype)
-                        deallocate(patomnametable)
-                        patomnametable => tmp_table
+      if(size(patomnametable)<num_patomrestype+count) then                                                                    ! increase table size
+        allocate(tmp_table(1:num_patomrestype+count))
+        tmp_table(1:num_patomrestype) = patomnametable(1:num_patomrestype)
+        deallocate(patomnametable)
+        patomnametable => tmp_table
+      end if
+
+      do i = 1,count
+        patomnametable(num_patomrestype + i)%natom = atom_count(i)
+        allocate(patomnametable(num_patomrestype + i)%qname(1:atom_count(i)))   ! allocate name tables
+        allocate(patomnametable(num_patomrestype + i)%xname(1:atom_count(i)))   !  - " -
+      end do
+
+      ! now read the residue and atom name information
+      count = 0
+      do
+        read(fp,'(a256)',iostat=filestat) buf
+        if(filestat.eq.0) then
+          if(trim(buf).eq.'') then
+            goto 3                                                                                                                  !       skip blank line
+          elseif(trim(buf(1:1)).eq.'#') then
+            goto 3                                                                                                                  ! skip comment
+          elseif(trim(buf(1:1)).eq.'*') then
+            goto 3                                                                                                                  ! skip comment
+          elseif(trim(buf(1:1)).eq.'!') then
+            goto 3                                                                                                                  ! skip comment
+          else
+            p = index(buf,'!')
+            if(p.ne.0) buf = buf(1:p-1)                                                                             ! remove traling comment
+
+            if(buf(1:1).eq.'{') then                                                ! begin residue information
+              count = count +1
+              p = index(buf,'}')
+              patomnametable(num_patomrestype + count)%res = buf(2:p-1)       ! read residue name
+
+              ! now read atom name table
+              i = 0
+              b_atomsection = 0
+              do
+                read(fp,'(a256)',iostat=filestat) buf
+                if(filestat.ne.0) then
+                  exit
+                elseif(trim(buf).eq.'') then
+                  goto 4                                                                                                                  !       skip blank line
+                elseif(trim(buf(1:1)).eq.'#') then
+                  goto 4                                                                                                                  ! skip comment
+                elseif(trim(buf(1:1)).eq.'*') then
+                  goto 4                                                                                                                  ! skip comment
+                elseif(trim(buf(1:1)).eq.'!') then
+                  goto 4                                                                                                                  ! skip comment
+                elseif(index(buf,'[atoms]').ne.0) then
+                  b_atomsection = 1                                                                               ! set flag
+                  i = 0
+                elseif(index(buf,'[').ne.0.and.b_atomsection.ne.0) then                 ! reached end of [atoms]-section
+                  b_atomsection = 0
+                  exit
+                else
+                  if(b_atomsection.ne.0) then
+                    i = i +1                                                                                                                ! read name information
+                    read(buf(1:256),*,iostat=filestat) slask, &
+                      patomnametable(num_patomrestype+count)%xname(i),&
+                      patomnametable(num_patomrestype+count)%qname(i)
+                  end if
                 end if
+                4                                               end do
+              end if
+            end if
+          else
+            exit
+          end if
+          3               end do
+          close(fp)
 
-                do i = 1,count
-                        patomnametable(num_patomrestype + i)%natom = atom_count(i)
-                        allocate(patomnametable(num_patomrestype + i)%qname(1:atom_count(i)))   ! allocate name tables
-                        allocate(patomnametable(num_patomrestype + i)%xname(1:atom_count(i)))   !  - " -
-                end do
+          num_patomrestype = num_patomrestype + count
+          return
 
-                ! now read the residue and atom name information
-                count = 0
-                do
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                if(trim(buf).eq.'') then
-                                        goto 3                                                                                                                  !       skip blank line
-                                elseif(trim(buf(1:1)).eq.'#') then
-                                        goto 3                                                                                                                  ! skip comment
-                                elseif(trim(buf(1:1)).eq.'*') then
-                                        goto 3                                                                                                                  ! skip comment
-                                elseif(trim(buf(1:1)).eq.'!') then
-                                        goto 3                                                                                                                  ! skip comment
-                                else
-                                        p = index(buf,'!')
-                                        if(p.ne.0) buf = buf(1:p-1)                                                                             ! remove traling comment
-
-                                        if(buf(1:1).eq.'{') then                                                ! begin residue information
-                                                count = count +1
-                                                p = index(buf,'}')
-                                                patomnametable(num_patomrestype + count)%res = buf(2:p-1)       ! read residue name
-
-                                                ! now read atom name table
-                                                i = 0
-                                                b_atomsection = 0
-                                                do
-                                                        read(fp,'(a256)',iostat=filestat) buf
-                                                        if(filestat.ne.0) then
-                                                                exit
-                                                        elseif(trim(buf).eq.'') then
-                                                                goto 4                                                                                                                  !       skip blank line
-                                                        elseif(trim(buf(1:1)).eq.'#') then
-                                                                goto 4                                                                                                                  ! skip comment
-                                                        elseif(trim(buf(1:1)).eq.'*') then
-                                                                goto 4                                                                                                                  ! skip comment
-                                                        elseif(trim(buf(1:1)).eq.'!') then
-                                                                goto 4                                                                                                                  ! skip comment
-                                                        elseif(index(buf,'[atoms]').ne.0) then
-                                                                b_atomsection = 1                                                                               ! set flag
-                                                                i = 0                                                                           
-                                                        elseif(index(buf,'[').ne.0.and.b_atomsection.ne.0) then                 ! reached end of [atoms]-section
-                                                                b_atomsection = 0
-                                                                exit
-                                                        else
-                                                                if(b_atomsection.ne.0) then
-                                                                        i = i +1                                                                                                                ! read name information
-                                                                        read(buf(1:256),*,iostat=filestat) slask, &
-                                                                                                                                                                                                                 patomnametable(num_patomrestype+count)%xname(i),&
-                                                                                                                                                                                                                 patomnametable(num_patomrestype+count)%qname(i)
-                                                                end if
-                                                        end if
-4                                               end do
-                                        end if
-                                end if
-                        else
-                                exit
-                        end if
-3               end do
-        close(fp)
-
-        num_patomrestype = num_patomrestype + count
-        return
-
-999 write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
-                stop
+999       write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
+          stop
 end subroutine XReadLib
 
 character(len=10) function XTranslatePAtomName(atom_res_id, res)
-        ! returns the correct aton name as found in residue table
-        ! dependant on the correct ordering of atoms within residue!
-        integer                                         :: atom_res_id
-        character(len=10)       :: res
-        integer                                         :: i
+  ! returns the correct aton name as found in residue table
+  ! dependant on the correct ordering of atoms within residue!
+  integer                                         :: atom_res_id
+  character(len=10)       :: res
+  integer                                         :: i
 
 
-        do i = 1,num_patomrestype
-                if(patomnametable(i)%res.eq.res) then
-                        XTranslatePatomName = patomnametable(i)%xname(atom_res_id)
-                        return
-                end if
-        end do
+  do i = 1,num_patomrestype
+    if(patomnametable(i)%res.eq.res) then
+      XTranslatePatomName = patomnametable(i)%xname(atom_res_id)
+      return
+    end if
+  end do
 
-        XTranslatePAtomName = 'Un'
+  XTranslatePAtomName = 'Un'
 end function XTranslatePAtomName
 
 character(len=10) function XTranslateResidue(res)
-        ! Translates some residue names used by Q to XScore equivalents
-        character(len=8)        :: res
-        integer                                         :: i
+  ! Translates some residue names used by Q to XScore equivalents
+  character(len=8)        :: res
+  integer                                         :: i
 
-        do i = 1,num_residue
-                if(trim(res).eq.trim(residuetable(i)%other)) then
-                        XTranslateResidue = residuetable(i)%xscore
-                        return
-                end if
-        end do
+  do i = 1,num_residue
+    if(trim(res).eq.trim(residuetable(i)%other)) then
+      XTranslateResidue = residuetable(i)%xscore
+      return
+    end if
+  end do
 
-        XTranslateResidue = res
+  XTranslateResidue = res
 end function XTranslateResidue
 
 subroutine XReadInput()
-        integer                                                 :: i,fp,filestat,p
-        character(len=256)      :: buf, head, chVal
-        character(len=256)                      :: line, restofline
-        integer                                                 :: res
+  integer                                                 :: i,fp,filestat,p
+  character(len=256)      :: buf, head, chVal
+  character(len=256)                      :: line, restofline
+  integer                                                 :: res
 
-        chInput = adjustl(trim(chInput))
+  chInput = adjustl(trim(chInput))
 
-        if(chInput.ne.'default') then
-                ! Open file
-                fp = freefile()
-                open(unit=fp,file=chInput,err=999,action='READ')
-                        do
-                                read(fp,'(a256)',iostat=filestat) buf
+  if(chInput.ne.'default') then
+    ! Open file
+    fp = freefile()
+    open(unit=fp,file=chInput,err=999,action='READ')
+    do
+      read(fp,'(a256)',iostat=filestat) buf
 
-                                if(filestat.eq.0) then
-                                        if(trim(buf).eq.'') then
-                                                goto 1                                                                                                                  !       skip blank line
-                                        elseif(trim(buf(1:1)).eq.'#') then
-                                                goto 1                                                                                                                  ! skip comment
-                                        else
-                                                p = index(buf,'#')
-                                                if(p.ne.0) buf = buf(1:p-1)                                                                             ! remove traling comment
-                                                
-                                                read(buf, *,iostat=filestat) head
-                                                call upcase(head)
-                                                head = adjustl(trim(head))
-
-                                                read(buf,*,iostat=filestat) head, chVal
-                                                
-                                                select case(head)                       
-                                                        case('SHOW_ATOM_BIND_SCORE')
-                                                                read(buf,*,iostat=filestat) head, input%show_abs
-                                                        case('SHOW_TOTAL_SCORE')
-                                                                read(buf,*,iostat=filestat) head, input%show_total
-
-                                                        case('APPLY_HPSCORE')
-                                                                read(buf,*,iostat=filestat) head, input%apply_hpscore
-                                                        case('HPSCORE_CVDW')
-                                                                read(buf,*,iostat=filestat) head, input%hpscore_cvdw
-                                                        case('HPSCORE_CHB')
-                                                                read(buf,*,iostat=filestat) head, input%hpscore_chb
-                                                        case('HPSCORE_CHP')
-                                                                read(buf,*,iostat=filestat) head, input%hpscore_chp
-                                                        case('HPSCORE_CRT')
-                                                                read(buf,*,iostat=filestat) head, input%hpscore_crt
-                                                        case('HPSCORE_C0')
-                                                                read(buf,*,iostat=filestat) head, input%hpscore_c0
-
-                                                        case('APPLY_HMSCORE')
-                                                                read(buf,*,iostat=filestat) head, input%apply_hmscore
-                                                        case('HMSCORE_CVDW')
-                                                                read(buf,*,iostat=filestat) head, input%hmscore_cvdw
-                                                        case('HMSCORE_CHB')
-                                                                read(buf,*,iostat=filestat) head, input%hmscore_chb
-                                                        case('HMSCORE_CHM')
-                                                                read(buf,*,iostat=filestat) head, input%hmscore_chm
-                                                        case('HMSCORE_CRT')
-                                                                read(buf,*,iostat=filestat) head, input%hmscore_crt
-                                                        case('HMSCORE_C0')
-                                                                read(buf,*,iostat=filestat) head, input%hmscore_c0
-
-                                                        case('APPLY_HSSCORE')
-                                                                read(buf,*,iostat=filestat) head, input%apply_hsscore
-                                                        case('HSSCORE_CVDW')
-                                                                read(buf,*,iostat=filestat) head, input%hsscore_cvdw
-                                                        case('HSSCORE_CHB')
-                                                                read(buf,*,iostat=filestat) head, input%hsscore_chb
-                                                        case('HSSCORE_CHS')
-                                                                read(buf,*,iostat=filestat) head, input%hsscore_chs
-                                                        case('HSSCORE_CRT')
-                                                                read(buf,*,iostat=filestat) head, input%hsscore_crt
-                                                        case('HSSCORE_C0')
-                                                                read(buf,*,iostat=filestat) head, input%hsscore_c0
-
-                                                        case('SHOW_LIGAND')
-                                                                read(buf,*,iostat=filestat) head, input%show_ligand
-                                                        case('SHOW_PROTEIN')
-                                                                read(buf,*,iostat=filestat) head, input%show_protein
-                                                        case('SHOW_COFACTOR')
-                                                                read(buf,*,iostat=filestat) head, input%show_cofactor
-                                                        case('SHOW_BONDS')
-                                                                read(buf,*,iostat=filestat) head, input%show_bonds
-
-                                                        case('RESIDUE_DEFINITIONS')
-                                                                read(buf,'(a256)') line
-                                                                read(line,*) head
-                                                                !workaround to allow / in strings
-                                                                input%residue_def = adjustl(line(len_trim(head)+1:len(line)))
-!                                                               read(buf,*,iostat=filestat) head, input%residue_def
-                                                        case('ATOM_DEFINITIONS')
-                                                                read(buf,'(a256)') line
-                                                                read(line,*) head
-                                                                !workaround to allow / in strings
-                                                                input%atom_def = adjustl(line(len_trim(head)+1:len(line)))
-!                                                               read(buf,*,iostat=filestat) head, input%atom_def
-                                                        case('LOGP_DEFINITIONS')
-                                                                read(buf,'(a256)') line
-                                                                read(line,*) head
-                                                                !workaround to allow / in strings
-                                                                input%logp_def = adjustl(line(len_trim(head)+1:len(line)))
-!                                                               read(buf,*,iostat=filestat) head, input%logp_def
-                                                        case('SURFACE_DEFINITIONS')
-                                                                read(buf,'(a256)') line
-                                                                read(line,*) head
-                                                                !workaround to allow / in strings
-                                                                input%surface_def = adjustl(line(len_trim(head)+1:len(line)))
-!                                                               read(buf,*,iostat=filestat) head, input%surface_def
-                                                        case('ATOM_TRANSLATIONS')
-                                                                read(buf,'(a256)') line
-                                                                read(line,*) head
-                                                                !workaround to allow / in strings
-                                                                input%atom_translations = adjustl(line(len_trim(head)+1:len(line)))
-!                                                               read(buf,*,iostat=filestat) head, input%atom_translations
-
-                                                end select      
-                                        end if
-                                else
-                                        exit
-                                end if
-1                       end do
-                close(fp)
-                
-                input%num_method = 0
-                if(input%apply_hpscore.eq.'YES') input%num_method = input%num_method +1
-                if(input%apply_hmscore.eq.'YES') input%num_method = input%num_method +1
-                if(input%apply_hsscore.eq.'YES') input%num_method = input%num_method +1
-
-                input%qatom = -1
+      if(filestat.eq.0) then
+        if(trim(buf).eq.'') then
+          goto 1                                                                                                                  !       skip blank line
+        elseif(trim(buf(1:1)).eq.'#') then
+          goto 1                                                                                                                  ! skip comment
         else
-                input%show_abs                  = 'NO'
-                input%show_total                = 'YES'
-                input%show_ligand               = 'YES'
-                input%show_protein      = 'NO'
-                input%show_cofactor     = 'YES'
-                input%show_cofactor     = 'NO'
+          p = index(buf,'#')
+          if(p.ne.0) buf = buf(1:p-1)                                                                             ! remove traling comment
+                                                
+          read(buf, *,iostat=filestat) head
+          call upcase(head)
+          head = adjustl(trim(head))
 
-                input%num_method                =  3
-                input%apply_hpscore = 'YES'
-                input%apply_hmscore = 'YES'
-                input%apply_hsscore = 'YES'
+          read(buf,*,iostat=filestat) head, chVal
+                                                
+          select case(head)
+            case('SHOW_ATOM_BIND_SCORE')
+              read(buf,*,iostat=filestat) head, input%show_abs
+            case('SHOW_TOTAL_SCORE')
+              read(buf,*,iostat=filestat) head, input%show_total
 
-                input%hpscore_cvdw  =  0.004 
-                input%hpscore_chb   =  0.054
-                input%hpscore_chp   =  0.009
-                input%hpscore_crt               = -0.061
-                input%hpscore_c0    =  3.441
+            case('APPLY_HPSCORE')
+              read(buf,*,iostat=filestat) head, input%apply_hpscore
+            case('HPSCORE_CVDW')
+              read(buf,*,iostat=filestat) head, input%hpscore_cvdw
+            case('HPSCORE_CHB')
+              read(buf,*,iostat=filestat) head, input%hpscore_chb
+            case('HPSCORE_CHP')
+              read(buf,*,iostat=filestat) head, input%hpscore_chp
+            case('HPSCORE_CRT')
+              read(buf,*,iostat=filestat) head, input%hpscore_crt
+            case('HPSCORE_C0')
+              read(buf,*,iostat=filestat) head, input%hpscore_c0
 
-                input%hmscore_cvdw  =  0.004
-                input%hmscore_chb   =  0.101
-                input%hmscore_chm   =  0.387
-                input%hmscore_crt               = -0.097
-                input%hmscore_c0    =  3.567
+            case('APPLY_HMSCORE')
+              read(buf,*,iostat=filestat) head, input%apply_hmscore
+            case('HMSCORE_CVDW')
+              read(buf,*,iostat=filestat) head, input%hmscore_cvdw
+            case('HMSCORE_CHB')
+              read(buf,*,iostat=filestat) head, input%hmscore_chb
+            case('HMSCORE_CHM')
+              read(buf,*,iostat=filestat) head, input%hmscore_chm
+            case('HMSCORE_CRT')
+              read(buf,*,iostat=filestat) head, input%hmscore_crt
+            case('HMSCORE_C0')
+              read(buf,*,iostat=filestat) head, input%hmscore_c0
 
-                input%hsscore_cvdw  =  0.004
-                input%hsscore_chb   =  0.073
-                input%hsscore_chs   =  0.004
-                input%hsscore_crt               = -0.090
-                input%hsscore_c0    =  3.328
+            case('APPLY_HSSCORE')
+              read(buf,*,iostat=filestat) head, input%apply_hsscore
+            case('HSSCORE_CVDW')
+              read(buf,*,iostat=filestat) head, input%hsscore_cvdw
+            case('HSSCORE_CHB')
+              read(buf,*,iostat=filestat) head, input%hsscore_chb
+            case('HSSCORE_CHS')
+              read(buf,*,iostat=filestat) head, input%hsscore_chs
+            case('HSSCORE_CRT')
+              read(buf,*,iostat=filestat) head, input%hsscore_crt
+            case('HSSCORE_C0')
+              read(buf,*,iostat=filestat) head, input%hsscore_c0
 
-                input%residue_def                                       = 'residue_def_xtool.dat'
-                input%atom_def                                          = 'atom_def_xtool.dat'
-                input%logp_def                                          = 'atom_def_xlogp.dat'
-                input%surface_def                                       = 'surface_def_xtool.dat'
-                input%atom_translations         = 'atom_type_translations.dat'
+            case('SHOW_LIGAND')
+              read(buf,*,iostat=filestat) head, input%show_ligand
+            case('SHOW_PROTEIN')
+              read(buf,*,iostat=filestat) head, input%show_protein
+            case('SHOW_COFACTOR')
+              read(buf,*,iostat=filestat) head, input%show_cofactor
+            case('SHOW_BONDS')
+              read(buf,*,iostat=filestat) head, input%show_bonds
 
+            case('RESIDUE_DEFINITIONS')
+              read(buf,'(a256)') line
+              read(line,*) head
+              !workaround to allow / in strings
+              input%residue_def = adjustl(line(len_trim(head)+1:len(line)))
+            !                                                               read(buf,*,iostat=filestat) head, input%residue_def
+            case('ATOM_DEFINITIONS')
+              read(buf,'(a256)') line
+              read(line,*) head
+              !workaround to allow / in strings
+              input%atom_def = adjustl(line(len_trim(head)+1:len(line)))
+            !                                                               read(buf,*,iostat=filestat) head, input%atom_def
+            case('LOGP_DEFINITIONS')
+              read(buf,'(a256)') line
+              read(line,*) head
+              !workaround to allow / in strings
+              input%logp_def = adjustl(line(len_trim(head)+1:len(line)))
+            !                                                               read(buf,*,iostat=filestat) head, input%logp_def
+            case('SURFACE_DEFINITIONS')
+              read(buf,'(a256)') line
+              read(line,*) head
+              !workaround to allow / in strings
+              input%surface_def = adjustl(line(len_trim(head)+1:len(line)))
+            !                                                               read(buf,*,iostat=filestat) head, input%surface_def
+            case('ATOM_TRANSLATIONS')
+              read(buf,'(a256)') line
+              read(line,*) head
+              !workaround to allow / in strings
+              input%atom_translations = adjustl(line(len_trim(head)+1:len(line)))
+          !                                                               read(buf,*,iostat=filestat) head, input%atom_translations
+
+          end select
         end if
+      else
+        exit
+      end if
+      1                       end do
+      close(fp)
+                
+      input%num_method = 0
+      if(input%apply_hpscore.eq.'YES') input%num_method = input%num_method +1
+      if(input%apply_hmscore.eq.'YES') input%num_method = input%num_method +1
+      if(input%apply_hsscore.eq.'YES') input%num_method = input%num_method +1
 
-        return
+      input%qatom = -1
+    else
+      input%show_abs                  = 'NO'
+      input%show_total                = 'YES'
+      input%show_ligand               = 'YES'
+      input%show_protein      = 'NO'
+      input%show_cofactor     = 'YES'
+      input%show_cofactor     = 'NO'
+
+      input%num_method                =  3
+      input%apply_hpscore = 'YES'
+      input%apply_hmscore = 'YES'
+      input%apply_hsscore = 'YES'
+
+      input%hpscore_cvdw  =  0.004
+      input%hpscore_chb   =  0.054
+      input%hpscore_chp   =  0.009
+      input%hpscore_crt               = -0.061
+      input%hpscore_c0    =  3.441
+
+      input%hmscore_cvdw  =  0.004
+      input%hmscore_chb   =  0.101
+      input%hmscore_chm   =  0.387
+      input%hmscore_crt               = -0.097
+      input%hmscore_c0    =  3.567
+
+      input%hsscore_cvdw  =  0.004
+      input%hsscore_chb   =  0.073
+      input%hsscore_chs   =  0.004
+      input%hsscore_crt               = -0.090
+      input%hsscore_c0    =  3.328
+
+      input%residue_def                                       = 'residue_def_xtool.dat'
+      input%atom_def                                          = 'atom_def_xtool.dat'
+      input%logp_def                                          = 'atom_def_xlogp.dat'
+      input%surface_def                                       = 'surface_def_xtool.dat'
+      input%atom_translations         = 'atom_type_translations.dat'
+
+    end if
+
+    return
 
 999 write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(chInput)), '. Exiting.'
-                stop
+    stop
 end subroutine XReadInput
 
 subroutine XReadInputQatom
-        integer                                                 :: i,fp,filestat,p
-        character(len=256)      :: buf, head, chVal
-        integer                                                 :: res
+  integer                                                 :: i,fp,filestat,p
+  character(len=256)      :: buf, head, chVal
+  integer                                                 :: res
 
-        if(input%show_abs(1:6).eq.'QATOM=') then
-                chVal = input%show_abs(7:20)
+  if(input%show_abs(1:6).eq.'QATOM=') then
+    chVal = input%show_abs(7:20)
 
-                p = index(chVal,':')
-                if(p.ne.0) then
+    p = index(chVal,':')
+    if(p.ne.0) then
 
-                        head = adjustl(trim(chVal(1:p-1)))
-                        buf  = adjustl(trim(chVal(p+1:256)))
+      head = adjustl(trim(chVal(1:p-1)))
+      buf  = adjustl(trim(chVal(p+1:256)))
 
-                        read(buf,*,iostat=filestat) res
+      read(buf,*,iostat=filestat) res
 
-                        do i = 0,ligand%mol%num_atom -1
-                                if(adjustl(trim(ligand%mol%atom(i)%res_id)).eq.adjustl(trim(head))) then
-                                        input%qatom = i + res
-                                        exit
-                                end if
-                        end do 
-                else
-                        read(chVal,*,iostat=filestat) input%qatom
-                end if
-        
-                input%show_abs = 'QATOM'
-                if(input%qatom<0.or.input%qatom>ligand%mol%num_atom -1) then
-                        write(*,'(a,a,a)') '>>> WARNING: Q-atom ', trim(chVal), ' does not exist. ABS will not be displayed.'
-                        warn = warn +1
-                        input%show_abs = 'NO'
-                end if
-
+      do i = 0,ligand%mol%num_atom -1
+        if(adjustl(trim(ligand%mol%atom(i)%res_id)).eq.adjustl(trim(head))) then
+          input%qatom = i + res
+          exit
         end if
+      end do
+    else
+      read(chVal,*,iostat=filestat) input%qatom
+    end if
+        
+    input%show_abs = 'QATOM'
+    if(input%qatom<0.or.input%qatom>ligand%mol%num_atom -1) then
+      write(*,'(a,a,a)') '>>> WARNING: Q-atom ', trim(chVal), ' does not exist. ABS will not be displayed.'
+      warn = warn +1
+      input%show_abs = 'NO'
+    end if
+
+  end if
 end subroutine XReadInputQatom
 
 subroutine xscore_precalc
-        integer                                                 :: i,j, p
-        character(len=256)      :: chBuf
-        character(len=256)      :: filename
-        real                                                            :: score
+  integer                                                 :: i,j, p
+  character(len=256)      :: chBuf
+  character(len=256)      :: filename
+  real                                                            :: score
 
-        ! ======================================
-        ! 0. READ PARAMETERS AND DO PREPARATIONS
-        ! ======================================
+  ! ======================================
+  ! 0. READ PARAMETERS AND DO PREPARATIONS
+  ! ======================================
 
 
-                        call XReadInput()
+  call XReadInput()
                         
-                        filename = input%residue_def                                                            !'RESIDUE_DEF_XTOOL'
-                        call ForceField_Read_RESIDUE_DEF(filename)
+  filename = input%residue_def                                                            !'RESIDUE_DEF_XTOOL'
+  call ForceField_Read_RESIDUE_DEF(filename)
 
-                        filename = input%atom_def                                                                               !'ATOM_DEF_XTOOL'
-                        call ForceField_Read_ATOM_DEF(filename)
+  filename = input%atom_def                                                                               !'ATOM_DEF_XTOOL'
+  call ForceField_Read_ATOM_DEF(filename)
 
-                        filename = input%logp_def                                                                               !'ATOM_DEF_XLOGP'
-                        call ForceField_Read_XATOM_DEF(filename)
+  filename = input%logp_def                                                                               !'ATOM_DEF_XLOGP'
+  call ForceField_Read_XATOM_DEF(filename)
 
-                        filename = input%surface_def                                                            !'SURFACE_DEF_XTOOL'
-                        call ForceField_Read_Surface_Def(filename)
+  filename = input%surface_def                                                            !'SURFACE_DEF_XTOOL'
+  call ForceField_Read_Surface_Def(filename)
 
-                        filename = input%atom_translations                                      !'XSCORE_ATOM_TYPE_CONVERSIONS.dat'             ! atom type conversions are only used on ligand atoms
-                        call XReadAtomTypeConversions(filename,chTranslationKey)                ! read atom type conversions
-                        call XReadResidueConversions(filename,chTranslationKey)                 ! read residue conversions
+  filename = input%atom_translations                                      !'XSCORE_ATOM_TYPE_CONVERSIONS.dat'             ! atom type conversions are only used on ligand atoms
+  call XReadAtomTypeConversions(filename,chTranslationKey)                ! read atom type conversions
+  call XReadResidueConversions(filename,chTranslationKey)                 ! read residue conversions
 
-                        ! Read atom names from residue tables of lib-files
-                        ! This is done prior to residue renameing and atom renameing
-                        chBuf = lib_files
-                        do
-                                p = index(chBuf,';')
-                                if(p>0) then
-                                        filename = chBuf(1:p-1)
-                                        call XReadLib(filename)
-                                        chBuf(1:256) = chBuf(p+1:256)
-                                else    
-                                        call XReadLib(chBuf)
-                                        exit
-                                end if
-                        end do                                  
-                        write(*,'(a,i4,a)') 'Read ', num_patomrestype, ' residues from library.'
+  ! Read atom names from residue tables of lib-files
+  ! This is done prior to residue renameing and atom renameing
+  chBuf = lib_files
+  do
+    p = index(chBuf,';')
+    if(p>0) then
+      filename = chBuf(1:p-1)
+      call XReadLib(filename)
+      chBuf(1:256) = chBuf(p+1:256)
+    else
+      call XReadLib(chBuf)
+      exit
+    end if
+  end do
+  write(*,'(a,i4,a)') 'Read ', num_patomrestype, ' residues from library.'
 
-                        ! Make corrections to what was read from lib-files
-                        filename = input%atom_translations                                      !'XSCORE_ATOM_TYPE_CONVERSIONS.dat'
-                        call XPAtomNameConversions(filename,chTranslationKey)
+  ! Make corrections to what was read from lib-files
+  filename = input%atom_translations                                      !'XSCORE_ATOM_TYPE_CONVERSIONS.dat'
+  call XPAtomNameConversions(filename,chTranslationKey)
 
-        ! ============================
-        ! 1. READ AND TRANSLATE LIGAND
-        ! ============================
+  ! ============================
+  ! 1. READ AND TRANSLATE LIGAND
+  ! ============================
 
-                        if(.not. qatom_load_atoms(fep_file)) then
-                                stop 'Failed to read Q-atom list from FEP file.'
-                        end if
+  if(.not. qatom_load_atoms(fep_file)) then
+    stop 'Failed to read Q-atom list from FEP file.'
+  end if
 
-                        allocate(iqatom(nat_solute))    ! Allocate mem for every solute atom
-                        iqatom(:) = 0
-                        do i=1,nqat
-                                iqatom(iqseq(i)) = i            ! Set references so that iqatom = 0 if protein and {number} of ligand
-                        end do
+  allocate(iqatom(nat_solute))    ! Allocate mem for every solute atom
+  iqatom(:) = 0
+  do i=1,nqat
+    iqatom(iqseq(i)) = i            ! Set references so that iqatom = 0 if protein and {number} of ligand
+  end do
 
-                        ! Extract bonds between q-atoms
-                        call xsort_bonds                                                
+  ! Extract bonds between q-atoms
+  call xsort_bonds
 
-                        ! Set topology numbers for q-atoms
-                        q_atoms(:)%top_nr = iqseq(:)
+  ! Set topology numbers for q-atoms
+  q_atoms(:)%top_nr = iqseq(:)
 
-                        ! Translate q-atom data to ligand structure
-                        call xligand_translate(ligand,nqat,nqbonds,q_atoms,q_bonds)
-                        ligand%mol%name = adjustl(trim(title))
-                        do i = 0,ligand%mol%num_atom -1
-                                ligand%mol%atom(i)%type2 = ligand%mol%atom(i)%ttype
-                                ligand%mol%atom(i)%ttype = XTranslateAtomType(ligand%mol%atom(i)%ttype)
-                        end do
-                        write(*,'(a,i4,a,i4,a)') 'Translated ', ligand%mol%num_atom, ' atoms and ', ligand%mol%num_bond, ' bonds to ligand'
+  ! Translate q-atom data to ligand structure
+  call xligand_translate(ligand,nqat,nqbonds,q_atoms,q_bonds)
+  ligand%mol%name = adjustl(trim(title))
+  do i = 0,ligand%mol%num_atom -1
+    ligand%mol%atom(i)%type2 = ligand%mol%atom(i)%ttype
+    ligand%mol%atom(i)%ttype = XTranslateAtomType(ligand%mol%atom(i)%ttype)
+  end do
+  write(*,'(a,i4,a,i4,a)') 'Translated ', ligand%mol%num_atom, ' atoms and ', ligand%mol%num_bond, ' bonds to ligand'
 
-                        call Ligand_Value_Atom(ligand)
+  call Ligand_Value_Atom(ligand)
 
-                        ! Find monitored q-atom if specified. This has to be done after ligand atom names are assigned.
-                        call XReadInputQatom()
+  ! Find monitored q-atom if specified. This has to be done after ligand atom names are assigned.
+  call XReadInputQatom()
 
-                        j = 0
-                        do i = 0,ligand%mol%num_atom -1
-                                if(ligand%mol%atom(i)%valid.eq.0) then
-!                                       write(*,'(a,i6,a,a,a,a,a)') 'WARNING: Atom ', mol%atom(i)%id, ' (', trim(adjustl(mol%atom(i)%qtype)),') in residue ', trim(adjustl(mol%atom(i)%residue)), ' does not match any type rule and will be ignored.'
-                                        j = j +1
-                                end if
-                        end do
-                        if(j>0) then
-                                write(*,'(a,i5,a,i5,a,a,a)') &
-                                'WARNING: ', j, ' atoms (out of ', &
-                                ligand%mol%num_atom, ') in ', &
-                                adjustl(trim(ligand%mol%name)), &
-                                ' (ligand) will be ignored. Note that nonpolar hydrogens are automatically ignored.'
-                                warn = warn +1
-                        end if
-                        if(adjustl(trim(input%show_ligand)).eq.'YES') call Molecule_Show_Contents(ligand%mol)
+  j = 0
+  do i = 0,ligand%mol%num_atom -1
+    if(ligand%mol%atom(i)%valid.eq.0) then
+      !                                       write(*,'(a,i6,a,a,a,a,a)') 'WARNING: Atom ', mol%atom(i)%id, ' (', trim(adjustl(mol%atom(i)%qtype)),') in residue ', trim(adjustl(mol%atom(i)%residue)), ' does not match any type rule and will be ignored.'
+      j = j +1
+    end if
+  end do
+  if(j>0) then
+    write(*,'(a,i5,a,i5,a,a,a)') &
+      'WARNING: ', j, ' atoms (out of ', &
+      ligand%mol%num_atom, ') in ', &
+      adjustl(trim(ligand%mol%name)), &
+      ' (ligand) will be ignored. Note that nonpolar hydrogens are automatically ignored.'
+    warn = warn +1
+  end if
+  if(adjustl(trim(input%show_ligand)).eq.'YES') call Molecule_Show_Contents(ligand%mol)
 
-        ! =============================
-        ! 2. READ AND TRANSLATE PROTEIN
-        ! =============================
+  ! =============================
+  ! 2. READ AND TRANSLATE PROTEIN
+  ! =============================
 
-                        ! First count protein bonds
-                        j = 0
-                        do i = 1,nbonds_solute
-!                               if((bnd(i)%i<=ligand_offset).and.(bnd(i)%j<=ligand_offset)) j = j +1
-                                if((iqatom(bnd(i)%i).eq.0).and.(iqatom(bnd(i)%j).eq.0)) j = j +1
-                        end do
+  ! First count protein bonds
+  j = 0
+  do i = 1,nbonds_solute
+    !                               if((bnd(i)%i<=ligand_offset).and.(bnd(i)%j<=ligand_offset)) j = j +1
+    if((iqatom(bnd(i)%i).eq.0).and.(iqatom(bnd(i)%j).eq.0)) j = j +1
+  end do
 
-                        allocate(top2prot(1:nat_solute))                                                ! top -> protein index translation matrix
+  allocate(top2prot(1:nat_solute))                                                ! top -> protein index translation matrix
 
-!                       call xprotein_translate(protein, offset, xtop)
-                        call xprotein_translate(protein, nat_solute, xtop,nbonds_solute,bnd)
-                        protein%name = adjustl(trim(title))
+  !                       call xprotein_translate(protein, offset, xtop)
+  call xprotein_translate(protein, nat_solute, xtop,nbonds_solute,bnd)
+  protein%name = adjustl(trim(title))
 
-                        ! Need to value cofactor-protein atoms using Molecule_Value_Atom instead
-                        ! of Protein_Value_Atom. Cofactor atoms are invalidated and added separately later.
-                        ! Need to flag cofactors before residue names are translated.
-                        call xflag_cofactors
+  ! Need to value cofactor-protein atoms using Molecule_Value_Atom instead
+  ! of Protein_Value_Atom. Cofactor atoms are invalidated and added separately later.
+  ! Need to flag cofactors before residue names are translated.
+  call xflag_cofactors
 
-                        do i = 0,protein%num_atom -1
-                                ! Rename atoms according to lib-files
-                                protein%atom(i)%name            = XTranslatePAtomName(protein%atom(i)%atom_res_id, protein%atom(i)%residue)
+  do i = 0,protein%num_atom -1
+    ! Rename atoms according to lib-files
+    protein%atom(i)%name            = XTranslatePAtomName(protein%atom(i)%atom_res_id, protein%atom(i)%residue)
                                 
-                                ! Rename residues according to translation table
-                                protein%atom(i)%old_residue = protein%atom(i)%residue
-                                protein%atom(i)%residue = XTranslateResidue(protein%atom(i)%residue)
-                        end do
+    ! Rename residues according to translation table
+    protein%atom(i)%old_residue = protein%atom(i)%residue
+    protein%atom(i)%residue = XTranslateResidue(protein%atom(i)%residue)
+  end do
                         
-                        write(*,'(a,i5,a,i5,a)') 'Translated ', protein%num_atom, ' atoms and ', protein%num_bond, ' bonds to protein'
+  write(*,'(a,i5,a,i5,a)') 'Translated ', protein%num_atom, ' atoms and ', protein%num_bond, ' bonds to protein'
 
-                        call Protein_Value_Atom(protein,flag=1)
+  call Protein_Value_Atom(protein,flag=1)
 
-                        allocate(cofactor(1:num_cofactor))
-                        do i = 1, num_cofactor
-!                               call xextract_cofactor(cofactor(i),cofactor_def(i),i,offset, nbonds,xtop,bnd)
-                                call xextract_cofactor(cofactor(i),cofactor_def(i),i,nat_solute, nbonds_solute,xtop,bnd)
+  allocate(cofactor(1:num_cofactor))
+  do i = 1, num_cofactor
+    !                               call xextract_cofactor(cofactor(i),cofactor_def(i),i,offset, nbonds,xtop,bnd)
+    call xextract_cofactor(cofactor(i),cofactor_def(i),i,nat_solute, nbonds_solute,xtop,bnd)
 
-                                if(cofactor(i)%mol%num_atom.eq.0) then
-                                        write(*,'(a,a,a)') '>>>>ERROR: Cofactor definition ', adjustl(trim(cofactor_def(i))), ' is empty.'
-                                        stop
-                                end if
+    if(cofactor(i)%mol%num_atom.eq.0) then
+      write(*,'(a,a,a)') '>>>>ERROR: Cofactor definition ', adjustl(trim(cofactor_def(i))), ' is empty.'
+      stop
+    end if
 
-                                do j = 0,cofactor(i)%mol%num_atom -1
-                                        cofactor(i)%mol%atom(j)%type2 = cofactor(i)%mol%atom(j)%ttype
-                                        cofactor(i)%mol%atom(j)%ttype = XTranslateAtomType(cofactor(i)%mol%atom(j)%ttype)
-                                end do
-                                write(*,'(a,i4,a,i4,a,a)') 'Translated ', &
-                                cofactor(i)%mol%num_atom, ' atoms and ', &
-                                cofactor(i)%mol%num_bond, ' bonds to cofactor ', cofactor_def(i)
+    do j = 0,cofactor(i)%mol%num_atom -1
+      cofactor(i)%mol%atom(j)%type2 = cofactor(i)%mol%atom(j)%ttype
+      cofactor(i)%mol%atom(j)%ttype = XTranslateAtomType(cofactor(i)%mol%atom(j)%ttype)
+    end do
+    write(*,'(a,i4,a,i4,a,a)') 'Translated ', &
+      cofactor(i)%mol%num_atom, ' atoms and ', &
+      cofactor(i)%mol%num_bond, ' bonds to cofactor ', cofactor_def(i)
 
-                                call Ligand_Value_Atom(cofactor(i))
-                                if(adjustl(trim(input%show_cofactor)).eq.'YES') call Molecule_Show_Contents(cofactor(i)%mol)
+    call Ligand_Value_Atom(cofactor(i))
+    if(adjustl(trim(input%show_cofactor)).eq.'YES') call Molecule_Show_Contents(cofactor(i)%mol)
                                 
-                                call Protein_Merge_Cofactor(protein,cofactor(i))
-                        end do
+    call Protein_Merge_Cofactor(protein,cofactor(i))
+  end do
                         
-                        ! Update neighbour count for protein atoms (some waters may mess this up)
-                        do i = 0,protein%num_atom -1
-                                do j = 0,6
-                                        if(protein%atom(i)%neib(j).eq.0) then
-                                                protein%atom(i)%num_neib = j
-                                                exit
-                                        end if
-                                end do
-                        end do
+  ! Update neighbour count for protein atoms (some waters may mess this up)
+  do i = 0,protein%num_atom -1
+    do j = 0,6
+      if(protein%atom(i)%neib(j).eq.0) then
+        protein%atom(i)%num_neib = j
+        exit
+      end if
+    end do
+  end do
 
-                        call Protein_Define_Pocket(protein, ff,ligand, 10.0)
+  call Protein_Define_Pocket(protein, ff,ligand, 10.0)
 
-                        j = 0
-                        do i = 0,protein%num_atom -1
-                                if(protein%atom(i)%valid.eq.0) then
-                                        if(protein%atom(i)%xtype.ne.'H' .and. &
-                                        protein%atom(i)%xtype.ne.'Un') then
-                                            write(*,'(a,i6,a,a,a,a,a)') &
-                                            'WARNING: Atom ', &
-                                            protein%atom(i)%id, ' (', &
-                                            trim(adjustl(protein%atom(i)%xtype)), &
-                                            ') in residue ', &
-                                            trim(adjustl(protein%atom(i)%residue)), &
-                                            ' will be ignored.'
-                                        endif
-                                        j = j +1
-                                end if
-                        end do
-                        if(j>0) then
-                                write(*,'(a,i4,a,i4,a,a,a)') &
-                                'WARNING: ', j, ' atoms (out of ', &
-                                protein%num_atom, ') in ', &
-                                adjustl(trim(protein%name)), &
-                                ' (protein) will be ignored. Note that nonpolar hydrogens are automatically ignored.'
-                                warn = warn +1
-                        end if
-                        if(adjustl(trim(input%show_protein)).eq.'YES') call Protein_Show_Contents(protein)
+  j = 0
+  do i = 0,protein%num_atom -1
+    if(protein%atom(i)%valid.eq.0) then
+      if(protein%atom(i)%xtype.ne.'H' .and. &
+        protein%atom(i)%xtype.ne.'Un') then
+        write(*,'(a,i6,a,a,a,a,a)') &
+          'WARNING: Atom ', &
+          protein%atom(i)%id, ' (', &
+          trim(adjustl(protein%atom(i)%xtype)), &
+          ') in residue ', &
+          trim(adjustl(protein%atom(i)%residue)), &
+          ' will be ignored.'
+      endif
+      j = j +1
+    end if
+  end do
+  if(j>0) then
+    write(*,'(a,i4,a,i4,a,a,a)') &
+      'WARNING: ', j, ' atoms (out of ', &
+      protein%num_atom, ') in ', &
+      adjustl(trim(protein%name)), &
+      ' (protein) will be ignored. Note that nonpolar hydrogens are automatically ignored.'
+    warn = warn +1
+  end if
+  if(adjustl(trim(input%show_protein)).eq.'YES') call Protein_Show_Contents(protein)
 
 
-        ! ==============================
-        ! 3. SCORE INITIAL CONFIGURATION
-        ! ==============================
+  ! ==============================
+  ! 3. SCORE INITIAL CONFIGURATION
+  ! ==============================
 
-                if(bDoTopcalc.eq.1) then 
-                        write(*,'(a)') 'Scoring initial configuration'
-                        score = Ligand_Calculate_Binding_Score(ligand, input,protein)
-                        call Ligand_Scoring_Stats(ligand)
-                        write(*,'(a, t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') &
-                        'Total score of topology', ligand%vdw,ligand%hb, &
-                        ligand%hp,ligand%hm,ligand%hs,ligand%rt,ligand%bind_score
-                end if
+  if(bDoTopcalc.eq.1) then
+    write(*,'(a)') 'Scoring initial configuration'
+    score = Ligand_Calculate_Binding_Score(ligand, input,protein)
+    call Ligand_Scoring_Stats(ligand)
+    write(*,'(a, t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') &
+      'Total score of topology', ligand%vdw,ligand%hb, &
+      ligand%hp,ligand%hm,ligand%hs,ligand%rt,ligand%bind_score
+  end if
 
 end subroutine xscore_precalc
 
 subroutine xflag_cofactors
-        integer                                                 :: i,j,count
-        character(len=10)               :: restype
+  integer                                                 :: i,j,count
+  character(len=10)               :: restype
 
-        ! valid cofactor definitions: restype=HEM                       -> all atoms in residues named HEM
+  ! valid cofactor definitions: restype=HEM                       -> all atoms in residues named HEM
 
-        protein%atom(:)%iscofactor = 0
-        do i = 1, num_cofactor
-                if(cofactor_def(i)(1:7).eq.'restype'.or.cofactor_def(i)(1:7).eq.'RESTYPE') then
-                        restype = adjustl(trim(cofactor_def(i)(9:80)))
-                        do j = 0,protein%num_atom -1
-                                if(protein%atom(j)%residue.eq.restype) protein%atom(j)%iscofactor = i
-                        end do
-                end if
-        end do
+  protein%atom(:)%iscofactor = 0
+  do i = 1, num_cofactor
+    if(cofactor_def(i)(1:7).eq.'restype'.or.cofactor_def(i)(1:7).eq.'RESTYPE') then
+      restype = adjustl(trim(cofactor_def(i)(9:80)))
+      do j = 0,protein%num_atom -1
+        if(protein%atom(j)%residue.eq.restype) protein%atom(j)%iscofactor = i
+      end do
+    end if
+  end do
 end subroutine xflag_cofactors
 
 subroutine xextract_cofactor(cf,cf_def,conumber,nAtoms,nBonds,coordinates,bonds)
-        type(tXLigand)                  :: cf
-        character(len=80)               :: cf_def
-        integer                                                 :: conumber
-        integer                                                 :: nAtoms,nBonds
-        real(8)                                                 :: coordinates(:)
-        type(BOND_TYPE)                 :: bonds(:)
+  type(tXLigand)                  :: cf
+  character(len=80)               :: cf_def
+  integer                                                 :: conumber
+  integer                                                 :: nAtoms,nBonds
+  real(8)                                                 :: coordinates(:)
+  type(BOND_TYPE)                 :: bonds(:)
 
-        integer                                                 :: i,j,count,mark,floating_offset
-        character(len=10)               :: restype
-        integer                                                 :: iRes                                 ! current residue
-        integer                                                 :: iNextRes                     ! starting point of next residue
+  integer                                                 :: i,j,count,mark,floating_offset
+  character(len=10)               :: restype
+  integer                                                 :: iRes                                 ! current residue
+  integer                                                 :: iNextRes                     ! starting point of next residue
 
-        integer,pointer                 :: mask(:),mask_res(:)
-        type(tXBond)                            :: tmp
-        integer,pointer                 :: prt2cof(:)
+  integer,pointer                 :: mask(:),mask_res(:)
+  type(tXBond)                            :: tmp
+  integer,pointer                 :: prt2cof(:)
 
-        ! valid cofactor definitions: restype=HEM                       -> all atoms in residues named HEM
+  ! valid cofactor definitions: restype=HEM                       -> all atoms in residues named HEM
 
-        ! Create atom mask for this cofactor
-        if(cf_def(1:7).eq.'restype'.or.cf_def(1:7).eq.'RESTYPE') then
-                restype = trim(adjustl(cf_def(9:80)))
-                count = 0
+  ! Create atom mask for this cofactor
+  if(cf_def(1:7).eq.'restype'.or.cf_def(1:7).eq.'RESTYPE') then
+    restype = trim(adjustl(cf_def(9:80)))
+    count = 0
 
-                iRes = 0
-                iNextRes = 1             
-                do i = 1,nAtoms
-                        if(i.eq.iNextRes) then
-                                iRes = iRes +1
-                                if(iRes<size(res)) iNextRes = res(iRes +1)%start
-                        end if
-                        if(res(iRes)%name.eq.restype) then
-                                call Int_Pushback(mask,i)                                       ! push back this atom
-                                call Int_Pushback(mask_res,iRes)        ! push back corresponding residue id
-                                glb_cofactor(i) = conumber                              ! set global cofactor flag
-                        end if
-                end do
+    iRes = 0
+    iNextRes = 1
+    do i = 1,nAtoms
+      if(i.eq.iNextRes) then
+        iRes = iRes +1
+        if(iRes<size(res)) iNextRes = res(iRes +1)%start
+      end if
+      if(res(iRes)%name.eq.restype) then
+        call Int_Pushback(mask,i)                                       ! push back this atom
+        call Int_Pushback(mask_res,iRes)        ! push back corresponding residue id
+        glb_cofactor(i) = conumber                              ! set global cofactor flag
+      end if
+    end do
                 
-                count = 0
-                do i = 0,protein%num_atom -1
-                        if(protein%atom(i)%residue.eq.restype) count = count +1
-                end do
+    count = 0
+    do i = 0,protein%num_atom -1
+      if(protein%atom(i)%residue.eq.restype) count = count +1
+    end do
 
-                cf%mol%num_atom = count
-                allocate(cf%mol%atom(0:cf%mol%num_atom-1))
+    cf%mol%num_atom = count
+    allocate(cf%mol%atom(0:cf%mol%num_atom-1))
                 
-                allocate(prt2cof(0:protein%num_atom-1))
+    allocate(prt2cof(0:protein%num_atom-1))
 
-                ! Copy protein atom data to cofactor
-                cf%mol%name = cf_def
-                cf%mol%num_ring = 0
-                nullify(cf%mol%ring)
-                j = -1
-                floating_offset = 0
-                do i = 0,protein%num_atom -1
-                        if(protein%atom(i)%residue.eq.restype) then
-                                j = j +1
-                                cf%mol%atom(j)%iscofactor               = conumber                              ! set cofactor number
-                                cf%mol%atom(j)%coor(0)                  = protein%atom(i)%coor(0)
-                                cf%mol%atom(j)%coor(1)                  = protein%atom(i)%coor(1)
-                                cf%mol%atom(j)%coor(2)                  = protein%atom(i)%coor(2)
-                                cf%mol%atom(j)%id                                               = j +1                                          ! need to set this temporarily
-                                cf%mol%atom(j)%atom_res_id      = j +1
-                                cf%mol%atom(j)%name                                     = ''                                                    ! not used. names are assigned using lib file and index within residue
-                                cf%mol%atom(j)%residue                  = 'COF'                                         ! res(iRes)%name
-                                cf%mol%atom(j)%res_id                           = protein%atom(i)%res_id
-                                cf%mol%atom(j)%ttype                            = protein%atom(i)%ttype                 ! ttype and xtype are set by Value_Atom
-                                cf%mol%atom(j)%xtype                            = 'Un'                                          ! cf%mol%atom(i -1)%ttype
-                                cf%mol%atom(j)%type2                            = 'Un' 
-                                cf%mol%atom(j)%hb                                               = 'N'
-                                cf%mol%atom(j)%valid                            = 1                                                             ! default
-                                cf%mol%atom(j)%origin                           = 2                                                             ! This is a cf%mol atom
-                                cf%mol%atom(j)%part                                     = 1                                                             ! regular atom
-                                cf%mol%atom(j)%occupancy                = 0.0                                                   ! default
-                                cf%mol%atom(j)%solv                                     = 0
-                                cf%mol%atom(j)%bfactor                  = 0
-                                cf%mol%atom(j)%logp                                     = 0
-                                cf%mol%atom(j)%num_neib     = protein%atom(i)%num_neib
-                                where(protein%atom(i)%neib.ne.0)
-                                        cf%mol%atom(j)%neib                             = protein%atom(i)%neib -floating_offset
-                                elsewhere
-                                        cf%mol%atom(j)%neib       = 0
-                                end where
-                                cf%mol%atom(j)%bond(:)                  = protein%atom(i)%bond(:)
-                                cf%mol%atom(j)%root(:)                  = 0
-                                cf%mol%atom(j)%temp                                     = i                                                             ! save insertion index
-                                prt2cof(i)                                                                      = j                                                             ! save protein index -> cof index
-                        else
-                                floating_offset = floating_offset +1
-                        end if
-                end do
+    ! Copy protein atom data to cofactor
+    cf%mol%name = cf_def
+    cf%mol%num_ring = 0
+    nullify(cf%mol%ring)
+    j = -1
+    floating_offset = 0
+    do i = 0,protein%num_atom -1
+      if(protein%atom(i)%residue.eq.restype) then
+        j = j +1
+        cf%mol%atom(j)%iscofactor               = conumber                              ! set cofactor number
+        cf%mol%atom(j)%coor(0)                  = protein%atom(i)%coor(0)
+        cf%mol%atom(j)%coor(1)                  = protein%atom(i)%coor(1)
+        cf%mol%atom(j)%coor(2)                  = protein%atom(i)%coor(2)
+        cf%mol%atom(j)%id                                               = j +1                                          ! need to set this temporarily
+        cf%mol%atom(j)%atom_res_id      = j +1
+        cf%mol%atom(j)%name                                     = ''                                                    ! not used. names are assigned using lib file and index within residue
+        cf%mol%atom(j)%residue                  = 'COF'                                         ! res(iRes)%name
+        cf%mol%atom(j)%res_id                           = protein%atom(i)%res_id
+        cf%mol%atom(j)%ttype                            = protein%atom(i)%ttype                 ! ttype and xtype are set by Value_Atom
+        cf%mol%atom(j)%xtype                            = 'Un'                                          ! cf%mol%atom(i -1)%ttype
+        cf%mol%atom(j)%type2                            = 'Un'
+        cf%mol%atom(j)%hb                                               = 'N'
+        cf%mol%atom(j)%valid                            = 1                                                             ! default
+        cf%mol%atom(j)%origin                           = 2                                                             ! This is a cf%mol atom
+        cf%mol%atom(j)%part                                     = 1                                                             ! regular atom
+        cf%mol%atom(j)%occupancy                = 0.0                                                   ! default
+        cf%mol%atom(j)%solv                                     = 0
+        cf%mol%atom(j)%bfactor                  = 0
+        cf%mol%atom(j)%logp                                     = 0
+        cf%mol%atom(j)%num_neib     = protein%atom(i)%num_neib
+        where(protein%atom(i)%neib.ne.0)
+          cf%mol%atom(j)%neib                             = protein%atom(i)%neib -floating_offset
+        elsewhere
+          cf%mol%atom(j)%neib       = 0
+        end where
+        cf%mol%atom(j)%bond(:)                  = protein%atom(i)%bond(:)
+        cf%mol%atom(j)%root(:)                  = 0
+        cf%mol%atom(j)%temp                                     = i                                                             ! save insertion index
+        prt2cof(i)                                                                      = j                                                             ! save protein index -> cof index
+      else
+        floating_offset = floating_offset +1
+      end if
+    end do
         
-                ! Translate bonds
-                count = 0
-                do i = 0,protein%num_bond -1
-!                       write(*,*) i, protein%bond(i)%atom_1-1, protein%bond(i)%atom_2-1, size(protein%atom)
-                        if(protein%atom(protein%bond(i)%atom_1-1)%iscofactor.eq.conumber.and. &
-                        protein%atom(protein%bond(i)%atom_2-1)%iscofactor.eq.conumber) then
-                                count = count +1
-                        end if
-                end do
+    ! Translate bonds
+    count = 0
+    do i = 0,protein%num_bond -1
+      !                       write(*,*) i, protein%bond(i)%atom_1-1, protein%bond(i)%atom_2-1, size(protein%atom)
+      if(protein%atom(protein%bond(i)%atom_1-1)%iscofactor.eq.conumber.and. &
+        protein%atom(protein%bond(i)%atom_2-1)%iscofactor.eq.conumber) then
+        count = count +1
+      end if
+    end do
 
-                cf%mol%num_bond = count
-                allocate(cf%mol%bond(0:cf%mol%num_bond -1))
-                count = 0
+    cf%mol%num_bond = count
+    allocate(cf%mol%bond(0:cf%mol%num_bond -1))
+    count = 0
 
-                ! No need to copy bonds later since they are never removed from protein
-                count = 0
-                do i = 0,protein%num_bond -1
-                        if(protein%atom(protein%bond(i)%atom_1-1)%iscofactor.eq.conumber.and. &
-                        protein%atom(protein%bond(i)%atom_2-1)%iscofactor.eq.conumber) then
-                                cf%mol%bond(count)%id                           = count
-                                cf%mol%bond(count)%valid                = 1
-                                cf%mol%bond(count)%atom_1               = prt2cof(protein%bond(i)%atom_1-1) +1
-                                cf%mol%bond(count)%atom_2               = prt2cof(protein%bond(i)%atom_2-1) +1
-                                cf%mol%bond(count)%ttype                = protein%bond(i)%ttype  !SYBYL_bond_type(bonds(i)%cod)
-                                cf%mol%bond(count)%neib(:)      = 0
-                                count = count +1
-                        end if
-                end do
+    ! No need to copy bonds later since they are never removed from protein
+    count = 0
+    do i = 0,protein%num_bond -1
+      if(protein%atom(protein%bond(i)%atom_1-1)%iscofactor.eq.conumber.and. &
+        protein%atom(protein%bond(i)%atom_2-1)%iscofactor.eq.conumber) then
+        cf%mol%bond(count)%id                           = count
+        cf%mol%bond(count)%valid                = 1
+        cf%mol%bond(count)%atom_1               = prt2cof(protein%bond(i)%atom_1-1) +1
+        cf%mol%bond(count)%atom_2               = prt2cof(protein%bond(i)%atom_2-1) +1
+        cf%mol%bond(count)%ttype                = protein%bond(i)%ttype  !SYBYL_bond_type(bonds(i)%cod)
+        cf%mol%bond(count)%neib(:)      = 0
+        count = count +1
+      end if
+    end do
 
-                do
-                        mark = 0
-                        do i = 0, cf%mol%num_bond -2
-                                if((cf%mol%bond(i)%atom_1.eq.cf%mol%bond(i+1)%atom_1).and. &
-                                        (cf%mol%bond(i)%atom_2.eq.cf%mol%bond(i+1)%atom_2)) goto 2
-                                if(cf%mol%bond(i)%atom_1 <  cf%mol%bond(i+1)%atom_1) goto 2
-                                if((cf%mol%bond(i)%atom_1.eq.cf%mol%bond(i+1)%atom_1) .and. &
-                                        (cf%mol%bond(i)%atom_2<=cf%mol%bond(i+1)%atom_2)) goto 2
+    do
+      mark = 0
+      do i = 0, cf%mol%num_bond -2
+        if((cf%mol%bond(i)%atom_1.eq.cf%mol%bond(i+1)%atom_1).and. &
+          (cf%mol%bond(i)%atom_2.eq.cf%mol%bond(i+1)%atom_2)) goto 2
+        if(cf%mol%bond(i)%atom_1 <  cf%mol%bond(i+1)%atom_1) goto 2
+        if((cf%mol%bond(i)%atom_1.eq.cf%mol%bond(i+1)%atom_1) .and. &
+          (cf%mol%bond(i)%atom_2<=cf%mol%bond(i+1)%atom_2)) goto 2
 
-                                ! If no rule triggered, the bonds are in the wrong order
-                                mark = 1
-                                call Bond_Swap(cf%mol%bond(i),cf%mol%bond(i+1))
+        ! If no rule triggered, the bonds are in the wrong order
+        mark = 1
+        call Bond_Swap(cf%mol%bond(i),cf%mol%bond(i+1))
         2               end do
-                        if(mark.eq.0) exit
-                end do
+        if(mark.eq.0) exit
+      end do
 
-                ! Reset bond id
-                do i = 0,cf%mol%num_bond -1
-                        cf%mol%bond(i)%id = i +1
-                end do
-        end if
+      ! Reset bond id
+      do i = 0,cf%mol%num_bond -1
+        cf%mol%bond(i)%id = i +1
+      end do
+    end if
 
-        deallocate(prt2cof)
-        return
+    deallocate(prt2cof)
+    return
 
-        if(.not. associated(mask).or.size(mask).eq.0) then
-                write(*,'(a,a)') 'Fatal: No atoms match cofactor description ', trim(adjustl(cf_def))
-                stop
-        end if
+    if(.not. associated(mask).or.size(mask).eq.0) then
+      write(*,'(a,a)') 'Fatal: No atoms match cofactor description ', trim(adjustl(cf_def))
+      stop
+    end if
         
-!       ! Extract atom data for this cofactor
-!       cf%mol%num_atom = size(mask)
-!       allocate(cf%mol%atom(0:cf%mol%num_atom-1))
-!       cf%cofactor_offset = mask(0) -1
-!       cf%mol%name = cf_def
-!       cf%mol%num_ring = 0
-!       nullify(cf%mol%ring)
-!       
-!       do i = 0,size(mask) -1
-!               j                       = mask(i) 
-!               iRes    = mask_res(i)   
-!
-!               cf%mol%atom(i)%coor(0)                  = coordinates(3*(j-1) +1)
-!               cf%mol%atom(i)%coor(1)                  = coordinates(3*(j-1) +2)
-!               cf%mol%atom(i)%coor(2)                  = coordinates(3*(j-1) +3)
-!               cf%mol%atom(i)%id                                               = i +1
-!               cf%mol%atom(i)%atom_res_id      = i +1
-!               cf%mol%atom(i)%name                                     = ''                                                    ! not used. names are assigned using lib file and index within residue
-!               cf%mol%atom(i)%residue                  = 'COF'                                         ! res(iRes)%name
-!               write(cf%mol%atom(i)%res_id, '(I8)') iRes                       ! use internal read to convert integer -> character
-!               cf%mol%atom(i)%ttype                            = tac(iac(j))                   ! ttype and xtype are set by Value_Atom
-!               cf%mol%atom(i)%xtype                            = 'Un'                                          ! cf%mol%atom(i -1)%ttype
-!               cf%mol%atom(i)%type2                            = 'Un' 
-!               cf%mol%atom(i)%hb                                               = 'N'
-!               cf%mol%atom(i)%valid                            = 1                                                             ! default
-!               cf%mol%atom(i)%origin                           = 2                                                             ! This is a cf%mol atom
-!               cf%mol%atom(i)%part                                     = 1                                                             ! regular atom
-!               cf%mol%atom(i)%occupancy                = 0.0                                                   ! default
-!               cf%mol%atom(i)%solv                                     = 0
-!               cf%mol%atom(i)%bfactor                  = 0
-!               cf%mol%atom(i)%logp                                     = 0
-!               cf%mol%atom(i)%neib(:)                  = 0
-!               cf%mol%atom(i)%bond(:)                  = 0
-!               cf%mol%atom(i)%root(:)                  = 0
-!       end do
-!       
-!       j = -1
-!       do i = 0,protein%num_atom -1
-!               if(protein%atom(i)%residue.eq.restype) then     
-!                       j = j +1
-!                       cf%mol%atom(j)%temp = i                                                                                 ! save insertion index, this works
-!               end if
-!       end do
+    !       ! Extract atom data for this cofactor
+    !       cf%mol%num_atom = size(mask)
+    !       allocate(cf%mol%atom(0:cf%mol%num_atom-1))
+    !       cf%cofactor_offset = mask(0) -1
+    !       cf%mol%name = cf_def
+    !       cf%mol%num_ring = 0
+    !       nullify(cf%mol%ring)
+    !
+    !       do i = 0,size(mask) -1
+    !               j                       = mask(i)
+    !               iRes    = mask_res(i)
+    !
+    !               cf%mol%atom(i)%coor(0)                  = coordinates(3*(j-1) +1)
+    !               cf%mol%atom(i)%coor(1)                  = coordinates(3*(j-1) +2)
+    !               cf%mol%atom(i)%coor(2)                  = coordinates(3*(j-1) +3)
+    !               cf%mol%atom(i)%id                                               = i +1
+    !               cf%mol%atom(i)%atom_res_id      = i +1
+    !               cf%mol%atom(i)%name                                     = ''                                                    ! not used. names are assigned using lib file and index within residue
+    !               cf%mol%atom(i)%residue                  = 'COF'                                         ! res(iRes)%name
+    !               write(cf%mol%atom(i)%res_id, '(I8)') iRes                       ! use internal read to convert integer -> character
+    !               cf%mol%atom(i)%ttype                            = tac(iac(j))                   ! ttype and xtype are set by Value_Atom
+    !               cf%mol%atom(i)%xtype                            = 'Un'                                          ! cf%mol%atom(i -1)%ttype
+    !               cf%mol%atom(i)%type2                            = 'Un'
+    !               cf%mol%atom(i)%hb                                               = 'N'
+    !               cf%mol%atom(i)%valid                            = 1                                                             ! default
+    !               cf%mol%atom(i)%origin                           = 2                                                             ! This is a cf%mol atom
+    !               cf%mol%atom(i)%part                                     = 1                                                             ! regular atom
+    !               cf%mol%atom(i)%occupancy                = 0.0                                                   ! default
+    !               cf%mol%atom(i)%solv                                     = 0
+    !               cf%mol%atom(i)%bfactor                  = 0
+    !               cf%mol%atom(i)%logp                                     = 0
+    !               cf%mol%atom(i)%neib(:)                  = 0
+    !               cf%mol%atom(i)%bond(:)                  = 0
+    !               cf%mol%atom(i)%root(:)                  = 0
+    !       end do
+    !
+    !       j = -1
+    !       do i = 0,protein%num_atom -1
+    !               if(protein%atom(i)%residue.eq.restype) then
+    !                       j = j +1
+    !                       cf%mol%atom(j)%temp = i                                                                                 ! save insertion index, this works
+    !               end if
+    !       end do
 
                 
-        ! Extract bond data for this cofactor. Note: covalent bonds to non-cofactor protein atoms are broken (but are restored later)
-        ! Find all bonds between atoms flagged as cofactor "conumber".
-        count = 0
-        do i = 1,nBonds
-                if(glb_cofactor(bnd(i)%i).eq.conumber.and.glb_cofactor(bnd(i)%j).eq.conumber) then
-                        count = count +1
-                end if
-        end do
+    ! Extract bond data for this cofactor. Note: covalent bonds to non-cofactor protein atoms are broken (but are restored later)
+    ! Find all bonds between atoms flagged as cofactor "conumber".
+    count = 0
+    do i = 1,nBonds
+      if(glb_cofactor(bnd(i)%i).eq.conumber.and.glb_cofactor(bnd(i)%j).eq.conumber) then
+        count = count +1
+      end if
+    end do
 
-        cf%mol%num_bond = count
-        allocate(cf%mol%bond(0:cf%mol%num_bond -1))
-        count = 0
-        do i = 1,nBonds
-                if(glb_cofactor(bnd(i)%i).eq.conumber.and.glb_cofactor(bnd(i)%j).eq.conumber) then
-                        cf%mol%bond(count)%id                   = count
-                        cf%mol%bond(count)%valid        = 1
-                        cf%mol%bond(count)%atom_1       = bnd(i)%i - cf%cofactor_offset
-                        cf%mol%bond(count)%atom_2       = bnd(i)%j - cf%cofactor_offset
-                        cf%mol%bond(count)%ttype        = SYBYL_bond_type(bonds(i)%cod)
-                        cf%mol%bond(count)%neib(:)      = 0
-                        count = count +1
-                end if
-        end do
+    cf%mol%num_bond = count
+    allocate(cf%mol%bond(0:cf%mol%num_bond -1))
+    count = 0
+    do i = 1,nBonds
+      if(glb_cofactor(bnd(i)%i).eq.conumber.and.glb_cofactor(bnd(i)%j).eq.conumber) then
+        cf%mol%bond(count)%id                   = count
+        cf%mol%bond(count)%valid        = 1
+        cf%mol%bond(count)%atom_1       = bnd(i)%i - cf%cofactor_offset
+        cf%mol%bond(count)%atom_2       = bnd(i)%j - cf%cofactor_offset
+        cf%mol%bond(count)%ttype        = SYBYL_bond_type(bonds(i)%cod)
+        cf%mol%bond(count)%neib(:)      = 0
+        count = count +1
+      end if
+    end do
 
-        ! Bubble sort bonds in increasing atom order
-        do
-                mark = 0
-                do i = 0, cf%mol%num_bond -2
-                        if((cf%mol%bond(i)%atom_1.eq.cf%mol%bond(i+1)%atom_1).and. &
-                                (cf%mol%bond(i)%atom_2.eq.cf%mol%bond(i+1)%atom_2)) cycle
-                        if(cf%mol%bond(i)%atom_1 <  cf%mol%bond(i+1)%atom_1) cycle
-                        if((cf%mol%bond(i)%atom_1.eq.cf%mol%bond(i+1)%atom_1) .and. &
-                                (cf%mol%bond(i)%atom_2<=cf%mol%bond(i+1)%atom_2)) cycle
+    ! Bubble sort bonds in increasing atom order
+    do
+      mark = 0
+      do i = 0, cf%mol%num_bond -2
+        if((cf%mol%bond(i)%atom_1.eq.cf%mol%bond(i+1)%atom_1).and. &
+          (cf%mol%bond(i)%atom_2.eq.cf%mol%bond(i+1)%atom_2)) cycle
+        if(cf%mol%bond(i)%atom_1 <  cf%mol%bond(i+1)%atom_1) cycle
+        if((cf%mol%bond(i)%atom_1.eq.cf%mol%bond(i+1)%atom_1) .and. &
+          (cf%mol%bond(i)%atom_2<=cf%mol%bond(i+1)%atom_2)) cycle
 
-                        ! If no rule triggered, the bonds are in the wrong order
-                        mark = 1
-                        call Bond_Swap(cf%mol%bond(i),cf%mol%bond(i+1))
-                end do
-                if(mark.eq.0) exit
-        end do
+        ! If no rule triggered, the bonds are in the wrong order
+        mark = 1
+        call Bond_Swap(cf%mol%bond(i),cf%mol%bond(i+1))
+      end do
+      if(mark.eq.0) exit
+    end do
 
-        ! Reset bond id
-        do i = 0,cf%mol%num_bond -1
-                cf%mol%bond(i)%id = i +1
-        end do
+    ! Reset bond id
+    do i = 0,cf%mol%num_bond -1
+      cf%mol%bond(i)%id = i +1
+    end do
         
-        deallocate(mask)
-        deallocate(mask_res)
+    deallocate(mask)
+    deallocate(mask_res)
 end subroutine xextract_cofactor
 
 subroutine xscore_calc(iCalc, iFrame)   ! calc topmost routine
-        !arguments
-        integer, intent(in)     :: iCalc                                ! calculation index, not used
-        integer, intent(in)     :: iFrame                               ! frame index
-        real                            :: score                                ! scoring results
-        integer                 :: i
+  !arguments
+  integer, intent(in)     :: iCalc                                ! calculation index, not used
+  integer, intent(in)     :: iFrame                               ! frame index
+  real                            :: score                                ! scoring results
+  integer                 :: i
 
-        ! Update coordinates
-        do i = 0,nqat -1
-                ligand%mol%atom(i)%coor(0) = xin(3*(iqseq(i+1)-1) +1)
-                ligand%mol%atom(i)%coor(1) = xin(3*(iqseq(i+1)-1) +2)
-                ligand%mol%atom(i)%coor(2) = xin(3*(iqseq(i+1)-1) +3)
-        end do
+  ! Update coordinates
+  do i = 0,nqat -1
+    ligand%mol%atom(i)%coor(0) = xin(3*(iqseq(i+1)-1) +1)
+    ligand%mol%atom(i)%coor(1) = xin(3*(iqseq(i+1)-1) +2)
+    ligand%mol%atom(i)%coor(2) = xin(3*(iqseq(i+1)-1) +3)
+  end do
 
-        do i = 0,protein%num_atom -1
-                protein%atom(i)%coor(0) = xin(3*(protein%atom(i)%topindex-1) +1)
-                protein%atom(i)%coor(1) = xin(3*(protein%atom(i)%topindex-1) +2)
-                protein%atom(i)%coor(2) = xin(3*(protein%atom(i)%topindex-1) +3)
-        end do
+  do i = 0,protein%num_atom -1
+    protein%atom(i)%coor(0) = xin(3*(protein%atom(i)%topindex-1) +1)
+    protein%atom(i)%coor(1) = xin(3*(protein%atom(i)%topindex-1) +2)
+    protein%atom(i)%coor(2) = xin(3*(protein%atom(i)%topindex-1) +3)
+  end do
 
-        call Ligand_Value_Atom(ligand,1)
-        call Protein_Value_Atom(protein, 1,1)           ! do lite run
-        call Protein_Define_Pocket(protein, ff,ligand, 10.0)                                    
+  call Ligand_Value_Atom(ligand,1)
+  call Protein_Value_Atom(protein, 1,1)           ! do lite run
+  call Protein_Define_Pocket(protein, ff,ligand, 10.0)
 
-        score = Ligand_Calculate_Binding_Score(ligand,input,protein)    
+  score = Ligand_Calculate_Binding_Score(ligand,input,protein)
 
-        call xlog_frame(iFrame,ligand)
+  call xlog_frame(iFrame,ligand)
 
-        if(input%show_abs.eq.'YES')             call Ligand_Scoring_Stats(ligand)
-        if(input%show_abs.eq.'QATOM') call Ligand_Scoring_Stats(ligand,input%qatom-1)
+  if(input%show_abs.eq.'YES')             call Ligand_Scoring_Stats(ligand)
+  if(input%show_abs.eq.'QATOM') call Ligand_Scoring_Stats(ligand,input%qatom-1)
 
-        if(input%show_total.eq.'YES') then
-            write(*,'(t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') &
-                ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt, &
-                ligand%bind_score
-        endif
-        if(input%show_abs.eq.'YES')             write(*,'(a)') '------------------------------------------------------------------------------'
+  if(input%show_total.eq.'YES') then
+    write(*,'(t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') &
+      ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt, &
+      ligand%bind_score
+  endif
+  if(input%show_abs.eq.'YES')             write(*,'(a)') '------------------------------------------------------------------------------'
 end subroutine xscore_calc
 
 subroutine xlog_frame(iFrame,ligand)                            ! logs scoring results for frame
-        integer, intent(in)             :: iFrame                                               ! current frame
-        type(tXLigand)                          :: ligand
-        type(tXScore),pointer   :: new_aXScore(:)               ! tmp pointer
+  integer, intent(in)             :: iFrame                                               ! current frame
+  type(tXLigand)                          :: ligand
+  type(tXScore),pointer   :: new_aXScore(:)               ! tmp pointer
         
-        nXScores = nXScores +1
-        if(nXScores>maxXScores) then
-                maxXScores = maxXScores + 16                                                                            ! allocate 16 elements a time
-                allocate(new_aXScore(maxXScores))                                                               ! allocate new mem
-                new_aXScore(1:nXScores-1) = xscores(1:nXScores-1)       ! copy old
+  nXScores = nXScores +1
+  if(nXScores>maxXScores) then
+    maxXScores = maxXScores + 16                                                                            ! allocate 16 elements a time
+    allocate(new_aXScore(maxXScores))                                                               ! allocate new mem
+    new_aXScore(1:nXScores-1) = xscores(1:nXScores-1)       ! copy old
                 
-                deallocate(xscores)                             ! return old mem to OS
-                xscores => new_aXScore                  ! update pointer
-        end if
+    deallocate(xscores)                             ! return old mem to OS
+    xscores => new_aXScore                  ! update pointer
+  end if
 
-        ! finally store values
-        xscores(nXScores)%frame = iFrame        ! iFrame may be redundant
-        xscores(nXScores)%vdw           = ligand%vdw
-        xscores(nXScores)%hb            = ligand%hb
-        xscores(nXScores)%rt            = ligand%rt
-        xscores(nXScores)%hp            =       ligand%hp
-        xscores(nXScores)%hs            = ligand%hs
-        xscores(nXScores)%hm            = ligand%hm
-        xscores(nXScores)%score = ligand%bind_score
+  ! finally store values
+  xscores(nXScores)%frame = iFrame        ! iFrame may be redundant
+  xscores(nXScores)%vdw   = ligand%vdw
+  xscores(nXScores)%hb    = ligand%hb
+  xscores(nXScores)%rt    = ligand%rt
+  xscores(nXScores)%hp    = ligand%hp
+  xscores(nXScores)%hs    = ligand%hs
+  xscores(nXScores)%hm    = ligand%hm
+  xscores(nXScores)%score = ligand%bind_score
 end subroutine xlog_frame
 
 subroutine xscore_mean

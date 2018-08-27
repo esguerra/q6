@@ -129,8 +129,8 @@ module topo
   logical                                         ::      use_pbc = .false.
 
   !bond information
-  integer                                                                                         ::      nbonds, nbonds_solute, max_bonds
-  type(bond_type), allocatable    ::      bnd(:)
+  integer                         :: nbonds, nbonds_solute, max_bonds
+  type(bond_type), allocatable    :: bnd(:)
 
   integer                                         ::      nbndcod, max_bondlib
   type(bondlib_type), allocatable:: bondlib(:)

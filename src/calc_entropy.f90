@@ -26,38 +26,37 @@ module calc_entropy
 
   ! Constants
   ! pi, Planck's constant, R, reference_volume
-  real(8)                    :: pi_val, hs, R, ref_vol, e, u, kb, cm
+  real(8)                          :: pi_val, hs, R, ref_vol, e, u, kb, cm
 
   !module variables
-  type(MASK_TYPE), private, target                :: masks(MAX_MASKS)
-  integer, private                                :: Nmasks = 0
+  type(mask_type), private, target :: masks(max_masks)
+  integer, private                 :: Nmasks = 0
 
-  type COVARIANCE_MATRIX    ! Numbers stored for covariance matrix calculation
-    real(8)                       :: Exy, Ex, Ey     ! C[X,Y] = E[XY] - E[X] -E[Y]
-  end type COVARIANCE_MATRIX
+type covariance_matrix    ! Numbers stored for covariance matrix calculation
+    real(8)                        :: Exy, Ex, Ey ! C[X,Y] = E[XY] - E[X] -E[Y]
+end type covariance_matrix
 
-
-  type ENTROPY_COORD_TYPE
-    real, pointer                                           :: x(:), xref(:)                                ! , Reference structure for rotational fit
-    real(8), pointer                                        :: xr(:)
-    real(8)                                                         :: xrcm(3)
-    integer                                                         :: interval, Calc_type                  ! Interval of calculations,
-    character(len=9)                                        :: Calc_select
-    real(8)                                                         :: Temperature             ! Temperature
-    integer                                                             :: tot_no_frames       ! Total number of frames
-  end type ENTROPY_COORD_TYPE
+type entropy_coord_type
+    real, pointer                  :: x(:), xref(:)         ! , Reference structure for rotational fit
+    real(8), pointer               :: xr(:)
+    real(8)                        :: xrcm(3)
+    integer                        :: interval, Calc_type   ! Interval of calculations,
+    character(len=9)               :: Calc_select
+    real(8)                        :: Temperature           ! Temperature
+    integer                        :: tot_no_frames         ! Total number of frames
+end type entropy_coord_type
         
-  type(ENTROPY_COORD_TYPE), private               :: coords(MAX_MASKS)
+  type(entropy_coord_type), private :: coords(max_masks)
   integer :: entropy_frame, start
 
-  type trajectory
-    type(COVARIANCE_MATRIX), pointer     :: COV_DATA(:,:)                                                                                                       ! E[XY], E[X], E[Y] - for calculation of Covariance matrix
-    real(8), pointer                                         :: C(:,:),  VIZ(:), massvector(:), Xcm(:,:), Xrot(:) , X(:,:)
-    integer                                                              :: startframe, endframe, no_atoms, no_frames, store_cov, Temperature, Calc_type
-    ! Under development:
-    real(8), dimension(3,3)                      :: ROT
-    real(8)                                                          :: masstot                                     ! Total mass
-  end type trajectory
+type trajectory
+  type(covariance_matrix), pointer     :: cov_data(:,:)                                                                                                       ! E[XY], E[X], E[Y] - for calculation of Covariance matrix
+  real(8), pointer                     :: C(:,:),  VIZ(:), massvector(:), Xcm(:,:), Xrot(:) , X(:,:)
+  integer                              :: startframe, endframe, no_atoms, no_frames, store_cov, Temperature, Calc_type
+  ! Under development:
+  real(8), dimension(3,3)              :: ROT
+  real(8)                              :: masstot                                     ! Total mass
+end type trajectory
    
 contains
 
@@ -67,8 +66,8 @@ contains
 !------------------------------------------------------------------------------!
   integer function entropy_add(desc)
     !arguments
-    character(*)                            ::      desc
-    integer                                         ::      ats
+    character(*)                    ::      desc
+    integer                         ::      ats
         
     if(Nmasks == 1) then
       write(*,10) 1
@@ -163,12 +162,11 @@ contains
     t%Calc_type = Calc_type                                                     ! Store choice of calculation
   end subroutine construct_trajectory
 
-  !-------------------------------------------
-  !- Subroutine: Entropy initialize/finalize -
-  !-------------------------------------------
 
-  subroutine entropy_initialize
-
+subroutine entropy_initialize
+!!-------------------------------------------
+!!- Subroutine: Entropy initialize/finalize -
+!!-------------------------------------------
     ! Set constants
     pi_val = 4 * atan(1.)                                                           ! pi
     e = exp(1.0)                                                                            ! Eulers number
@@ -183,7 +181,7 @@ contains
     entropy_frame = 1
     start = 1
     return
-  end subroutine entropy_initialize
+end subroutine entropy_initialize
 
 
 subroutine entropy_finalize(i)
@@ -742,57 +740,57 @@ end subroutine pca
 
 
 !###############################
-!- Calculation of Euler angles -
+!- calculation of euler angles -
 !###############################
-! Euler type angle from Classical dynamics of particles and systems, Marion Thornton 
+! euler type angle from classical dynamics of particles and systems, marion thornton
 subroutine euler_angles(t)
 
   type(trajectory) :: t
   real(8) :: phi, psi, theta, delta
   integer :: i,j,k
-        
-  theta =  acos(t%ROT(3,3))           ! Calculate Euler angles
-  phi   =  atan2(t%ROT(3,1)/sin(theta),-t%ROT(3,2)/sin(theta))
-  psi   =  atan2(t%ROT(1,3)/sin(theta),t%ROT(2,3)/sin(theta))
 
-  t%Xrot(1) = theta
-  t%Xrot(2) = psi
-  t%Xrot(3) = phi
+  theta =  acos(t%rot(3,3))           ! calculate euler angles
+  phi   =  atan2(t%rot(3,1)/sin(theta),-t%rot(3,2)/sin(theta))
+  psi   =  atan2(t%rot(1,3)/sin(theta),t%rot(2,3)/sin(theta))
 
-  ! Uppdate covariance matrix
+  t%xrot(1) = theta
+  t%xrot(2) = psi
+  t%xrot(3) = phi
+
+  ! uppdate covariance matrix
 
   do j=1,3
     do k =1,j
-      t%COV_DATA(j,k)%Exy = (t%COV_DATA(j,k)%Exy*(t%no_frames-1) + t%Xrot(j)*t%Xrot(k))/t%no_frames
-      t%COV_DATA(j,k)%Ex  = (t%COV_DATA(j,k)%Ex*(t%no_frames-1)  + t%Xrot(j))/t%no_frames
-      t%COV_DATA(j,k)%Ey  = (t%COV_DATA(j,k)%Ey*(t%no_frames-1)  + t%Xrot(k))/t%no_frames
-        
-      t%COV_DATA(k,j)%Exy = t%COV_DATA(j,k)%Exy
-      t%COV_DATA(k,j)%Ex  = t%COV_DATA(j,k)%Ex
-      t%COV_DATA(k,j)%Ey  = t%COV_DATA(j,k)%Ey
+      t%cov_data(j,k)%exy = (t%cov_data(j,k)%exy*(t%no_frames-1) + t%xrot(j)*t%xrot(k))/t%no_frames
+      t%cov_data(j,k)%ex  = (t%cov_data(j,k)%ex*(t%no_frames-1)  + t%xrot(j))/t%no_frames
+      t%cov_data(j,k)%ey  = (t%cov_data(j,k)%ey*(t%no_frames-1)  + t%xrot(k))/t%no_frames
+
+      t%cov_data(k,j)%exy = t%cov_data(j,k)%exy
+      t%cov_data(k,j)%ex  = t%cov_data(j,k)%ex
+      t%cov_data(k,j)%ey  = t%cov_data(j,k)%ey
     enddo
   enddo
-      
+
 end subroutine euler_angles
 
 
 !#########################################
-!- Subroutine to update Covariancematrix -
+!- subroutine to update covariancematrix -
 !#########################################
-subroutine updatecovariancematrix(t,i)  ! NOTE: Not in use yet!
+subroutine updatecovariancematrix(t,i)  ! note: not in use yet!
   type(trajectory) :: t
   integer :: i,j,k
-        
+
   do j=1,t%no_atoms*3
     do k =1,j
-        
-      t%COV_DATA(j,k)%Exy = (t%COV_DATA(j,k)%Exy*(t%no_frames-1) + coords(i)%x(j)*coords(i)%x(k))/t%no_frames
-      t%COV_DATA(j,k)%Ex  = (t%COV_DATA(j,k)%Ex*(t%no_frames-1)  + coords(i)%x(j))/t%no_frames
-      t%COV_DATA(j,k)%Ey  = (t%COV_DATA(j,k)%Ey*(t%no_frames-1)  + coords(i)%x(k))/t%no_frames
-        
-      t%COV_DATA(k,j)%Exy = t%COV_DATA(j,k)%Exy
-      t%COV_DATA(k,j)%Ex  = t%COV_DATA(j,k)%Ex
-      t%COV_DATA(k,j)%Ey  = t%COV_DATA(j,k)%Ey
+
+      t%cov_data(j,k)%exy = (t%cov_data(j,k)%exy*(t%no_frames-1) + coords(i)%x(j)*coords(i)%x(k))/t%no_frames
+      t%cov_data(j,k)%ex  = (t%cov_data(j,k)%ex*(t%no_frames-1)  + coords(i)%x(j))/t%no_frames
+      t%cov_data(j,k)%ey  = (t%cov_data(j,k)%ey*(t%no_frames-1)  + coords(i)%x(k))/t%no_frames
+
+      t%cov_data(k,j)%exy = t%cov_data(j,k)%exy
+      t%cov_data(k,j)%ex  = t%cov_data(j,k)%ex
+      t%cov_data(k,j)%ey  = t%cov_data(j,k)%ey
     
     enddo
   enddo

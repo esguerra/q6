@@ -18,29 +18,33 @@
 !  protein residues
 !------------------------------------------------------------------------------!
 module calc_nb
-  use CALC_BASE
-  use MASKMANIP
-  use PARSE
-  use ATOM_MASK
+  use calc_base
+  use maskmanip
+  use parse
+  use atom_mask
   implicit none
 
   !constants
-  integer, parameter                                      :: MAX_LISTS = 20
-  integer, parameter                                      :: MAX_NB_QP = 1
+  integer, parameter               :: max_lists = 20
+  integer, parameter               :: max_nb_qp = 1
   !module variables
   type(MASK_TYPE), private, target        ::      masks(2)
   integer, private                                        ::      Nlists = 0
   integer, private                    ::  N_nb_qp = 0
+
   type NB_LIST_TYPE
     integer                                                 ::  number_of_NB
     integer, pointer                                ::      atom1(:), atom2(:)
     real, pointer                                   ::  AA(:), BB(:), qq(:)
   end type NB_LIST_TYPE
+
   type(NB_LIST_TYPE), private, allocatable::  nb_listan(:)
   type(NB_LIST_TYPE), private, allocatable::  nb_list_res(:)
+
   type AVERAGES
     real                                                    :: lj, el
   end type AVERAGES
+
   type(AVERAGES),allocatable                      ::  aves(:)
   type(AVERAGES),allocatable                      ::  qp_aves(:)
   integer,allocatable                                     ::      total_frames(:)
@@ -171,42 +175,41 @@ end subroutine nb_calc
 !*******************************************************************
 
 subroutine nb_calc_lists(NB_Vlj, NB_Vel, nb_list)
-        !arguments
-        real(8), intent(out)            ::  NB_Vlj, NB_Vel
-        type(NB_LIST_TYPE), intent(in) :: nb_list
+  !arguments
+  real(8), intent(out)             :: NB_Vlj, NB_Vel
+  type(NB_LIST_TYPE), intent(in)   :: nb_list
 
-        !locals
-        real(8)                                         ::      r, x1, x2, y1, y2, z1, z2, invr, invr6, invr12
-        integer                                         ::  j,k,storleken
+  !locals
+  real(8)                          :: r, x1, x2, y1, y2, z1, z2, invr, invr6, invr12
+  integer                          :: j,k,storleken
 
-        NB_Vlj = 0
-        NB_Vel = 0 
+  NB_Vlj = 0
+  NB_Vel = 0
 
-        storleken = nb_list%number_of_NB
+  storleken = nb_list%number_of_NB
 
-        do j=1,storleken
-                x1 = xin(3*nb_list%atom1(j)-2)
-                x2 = xin(3*nb_list%atom2(j)-2)
-                y1 = xin(3*nb_list%atom1(j)-1)
-                y2 = xin(3*nb_list%atom2(j)-1)
-                z1 = xin(3*nb_list%atom1(j))
-                z2 = xin(3*nb_list%atom2(j))
-                r = sqrt((x1-x2)**2+(y1-y2)**2+(z1-z2)**2)
-                if (r /= 0) then
-                        invr = 1/r
-                        invr6 = invr*invr*invr*invr*invr*invr
-                        invr12 = invr6*invr6
-                        
-                        
-                        if(ivdw_rule==1) then !geometric comb. rule
-                                NB_Vlj = NB_Vlj + nb_list%AA(j)*invr12 - nb_list%BB(j)*invr6
-            else !arithmetic
-                                NB_Vlj = NB_Vlj + sqrt(nb_list%BB(j)) * (nb_list%AA(j))**6 * invr6 * ((nb_list%AA(j))**6 * invr6 - 2.0)
-                        endif                   
-                                                                
-                        NB_Vel = NB_Vel + nb_list%qq(j)*invr
-                end if
-        end do
+  do j=1,storleken
+    x1 = xin(3*nb_list%atom1(j)-2)
+    x2 = xin(3*nb_list%atom2(j)-2)
+    y1 = xin(3*nb_list%atom1(j)-1)
+    y2 = xin(3*nb_list%atom2(j)-1)
+    z1 = xin(3*nb_list%atom1(j))
+    z2 = xin(3*nb_list%atom2(j))
+    r = sqrt((x1-x2)**2+(y1-y2)**2+(z1-z2)**2)
+    if (r /= 0) then
+      invr = 1/r
+      invr6 = invr*invr*invr*invr*invr*invr
+      invr12 = invr6*invr6
+
+      if(ivdw_rule==1) then !geometric comb. rule
+        NB_Vlj = NB_Vlj + nb_list%AA(j)*invr12 - nb_list%BB(j)*invr6
+      else !arithmetic
+        NB_Vlj = NB_Vlj + sqrt(nb_list%BB(j)) * (nb_list%AA(j))**6 * invr6 * ((nb_list%AA(j))**6 * invr6 - 2.0)
+      endif
+
+      NB_Vel = NB_Vel + nb_list%qq(j)*invr
+    end if
+  end do
 
 end subroutine nb_calc_lists
 

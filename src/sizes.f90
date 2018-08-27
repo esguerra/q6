@@ -80,7 +80,7 @@ module sizes
   ! it is important that you change the types in subroutine 'init_nodes'
   ! in md.f90 when you change the types above. otherwise the datastructures 
   ! sent to the slave nodes will be incorrect. this can be dynamically 
-  ! handled with later versions of mpi, but is not supported in the 
+  ! handled with later versions of mpi, but it is not supported in the
   ! current version.
 
 end module sizes

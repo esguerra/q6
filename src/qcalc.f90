@@ -183,65 +183,66 @@ subroutine initialize
 end subroutine initialize
 
 subroutine do_pre_calcs
-        integer                                         ::      c, i
+  integer                 :: c, i
 
-        do c = 1, Ncalcs
-                i = calcs(c)%i
-                select case(cdef(calcs(c)%typ)%key)
-                        case('chemscore')
-                                call score_precalc
-                        case('xscore')
-                                call xscore_precalc
-                        case('pmfscore')
-                                call pmf_precalc
+  do c = 1, Ncalcs
+    i = calcs(c)%i
+    select case(cdef(calcs(c)%typ)%key)
+      case('chemscore')
+        call score_precalc
+      case('xscore')
+        call xscore_precalc
+      case('pmfscore')
+        call pmf_precalc
 
-       !add more call to calculation pre-routines here...
-                end select
-         end do 
+    !add more call to calculation pre-routines here...
+    end select
+  end do
 end subroutine
 
-subroutine finalize
-        integer                                         ::      c, i
 
-        deallocate(xin)
-        do c=1, Ncalcs
-                if(cdef(calcs(c)%typ)%output) then
-                        i = calcs(c)%i
-                        select case(cdef(calcs(c)%typ)%key)
-                        case('rmsd')
-                                call rms_finalize(i)
-                        case('fit')
-                                call fit_finalize(i)
-                        case('entropy')
-                            call entropy_finalize(i)
-                        case('nonbond')
-                            call nb_finalize(i)
-                        case('nb_prot_qatom')
-                            call nb_qp_finalize()
-                        case('dist', 'angle', 'torsion', 'improper')
-                                !nothing needed
+subroutine finalize
+  integer                 :: c, i
+
+  deallocate(xin)
+  do c=1, Ncalcs
+    if(cdef(calcs(c)%typ)%output) then
+      i = calcs(c)%i
+      select case(cdef(calcs(c)%typ)%key)
+        case('rmsd')
+          call rms_finalize(i)
+        case('fit')
+          call fit_finalize(i)
+        case('entropy')
+          call entropy_finalize(i)
+        case('nonbond')
+          call nb_finalize(i)
+        case('nb_prot_qatom')
+          call nb_qp_finalize()
+        case('dist', 'angle', 'torsion', 'improper')
+                !nothing needed
                                 
-                        case('chemscore')
-                                call chemscore_finalize
-                        case('xscore')
-                                call xscore_finalize
-                        case('pmfscore')
-                                call pmf_finalize
-                        case('rdf')
-                                call rdf_finalize(i)
-                        case('rmsf')
-                                call RMSF_finalize(i)
-                        case('com_ke')
-                                call COM_KE_finalize(i)
-                        case('com')
-                                call COM_finalize(i)
-                        !add more call to finalize routines here...
+        case('chemscore')
+          call chemscore_finalize
+        case('xscore')
+          call xscore_finalize
+        case('pmfscore')
+          call pmf_finalize
+        case('rdf')
+          call rdf_finalize(i)
+        case('rmsf')
+          call RMSF_finalize(i)
+        case('com_ke')
+          call COM_KE_finalize(i)
+        case('com')
+          call COM_finalize(i)
+      !add more call to finalize routines here...
                     
-                        end select
-                end if
-        end do
+      end select
+    end if
+  end do
                 
-        call mask_shutdown
+  call mask_shutdown
 end subroutine finalize
 
 
@@ -262,6 +263,7 @@ subroutine process_help
 
 end subroutine process_help
 
+
 subroutine finishtrj_all
         ! this sub invokes corresponding end-of-trajectory functions in calc. modules
         ! when end of trj file is reached
@@ -271,80 +273,81 @@ subroutine finishtrj_all
         ! add more calls here
 end subroutine finishtrj_all
 
+
 subroutine process_data
-        !locals
-        character(len=256):: cf !coord file name
-        integer                                         :: fn !LUN for cf
-        real(8)                                         :: rms
-        integer                                         :: frame,p1,p2,frame_start,frame_end,every_n
-        character(len=80)       :: frames
+  !locals
+  character(len=256):: cf !coord file name
+  integer                                         :: fn !LUN for cf
+  real(8)                                         :: rms
+  integer                                         :: frame,p1,p2,frame_start,frame_end,every_n
+  character(len=80)       :: frames
     
-        do while(get_coordfile(cf, fn,frames))
-                every_n = 0
-                if(frames.ne.'') then
-                        p1 = index(frames,'=')
-                        p2 = index(frames,'-')
+  do while(get_coordfile(cf, fn,frames))
+    every_n = 0
+    if(frames.ne.'') then
+      p1 = index(frames,'=')
+      p2 = index(frames,'-')
                         
-                        if(p2.ne.0) then
-                                read(frames(p1+1:p2-1),*) frame_start
-                                read(frames(p2+1:len_trim(frames)),*) frame_end
-                        else
-                                frames = frames(p1+1:80)
-                                if(frames(1:5).eq.'every') then
-                                        read(frames(6:80),*) every_n
-                                end if
-                        end if
-                end if
+      if(p2.ne.0) then
+        read(frames(p1+1:p2-1),*) frame_start
+        read(frames(p2+1:len_trim(frames)),*) frame_end
+      else
+        frames = frames(p1+1:80)
+        if(frames(1:5).eq.'every') then
+          read(frames(6:80),*) every_n
+        end if
+      end if
+    end if
                 
-                frame = 0
-                if(fn /= 0) then
-                        ! restart file
-                        if(load_restart(fn)) then
-                                call process_frame(cf, 0)               ! was process_frame(cf,1)
-                        end if
-                else
-                        ! trajectory file
-                        do while(trj_read(xin))
-                                ! coordinates for frame "frame" are now in xin(:)
-                                frame = frame+1
-!                               write(*,*) 'frame= ', frame
-                                if(frames.ne.'') then
-                                        if(every_n.eq.0) then
-                                                if(frame>=frame_start.and.frame<=frame_end) call process_frame(cf, frame)
-                                        else
-                                                if(modulo(frame,every_n).eq.0) call process_frame(cf,frame)
-                                        end if
-                                else
-                                        call process_frame(cf, frame)
-                                end if
-                        end do
-                        call trj_close
-                end if
-        end do
+    frame = 0
+    if(fn /= 0) then
+      ! restart file
+      if(load_restart(fn)) then
+        call process_frame(cf, 0)               ! was process_frame(cf,1)
+      end if
+    else
+      ! trajectory file
+      do while(trj_read(xin))
+        ! coordinates for frame "frame" are now in xin(:)
+        frame = frame+1
+        !                               write(*,*) 'frame= ', frame
+        if(frames.ne.'') then
+          if(every_n.eq.0) then
+            if(frame>=frame_start.and.frame<=frame_end) call process_frame(cf, frame)
+          else
+            if(modulo(frame,every_n).eq.0) call process_frame(cf,frame)
+          end if
+        else
+          call process_frame(cf, frame)
+        end if
+      end do
+      call trj_close
+    end if
+  end do
 end subroutine process_data
 
-subroutine process_frame(cf, frame)
-        !arguments
-        character(*)                    ::      cf
-        integer                                         ::      frame
-        character(len=32) :: filename
 
-        if (len_trim(cf) .gt. 20) then
-                filename(1:5)  = cf(1:5)
-                filename(6:8)  = '...'
-                filename(9:20) = cf(len_trim(cf)-11:len_trim(cf))
-        else
-                filename(:) = ' '
-                filename(1:len_trim(cf)) = cf(1:len_trim(cf))
-        end if
+subroutine process_frame(cf, frame)
+  !arguments
+  character(*)            :: cf
+  integer                 :: frame
+  character(len=32)       :: filename
+
+  if (len_trim(cf) .gt. 20) then
+    filename(1:5)  = cf(1:5)
+    filename(6:8)  = '...'
+    filename(9:20) = cf(len_trim(cf)-11:len_trim(cf))
+  else
+    filename(:) = ' '
+    filename(1:len_trim(cf)) = cf(1:len_trim(cf))
+  end if
         
-        
-        
-        write(*, 100, advance='no') filename, frame
-100     format(a21, i4)
-        call calc_all(frame)
-    write(*,*) !new line                                            
+  write(*, 100, advance='no') filename, frame
+100 format(a21, i4)
+  call calc_all(frame)
+  write(*,*) !new line
 end subroutine process_frame
+
 
 subroutine make_mean_all                                ! calls mean routines in other modules
         integer :: c

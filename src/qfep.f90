@@ -30,14 +30,14 @@ program qfep
   integer                 :: k
   
   integer,parameter :: mxpts = 20000000
-  integer,parameter :: mxbin = 100
+  integer,parameter :: mxbin = 600
   integer,parameter :: mxstates = 4
   character(80)     :: filnam, line
   integer           :: i,j,ifile,ipt,istate,ibin,nfiles,nstates,ERR, &
                        nskip,nbins,nmin,idum,noffd,nnoffd,offel,ngroups, &
                        iexclg,igrp,mpts,iexclgn,astate,bstate
 
-  type(OFFDIAG_SAVE), dimension(mxstates) :: offd
+  type(offdiag_save), dimension(mxstates) :: offd
 
   real(8) :: rt,gapmin,gapmax,sum,dv,gaprange,xint,dvg,veff1,veff2, &
              dGa,dGb,dGg,alpha_B,scale_Hij,veff,min,dlam,sumf,sumb, &
@@ -48,8 +48,8 @@ program qfep
   real(8),dimension(mxbin,4) :: binsum
   integer,dimension(mxbin)   :: nbinpts, ptsum
 
-  type(Q_ENERGIES), dimension(mxstates) :: EQ
-  type(Q_ENERGIES), dimension(mxstates) :: avEQ
+  type(q_energies), dimension(mxstates) :: EQ
+  type(q_energies), dimension(mxstates) :: avEQ
   real(8),dimension(mxstates)           :: dvv,dGv,alfa,coeff,Vel,Vvdw
 
   real(8),dimension(3) :: u,y
@@ -58,15 +58,15 @@ program qfep
   real(8),dimension(mxstates,mxstates) :: A,mu,eta,rxy0
   real(8),allocatable                  :: Hij(:,:),d(:),e(:)
 
-  type FEP_DATA_TYPE
+  type fep_data_type
      integer           :: npts
      real(8)           :: lambda(mxstates)
      real(8), pointer  :: v(:,:), r(:,:) !indices are state, point
      real(8), pointer  :: vg(:), gap(:), c1(:), c2(:) !index is point
-  end type FEP_DATA_TYPE
+  end type fep_data_type
 
-  type(FEP_DATA_TYPE), allocatable :: FEP(:) !index is file
-  type(FEP_DATA_TYPE) :: FEPtmp !temporary storage for one file
+  type(fep_data_type), allocatable :: FEP(:) !index is file
+  type(fep_data_type) :: FEPtmp !temporary storage for one file
 
   real(8),dimension(mxstates,mxbin) :: avdvv,sumv,sumv2 
 
@@ -374,7 +374,6 @@ program qfep
              avEQ(istate)%qq%el,avEQ(istate)%qq%vdw,avEQ(istate)%qp%el,&
              avEQ(istate)%qp%vdw, &
              avEQ(istate)%qw%el,avEQ(istate)%qw%vdw,avEQ(istate)%restraint
-
      end do
 17   format(a,t23,i2,1x,i6,1x,f8.6,14f8.2)
   end do  !ifile
@@ -407,6 +406,8 @@ program qfep
         dgfsum(ifile+1)=dgfsum(ifile)+dgf(ifile)
         sum=0.
      end do
+
+
      dgrsum=0.
      dgr=0.
      sum=0.
@@ -429,6 +430,9 @@ program qfep
         dgrsum(ifile-1)=dgrsum(ifile)+dgr(ifile)
         sum=0.
      end do
+
+
+!!  Thermodynamic Integration
      dgtisum=0.
      dgti=0.
      sum=0.
@@ -438,7 +442,7 @@ program qfep
      astate=1
      bstate=2 
      istate=1
-     do ifile=1,nfiles                        
+     do ifile=1,nfiles
         do ipt=nskip+1,FEP(ifile)%npts
            veff1=FEP(ifile)%v(astate,ipt)
            veff2=FEP(ifile)%v(bstate,ipt)
@@ -454,6 +458,9 @@ program qfep
         dlam=FEP(ifile-1)%lambda(istate)-FEP(ifile)%lambda(istate)
         dgtisum(ifile)=dgtisum(ifile-1)+(0.5*(dgti(ifile-1)+dgti(ifile))*dlam)
      end do
+
+
+!! Overlap Sampling
      dglu=0.
      dglusum=0.
      sum=0.
@@ -488,6 +495,9 @@ program qfep
         dglusum(ifile+1)=dglusum(ifile)+dglu(ifile)
         sum=0.
      end do
+
+
+!!  Bennet's Acceptance Ratio (BAR)
      dgbar=0.
      dgbarsum=0.
      sum=0.
@@ -498,7 +508,7 @@ program qfep
      fel=1
      do ifile=1,nfiles-1
         konst=dglu(ifile)
-        do while (fel>0.001)  
+        do while (fel .gt. 0.001)
            nfnr=real(FEP(ifile)%npts-nskip)/real(FEP(ifile+1)%npts-nskip)
            nrnf=real(FEP(ifile+1)%npts-nskip)/real(FEP(ifile)%npts-nskip)
            do ipt=nskip+1,FEP(ifile)%npts
@@ -526,12 +536,16 @@ program qfep
            sumb=sum/real(FEP(ifile+1)%npts-nskip)
            dgbar(ifile)=-rt*dlog((sumf/sumb)*exp(-konst/rt)*nfnr)
            sum=0.
+           print *, 'The optimization constant is', fel
            fel=ABS(konst-dgbar(ifile))
            konst=dgbar(ifile)
         end do
         dgbarsum(ifile+1)=dgbarsum(ifile)+dgbar(ifile)
+!        print *, 'The optimization constant is', fel
         fel=1
      end do
+
+
 
 
      write(*,*) 
@@ -687,6 +701,9 @@ program qfep
      end do
 
 
+!
+! Lu, Kofke, and Woolf, Vol. 25, No. 1, Journal of Computational Chemistry 2004
+!
      write(*,*) 
      write(*,*) 
      write(*,32)
@@ -725,6 +742,7 @@ program qfep
 
 
 
+
 contains
 
   !----------------------------------------------------------------------------!
@@ -752,14 +770,14 @@ subroutine startup
 end subroutine startup
 
 
-  !----------------------------------------------------------------------------!
-  !!  subroutine: prompt
-  !----------------------------------------------------------------------------!
-  subroutine prompt (outtxt)
-    character(*) outtxt
+subroutine prompt (outtxt)
+!!---------------------------------------------------------------------------!
+!!  subroutine: prompt
+!!---------------------------------------------------------------------------!
+    character( * ) outtxt
 #if defined (__osf__)
     !prompt to STDERR using unit 5=STDIN on OSF/1=DEC UNIX
-    integer, parameter                      ::      f=5
+    integer, parameter              :: f=5
     !write (f,'($,a)') outtxt
 #elseif defined (_WIN32)
     !open the ERR file on Win32
@@ -771,16 +789,18 @@ end subroutine startup
     !write (f1,'($,a)') outtxt
 #else
     !otherwise prompt to STDOUT
-    integer, parameter                  ::      f=6
+    integer, parameter              :: f = 6
     !write (f2,'($,a)') outtxt
 #endif
-    write (f,'($,a)') outtxt
-  end subroutine prompt
+    write ( f ,'(a,$)') outtxt
+!    write ( f ,'($,a)') outtxt    
+end subroutine prompt
+
 
   !----------------------------------------------------------------------------!
   !!  subroutine: commandlineoptions  
   !----------------------------------------------------------------------------!
-  subroutine commandlineoptions
+subroutine commandlineoptions
   do k = 1, command_argument_count()
     call get_command_argument(k, arg)
     select case (arg)
@@ -796,12 +816,12 @@ end subroutine startup
       stop
     end select
   end do
-  end subroutine commandlineoptions
+end subroutine commandlineoptions
 
   !----------------------------------------------------------------------------!
   !!  subroutine: print_help  
   !----------------------------------------------------------------------------!
-  subroutine print_help()
+subroutine print_help()
     print '(a)', 'usage:'
     print '(a)', 'qfep [OPTION]'
     print '(a)', '  or'
@@ -813,10 +833,10 @@ end subroutine startup
     print '(a)', ''
     print '(a)', '  -v, --version     print version information and exit'
     print '(a)', '  -h, --help        print usage information and exit'
-  end subroutine print_help
+end subroutine print_help
 
   
-  subroutine tred2(A,N,NP,D,E)
+subroutine tred2(A,N,NP,D,E)
     !------------------------------------------------------------
     ! This subroutine reduces a symmetric matrix to tridiagonal
     ! form. The tridiagonal matrix can further be diagonalized by
@@ -906,10 +926,10 @@ end subroutine startup
           end do
        END IF
     end do
-  end subroutine tred2
-  !-----------------------------------
+end subroutine tred2
+!-----------------------------------
 
-  subroutine tqli(D,E,N,NP,Z)
+subroutine tqli(D,E,N,NP,Z)
     !------------------------------------------------------------ 
     ! This subroutine diagonalizes a tridiagonal matrix which has 
     ! been prepared by the subroutine tred2.
@@ -979,7 +999,7 @@ end subroutine startup
        end do
     END IF
     RETURN
-  end subroutine tqli
-  !-----------------------------------
+end subroutine tqli
+!-----------------------------------
 
 end program qfep

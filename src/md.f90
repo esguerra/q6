@@ -38,7 +38,7 @@ module md
   character*(*), parameter  :: md_version = '5.7'
   character*(*), parameter  :: md_date = '2015-02-22'
   real, parameter           :: rho_wat = 0.0335  ! molecules / A**3
-  real, parameter           :: Boltz = 0.001986
+  real, parameter           :: boltz = 0.001986
   real(8)                   :: pi, deg2rad !set in sub startup
 
   ! Read status
@@ -65,7 +65,7 @@ module md
   !-----------------------------------------------------------------------------
   !       Periodic box information
   !-----------------------------------------------------------------------------
-  !******Petra Wennerstrom added variable 2001-10-10
+  !*Petra Wennerstrom added variable 2001-10-10
   logical                   :: box, rigid_box_center
   logical                   :: put_solute_back_in_box, put_solvent_back_in_box
 
@@ -105,7 +105,7 @@ module md
   integer                   :: itrj_cycle, iene_cycle
   integer                   :: itemp_cycle, iout_cycle
   logical                   :: force_rms
-  !******PetraWadded 2001-10-23
+  !*Petra Wennerstrom added 2001-10-23
   integer                   :: ivolume_cycle
 
   ! --- Protein boundary
@@ -1932,9 +1932,9 @@ contains
     integer(kind=MPI_ADDRESS_KIND)  :: fdisp(vars)
     integer                         :: mpitype_batch,mpitype_batch2
     integer                         :: nat3
-    real(kind=dp), allocatable     :: temp_lambda(:)
+    real(kind=dp), allocatable      :: temp_lambda(:)
     integer, parameter              :: maxint=2147483647
-    real(kind=dp), parameter       :: maxreal=1E35
+    real(kind=dp), parameter        :: maxreal=1E35
     integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
 
     !external MPI_Address
@@ -2027,9 +2027,10 @@ contains
     call MPI_Bcast(xpcent, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
     if (ierr .ne. 0) call die('init_nodes/MPI_Bcast xpcent')
 
-    !**MN-> Beh�vs om shake ska parallelliseras
+    !**MN-> Needed if SHAKE is to be parallelized
     ! shake/temperature parameters
     !call MPI_Bcast(shake_constraints, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)  !bara i init_shake & md_run
+    !if (ierr .ne. 0) call die('init_nodes/MPI_Bcast shake_constraints')
     !call MPI_Bcast(shake_molecules, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
     !call MPI_Bcast(Ndegf, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
     !call MPI_Bcast(Ndegfree, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
@@ -2322,8 +2323,6 @@ contains
 #endif
 
 
-  !-----------------------------------------------------------------------
-
   subroutine init_shake
     !
     ! initialize shake constraints
@@ -2500,17 +2499,15 @@ contains
     end do
   end subroutine init_shake
 
-  !-----------------------------------------------------------------------
 
   subroutine initial_shaking
     !
     ! initial shaking
     !
-    integer                                         :: niter
-
+    integer                        :: niter
 
     xx(:)=x(:)
-    niter=shake(xx, x)      
+    niter=shake(xx, x)
     write(*,100) 'x', niter
 100 format('Initial ',a,'-shaking required',i4,&
       ' interations per molecule on average.')
@@ -2520,7 +2517,6 @@ contains
     write(*,100) 'v', niter
 
     v(:)=(x(:)-xx(:))/dt
-
 
   end subroutine initial_shaking
 
@@ -3798,7 +3794,7 @@ contains
 
     !       Generate Maxwellian velocities 
     zero  = 0.0
-    kT = Boltz*Tmaxw
+    kT = boltz*Tmaxw
 
     do i=1,natom
       sd = sqrt (kT/iaclib(iac(i))%mass)
@@ -3851,7 +3847,7 @@ contains
       !if ( .not. excl(i)) Tfree = Tfree + Ekin
       if ( Ekin .gt. Ekinmax ) then
         ! hot atom warning
-        write (*,180) i,2.*Ekin/Boltz/3.
+        write (*,180) i,2.*Ekin/boltz/3.
       end if
     end do
 
@@ -3876,7 +3872,7 @@ contains
       !if ( .not. excl(i)) Tfree = Tfree + Ekin
       if ( Ekin .gt. Ekinmax ) then
         ! hot atom warning
-        write (*,180) i,2.*Ekin/Boltz/3.
+        write (*,180) i,2.*Ekin/boltz/3.
       end if
     end do
 
@@ -3885,17 +3881,17 @@ contains
 
     E%kinetic = Temp
 
-    Temp  = 2.0*Temp/Boltz/real(Ndegf)
-    Tfree = 2.0*Tfree/Boltz/real(Ndegfree)
+    Temp  = 2.0*Temp/boltz/real(Ndegf)
+    Tfree = 2.0*Tfree/boltz/real(Ndegfree)
 
     if (detail_temps) then
-      Temp_solute  = 2.0*Temp_solute /Boltz/real(Ndegf_solute)
-      Tfree_solute = 2.0*Tfree_solute/Boltz/real(Ndegfree_solute)
-      if ( Ndegf_solute .ne. Ndegfree_solute) Texcl_solute = 2.0*Texcl_solute/Boltz/real(Ndegf_solute - Ndegfree_solute)
+      Temp_solute  = 2.0*Temp_solute /boltz/real(Ndegf_solute)
+      Tfree_solute = 2.0*Tfree_solute/boltz/real(Ndegfree_solute)
+      if ( Ndegf_solute .ne. Ndegfree_solute) Texcl_solute = 2.0*Texcl_solute/boltz/real(Ndegf_solute - Ndegfree_solute)
 
-      Temp_solvent  = 2.0*Temp_solvent /Boltz/real(Ndegf_solvent)
-      Tfree_solvent = 2.0*Tfree_solvent/Boltz/real(Ndegfree_solvent) ! Eq. S2 Marrink2010
-      if ( Ndegf_solvent .ne. Ndegfree_solvent) Texcl_solvent = 2.0*Texcl_solvent/Boltz/real(Ndegf_solvent - Ndegfree_solvent)
+      Temp_solvent  = 2.0*Temp_solvent /boltz/real(Ndegf_solvent)
+      Tfree_solvent = 2.0*Tfree_solvent/boltz/real(Ndegfree_solvent) ! Eq. S2 Marrink2010
+      if ( Ndegf_solvent .ne. Ndegfree_solvent) Texcl_solvent = 2.0*Texcl_solvent/boltz/real(Ndegf_solvent - Ndegfree_solvent)
     end if
 
 
@@ -3919,7 +3915,7 @@ contains
 !------------------------------------------------------------------------------!
 !>  subroutine: **md_run**
 !!  Prepare an md run
-!! ******PWchanged 2002-10-01
+!! Petra W changed 2002-10-01
 !! This subroutine has the main algorithms for the equations of motion.
 !------------------------------------------------------------------------------!
   subroutine md_run
@@ -3934,7 +3930,7 @@ contains
     integer(4)                      :: time_completion
 
 #if defined(PROFILING)
-    real(8)                   :: start_loop_time1, start_loop_time2
+    real(8)                         :: start_loop_time1, start_loop_time2
     profile(1)%name = 'NB_update'
     profile(2)%name = '   nbwwlist_time'
     profile(3)%name = '   nbpplist_time'
@@ -3970,7 +3966,7 @@ contains
     ! calculate maximum temperature
     !**Martin Nervall-> Only master calc. temp for now.
     if (nodeid .eq. 0) then
-      Ekinmax = 1000.0*Ndegf*Boltz*Temp0/2.0/real(natom)
+      Ekinmax = 1000.0*Ndegf*boltz*Temp0/2.0/real(natom)
 
       call temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
       !store old Temp
@@ -11556,15 +11552,15 @@ subroutine nonbond_qw_3atom
    !using geometric comb. rule
 
    ! local variables
-  integer                                         :: jw,iq,i,j,iLJ1, iLJ2, iLJ3, iaci
-  integer                                         :: istate
-  real(8)                                         ::      dx1, dy1, dz1, dx2, dy2, dz2, dx3, dy3, dz3
-  real(8)                                         ::      r_1, r2_1, r6_1, r_2, r2_2, r6_2, r_3, r2_3, r6_3
-  real(8)                                         ::      Vel1, Vel2, Vel3, dv1, dv2, dv3
-  real(8)                                         :: V_a1,V_b1, V_a2, V_b2, V_a3, V_b3,r6_1_sc,r6_2_sc,r6_3_sc,r6_1_hc,r6_2_hc,r6_3_hc
-  real(8), save                           ::      a1(2), b1(2), a2(2), b2(2), a3(2), b3(2)
-  integer, save                           ::      iac1, iac2, iac3
-  real, save                                      ::      crg1, crg2, crg3
+  integer                           :: jw,iq,i,j,iLJ1, iLJ2, iLJ3, iaci
+  integer                           :: istate
+  real(8)                           :: dx1, dy1, dz1, dx2, dy2, dz2, dx3, dy3, dz3
+  real(8)                           :: r_1, r2_1, r6_1, r_2, r2_2, r6_2, r_3, r2_3, r6_3
+  real(8)                           :: Vel1, Vel2, Vel3, dv1, dv2, dv3
+  real(8)                           :: V_a1,V_b1, V_a2, V_b2, V_a3, V_b3,r6_1_sc,r6_2_sc,r6_3_sc,r6_1_hc,r6_2_hc,r6_3_hc
+  real(8), save                     :: a1(2), b1(2), a2(2), b2(2), a3(2), b3(2)
+  integer, save                     :: iac1, iac2, iac3
+  real, save                        :: crg1, crg2, crg3
   ! global variables used:
   !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
 
@@ -11684,16 +11680,16 @@ subroutine nonbond_qw_3atom_box
    !calculate non-bonded interactions between Q-atoms and 3-atom solvent molecules
    !using geometric comb. rule
    ! local variables
-  integer                                         :: jw,iq,i,j,iLJ1, iLJ2, iLJ3, iaci
-  integer                                         :: istate
-  real(8)                                         ::      dx1, dy1, dz1, dx2, dy2, dz2, dx3, dy3, dz3
-  real(8)                                         ::      r_1, r2_1, r6_1, r_2, r2_2, r6_2, r_3, r2_3, r6_3
-  real(8)                                         ::      Vel1, Vel2, Vel3, dv1, dv2, dv3
-  real(8)                                         :: V_a1,V_b1, V_a2, V_b2, V_a3, V_b3,r6_1_sc,r6_2_sc,r6_3_sc,r6_1_hc,r6_2_hc,r6_3_hc
-  real(8)                                         :: boxshiftx, boxshifty, boxshiftz, dx, dy, dz
-  real(8), save                           ::      a1(2), b1(2), a2(2), b2(2), a3(2), b3(2)
-  integer, save                           ::      iac1, iac2, iac3
-  real, save                                      ::      crg1, crg2, crg3
+  integer                           :: jw,iq,i,j,iLJ1, iLJ2, iLJ3, iaci
+  integer                           :: istate
+  real(8)                           :: dx1, dy1, dz1, dx2, dy2, dz2, dx3, dy3, dz3
+  real(8)                           :: r_1, r2_1, r6_1, r_2, r2_2, r6_2, r_3, r2_3, r6_3
+  real(8)                           :: Vel1, Vel2, Vel3, dv1, dv2, dv3
+  real(8)                           :: V_a1,V_b1, V_a2, V_b2, V_a3, V_b3,r6_1_sc,r6_2_sc,r6_3_sc,r6_1_hc,r6_2_hc,r6_3_hc
+  real(8)                           :: boxshiftx, boxshifty, boxshiftz, dx, dy, dz
+  real(8), save                     :: a1(2), b1(2), a2(2), b2(2), a3(2), b3(2)
+  integer, save                     :: iac1, iac2, iac3
+  real, save                        :: crg1, crg2, crg3
   ! global variables used:
   !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
 
@@ -14450,19 +14446,39 @@ real(8) function randm (ig)
 
 end function randm
 
-!-----------------------------------------------------------------------
 
 integer function shake(xx, x)
-   !arguments
-  real(8)                                         ::      xx(:), x(:)
-  !       returns no. of iterations
+!!-------------------------------------------------------------------------------
+!! function: shake
+!! This is the main SHAKE algorithm. Uncertain where it came from.
+!! Citation needed here.
+!! Could it be that it's QSHAKE, that is, holonomic constraints SHAKE,
+!! so-called QSHAKE? Improbable.
+!!
+!! The original reference for SHAKE is:
+!! Ryckaert, J-P; Ciccotti G; Berendsen HJC (1977). "Numerical Integration
+!! of the Cartesian Equations of Motion of a System with Constraints: Molecular
+!! Dynamics of n-Alkanes". Journal of Computational Physics. 23 (3): 327–341.
+!! Bibcode:1977JCoPh..23..327R. doi:10.1016/0021-9991(77)90098-5
+!!
+!! When looking at the code and comparing it to the MOLARIS subroutine
+!! shake_bond one can see that they're practically the same.
+!!
+!! shake tolerance is a hard-fixed on compilation number. should be changed to
+!! an option with a default value.
+!!
+!! SHAKE_TOL = 0.0001
+!!-------------------------------------------------------------------------------
+  !arguments
+  real(8)                          :: xx(:), x(:)
+  !returns no. of iterations
 
   ! *** local variables
-  integer                                         ::      i,j,i3,j3,mol,ic,nits
-  real(8)                                         ::      xij2,diff,corr,scp,xxij2
-  real(8)                                         ::      xij(3),xxij(3)
+  integer                          :: i,j,i3,j3,mol,ic,nits
+  real(8)                          :: xij2,diff,corr,scp,xxij2 ! scp = scalar product
+  real(8)                          :: xij(3),xxij(3)
 #if defined (PROFILING)
-  real(8)                                         :: start_loop_time
+  real(8)                          :: start_loop_time
   start_loop_time = rtime()
 #endif
 
@@ -14549,7 +14565,6 @@ integer function shake(xx, x)
 
 end function shake
 
-!-----------------------------------------------------------------------
 
 subroutine shrink_topology
    !get rid of bonds and angles where all atoms are excluded
@@ -14900,10 +14915,10 @@ subroutine restrain_solvent
   real(8)                                         ::      shift
 
   ! global variables used:
-  !  E, Boltz, Tfree, fk_wsphere, nwat, nat_pro, x, xwcent, rwat, Dwmz, awmz, d
+  !  E, boltz, Tfree, fk_wsphere, nwat, nat_pro, x, xwcent, rwat, Dwmz, awmz, d
 
   if(fk_wsphere /= 0.) then
-    shift = sqrt (Boltz*Tfree/fk_wsphere)
+    shift = sqrt (boltz*Tfree/fk_wsphere)
   else
     shift = 0.
   end if
@@ -15763,7 +15778,7 @@ subroutine MC_volume()
   if (nodeid .eq. 0) then
     !Jamfor nya med gamla
     deltaE = E%potential - old_E%potential
-    deltaW = deltaE + pressure * deltaV - nmol*Boltz*Temp0*log(new_V/old_V)
+    deltaW = deltaE + pressure * deltaV - nmol*boltz*Temp0*log(new_V/old_V)
     write(*,4) 'old', 'new', 'delta'
     write(*,6) 'Potential', old_E%potential, E%potential, deltaE
     write(*,*)
@@ -15774,7 +15789,7 @@ subroutine MC_volume()
     else
       !slumpa tal mellan  0 coh 1
       randomno = randm(pressure_seed)
-      if( randomno > exp(- deltaW / Boltz / Temp0) ) then
+      if( randomno > exp(- deltaW / boltz / Temp0) ) then
         acc = .false.
       else
         acc = .true.

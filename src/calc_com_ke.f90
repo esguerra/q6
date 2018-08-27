@@ -1,25 +1,25 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
-!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
-!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
-!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
-!  latest update: August 29, 2017                                              !
+!  q version 5.7                                                               !
+!  code authors: johan aqvist, martin almlof, martin ander, jens carlson,      !
+!  isabella feierberg, peter hanspers, anders kaplan, karin kolmodin,          !
+!  petra wennerstrom, kajsa ljunjberg, john marelius, martin nervall,          !
+!  johan sund, ake sandgren, alexandre barrozo, masoud kazemi, paul bauer,     !
+!  miha purg, irek szeler, mauricio esguerra                                   !
+!  latest update: august 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
-!!  and Paul Bauer
+!!  copyright (c) 2017 johan aqvist, john marelius, shina caroline lynn kamerlin
+!!  and paul bauer
 !  calc_kineticenergy.f90
-!  by Martin Almlof
-!  calculates the kinetic energy of the center of mass of whatever atom 
+!  by martin almlof
+!  calculates the kinetic energy of the center of mass of whatever atom
 !  mask is specified
 !------------------------------------------------------------------------------!
 module calc_com_ke
   use calc_base
   use maskmanip
-! use LAPACKMINI
+! use lapackmini
   implicit none
 
 !constants
@@ -29,44 +29,44 @@ module calc_com_ke
   integer, private                 :: frames(max_masks), apa
   real(8), allocatable             :: kineticenergy(:)
   type(mask_type), private, target :: masks(max_masks)
-  integer, private                 :: Nmasks = 0
+  integer, private                 :: nmasks = 0
 
-  type COM_KE_COORD_TYPE
+  type com_ke_coord_type
     real, pointer                  :: x(:), y(:), z(:), mass(:)
-  end type COM_KE_COORD_TYPE
-  type(COM_KE_COORD_TYPE), private :: coords_mass(MAX_MASKS), prev_coords_mass(MAX_MASKS)
+  end type com_ke_coord_type
+  type(com_ke_coord_type), private :: coords_mass(max_masks), prev_coords_mass(max_masks)
 
-  type COM_KE_VELOCITY_TYPE
+  type com_ke_velocity_type
     real, pointer                  :: x(:), y(:), z(:)
-  end type COM_KE_VELOCITY_TYPE
-  type(COM_KE_VELOCITY_TYPE), private :: velocity(MAX_MASKS), rel_coords(MAX_MASKS), prev_rel_coords(MAX_MASKS),rad_vec(MAX_MASKS,3) !rel_coords is not velocities
-  
-  type COORD_TYPE
+  end type com_ke_velocity_type
+  type(com_ke_velocity_type), private :: velocity(max_masks), rel_coords(max_masks), prev_rel_coords(max_masks),rad_vec(max_masks,3) !rel_coords is not velocities
+
+  type coord_type
     real, pointer                  :: xyz(:)
-  end type COORD_TYPE
-  type(COORD_TYPE), private        :: coords(MAX_MASKS), prev_coords(MAX_MASKS)
+  end type coord_type
+  type(coord_type), private        :: coords(max_masks), prev_coords(max_masks)
 
-  type DP_TYPE
+  type dp_type
     real, pointer                  :: dp(:)
-  end type DP_TYPE
-  type(DP_TYPE), private           :: dp_vect(MAX_MASKS)
+  end type dp_type
+  type(dp_type), private           :: dp_vect(max_masks)
 
-  type MASS_AVE_TYPE
+  type mass_ave_type
     real                          :: x,y,z
-  end type MASS_AVE_TYPE
-  type(MASS_AVE_TYPE), private    :: mass_ave(MAX_MASKS), prev_mass_ave(MAX_MASKS) , ang_momentum(MAX_MASKS,3)
-  
-  type EIGEN_STUFF_TYPE
+  end type mass_ave_type
+  type(mass_ave_type), private    :: mass_ave(max_masks), prev_mass_ave(max_masks) , ang_momentum(max_masks,3)
+
+  type eigen_stuff_type
     real                          :: evalue(3),evector(3,3)
-  end type EIGEN_STUFF_TYPE
-  type(EIGEN_STUFF_TYPE), private :: eigen_stuff(MAX_MASKS)
+  end type eigen_stuff_type
+  type(eigen_stuff_type), private :: eigen_stuff(max_masks)
 
 
-  real,private                    :: tot_mass(MAX_MASKS), KE_rot(MAX_MASKS,3)
-  logical,private                 :: first_frame(MAX_MASKS) = .true.
-!       real,private                    :: previous_mass_center(3,MAX_MASKS)
+  real,private                    :: tot_mass(max_masks), ke_rot(max_masks,3)
+  logical,private                 :: first_frame(max_masks) = .true.
+!       real,private                    :: previous_mass_center(3,max_masks)
   real, private                   :: frame_length = 0
-        
+
 contains
 
 subroutine com_ke_initialize
@@ -74,7 +74,7 @@ end subroutine com_ke_initialize
 
 
 subroutine com_ke_finalize(i)
-  integer                          :: i
+  integer                         :: i
 
   call mask_finalize(masks(i))
 end subroutine com_ke_finalize
@@ -86,77 +86,77 @@ integer function com_ke_add(desc)
   character(len=80)                       ::      line
   integer                                         ::      readstat
   integer                                         ::      ats,j
-  if(Nmasks == MAX_MASKS) then
-    write(*,10) MAX_MASKS
+  if(nmasks == max_masks) then
+    write(*,10) max_masks
     return
   end if
-10 format('Sorry, the maximum number of COM_KE calculations is ',i2)
+10 format('sorry, the maximum number of com_ke calculations is ',i2)
 
 
   !get frame time length
   if (frame_length == 0) then
-    write(*,'(a)', advance='no') 'Enter time span between each trajectory frame (fs): '
+    write(*,'(a)', advance='no') 'enter time span between each trajectory frame (fs): '
     read(*,'(a)', iostat=readstat) line
     read(line, *, iostat=readstat) frame_length
     if(readstat /= 0 .or. frame_length <= 0) then
       write(*, 900)
-900   format('>>>>> ERROR: Invalid time span.')
-      COM_KE_add = 0
+900   format('>>>>> error: invalid time span.')
+      com_ke_add = 0
       return
     end if
   end if
 
-  !add a new COM_KE mask
-  Nmasks = Nmasks + 1
-  call mask_initialize(masks(Nmasks))
-  ats =  maskmanip_make(masks(Nmasks))
+  !add a new com_ke mask
+  nmasks = nmasks + 1
+  call mask_initialize(masks(nmasks))
+  ats =  maskmanip_make(masks(nmasks))
   !discard if no atoms in mask
   if(ats == 0) then
-    call mask_finalize(masks(Nmasks))
-    Nmasks = Nmasks - 1
-    COM_KE_add = 0
+    call mask_finalize(masks(nmasks))
+    nmasks = nmasks - 1
+    com_ke_add = 0
     return
   end if
 
-  allocate(coords(Nmasks)%xyz(3*ats), prev_coords(Nmasks)%xyz(3*ats))
-  allocate(coords_mass(Nmasks)%x(ats), coords_mass(Nmasks)%y(ats), coords_mass(Nmasks)%z(ats), coords_mass(Nmasks)%mass(ats))
-  allocate(prev_coords_mass(Nmasks)%x(ats), prev_coords_mass(Nmasks)%y(ats))
-  allocate(prev_coords_mass(Nmasks)%z(ats), prev_coords_mass(Nmasks)%mass(ats))
-  allocate(velocity(Nmasks)%x(ats), velocity(Nmasks)%y(ats), velocity(Nmasks)%z(ats))
-  allocate(rel_coords(Nmasks)%x(ats), rel_coords(Nmasks)%y(ats), rel_coords(Nmasks)%z(ats))
-  allocate(dp_vect(Nmasks)%dp(ats) ,prev_rel_coords(Nmasks)%x(ats))
-  allocate(prev_rel_coords(Nmasks)%y(ats), prev_rel_coords(Nmasks)%z(ats))
+  allocate(coords(nmasks)%xyz(3*ats), prev_coords(nmasks)%xyz(3*ats))
+  allocate(coords_mass(nmasks)%x(ats), coords_mass(nmasks)%y(ats), coords_mass(nmasks)%z(ats), coords_mass(nmasks)%mass(ats))
+  allocate(prev_coords_mass(nmasks)%x(ats), prev_coords_mass(nmasks)%y(ats))
+  allocate(prev_coords_mass(nmasks)%z(ats), prev_coords_mass(nmasks)%mass(ats))
+  allocate(velocity(nmasks)%x(ats), velocity(nmasks)%y(ats), velocity(nmasks)%z(ats))
+  allocate(rel_coords(nmasks)%x(ats), rel_coords(nmasks)%y(ats), rel_coords(nmasks)%z(ats))
+  allocate(dp_vect(nmasks)%dp(ats) ,prev_rel_coords(nmasks)%x(ats))
+  allocate(prev_rel_coords(nmasks)%y(ats), prev_rel_coords(nmasks)%z(ats))
 
   do j=1,3
-    allocate(rad_vec(Nmasks,j)%x(ats),rad_vec(Nmasks,j)%y(ats),rad_vec(Nmasks,j)%z(ats))
+    allocate(rad_vec(nmasks,j)%x(ats),rad_vec(nmasks,j)%y(ats),rad_vec(nmasks,j)%z(ats))
   end do
 
 
 
-  coords_mass(Nmasks)%x(:) = 0
-  coords_mass(Nmasks)%y(:) = 0
-  coords_mass(Nmasks)%z(:) = 0
-  coords_mass(Nmasks)%mass(:) = 0
-  coords(Nmasks)%xyz(:) = 0
-        
-  frames(Nmasks) = 0
-  call COM_KE_put_mass(Nmasks)
-  COM_KE_add = Nmasks
-  write(desc, 20) masks(Nmasks)%included
-20 format('Center of mass kinetic energy for ',i6,' atoms')
+  coords_mass(nmasks)%x(:) = 0
+  coords_mass(nmasks)%y(:) = 0
+  coords_mass(nmasks)%z(:) = 0
+  coords_mass(nmasks)%mass(:) = 0
+  coords(nmasks)%xyz(:) = 0
+
+  frames(nmasks) = 0
+  call com_ke_put_mass(nmasks)
+  com_ke_add = nmasks
+  write(desc, 20) masks(nmasks)%included
+20 format('center of mass kinetic energy for ',i6,' atoms')
 end function com_ke_add
 
 
 subroutine com_ke_calc(i)
   !arguments
   integer, intent(in)     :: i
-  integer                 :: info, IPIV(3,3),j
-  double precision        :: A(3,3), B(3), W(30), K(6), C(6)
+  integer                 :: info, ipiv(3,3),j
+  double precision        :: a(3,3), b(3), w(30), k(6), c(6)
 
   !locals
-  real(8)                 :: KE, IXX, IXY, IXZ, IYY, IYZ, IZZ, tot_KE_rot
+  real(8)                 :: ke, ixx, ixy, ixz, iyy, iyz, izz, tot_ke_rot
 
-  if(i < 1 .or. i > Nmasks) return
+  if(i < 1 .or. i > nmasks) return
 
   frames(i)=frames(i) + 1
 
@@ -176,7 +176,7 @@ subroutine com_ke_calc(i)
   prev_coords_mass(i)%x = prev_coords(i)%xyz(1::3)
   prev_coords_mass(i)%y = prev_coords(i)%xyz(2::3)
   prev_coords_mass(i)%z = prev_coords(i)%xyz(3::3)
-        
+
 
   !calculate center of mass
   mass_ave(i)%x = dot_product(coords_mass(i)%x(:),coords_mass(i)%mass)/tot_mass(i)
@@ -197,13 +197,13 @@ subroutine com_ke_calc(i)
 
 
   !calculate moment of inertia tensor
-  IXX = dot_product( (rel_coords(i)%y)**2 + (rel_coords(i)%z)**2, coords_mass(i)%mass)
-  IYY = dot_product( (rel_coords(i)%x)**2 + (rel_coords(i)%z)**2, coords_mass(i)%mass)
-  IZZ = dot_product( (rel_coords(i)%y)**2 + (rel_coords(i)%x)**2, coords_mass(i)%mass)
-  IXY = -1._8 * sum( (rel_coords(i)%y) * (rel_coords(i)%x) * coords_mass(i)%mass )
-  IXZ = -1._8 * sum( (rel_coords(i)%x) * (rel_coords(i)%z) * coords_mass(i)%mass )
-  IYZ = -1._8 * sum( (rel_coords(i)%y) * (rel_coords(i)%z) * coords_mass(i)%mass )
-        
+  ixx = dot_product( (rel_coords(i)%y)**2 + (rel_coords(i)%z)**2, coords_mass(i)%mass)
+  iyy = dot_product( (rel_coords(i)%x)**2 + (rel_coords(i)%z)**2, coords_mass(i)%mass)
+  izz = dot_product( (rel_coords(i)%y)**2 + (rel_coords(i)%x)**2, coords_mass(i)%mass)
+  ixy = -1._8 * sum( (rel_coords(i)%y) * (rel_coords(i)%x) * coords_mass(i)%mass )
+  ixz = -1._8 * sum( (rel_coords(i)%x) * (rel_coords(i)%z) * coords_mass(i)%mass )
+  iyz = -1._8 * sum( (rel_coords(i)%y) * (rel_coords(i)%z) * coords_mass(i)%mass )
+
 
   !calculate individual atom (relative?) velocities
   velocity(i)%x = (rel_coords(i)%x - prev_rel_coords(i)%x) / frame_length
@@ -211,21 +211,21 @@ subroutine com_ke_calc(i)
   velocity(i)%z = (rel_coords(i)%z - prev_rel_coords(i)%z) / frame_length
 
   !       write (*,*) ' '
-  K(:) = (/IXX,IXY,IYY,IXZ,IYZ,IZZ/)
+  k(:) = (/ixx,ixy,iyy,ixz,iyz,izz/)
 
-  !       write(*,'(6f18.3)'), K(:)
-  call EIGEN(K,A,3,0)
-        
+  !       write(*,'(6f18.3)'), k(:)
+  call eigen(k,a,3,0)
+
   do j = 1, 3
-    !               write (*,*) A(1,j),A(2,j),A(3,j),K(j*(j+1)/2)
+    !               write (*,*) a(1,j),a(2,j),a(3,j),k(j*(j+1)/2)
     !               write (*,*) info
-    eigen_stuff(i)%evalue(j) = K(j*(j+1)/2)
-    eigen_stuff(i)%evector(:,j) = A(:,j)
+    eigen_stuff(i)%evalue(j) = k(j*(j+1)/2)
+    eigen_stuff(i)%evector(:,j) = a(:,j)
   !               write (*,'(4f23.8)') eigen_stuff(i)%evalue(j), eigen_stuff(i)%evector(:,j)
 
   end do
-        
-  !eigen_stuff(i)%evector are the NORMALIZED principal axes of rotation
+
+  !eigen_stuff(i)%evector are the normalized principal axes of rotation
   !vector of dot_product(principal axis,atom coordinate)
 
   do j=1,3
@@ -257,21 +257,21 @@ subroutine com_ke_calc(i)
   !               write (*,'(3f23.15)') ang_momentum(i,j)%x,ang_momentum(i,j)%y,ang_momentum(i,j)%z
   end do
 
-  tot_KE_rot = 0
-  !Rotational kinetic energy = Lj^2/(2Ij)
+  tot_ke_rot = 0
+  !rotational kinetic energy = lj^2/(2ij)
   do j=1,3
-    KE_rot(i,j) = ((ang_momentum(i,j)%x)**2+(ang_momentum(i,j)%y)**2+ &
+    ke_rot(i,j) = ((ang_momentum(i,j)%x)**2+(ang_momentum(i,j)%y)**2+ &
       (ang_momentum(i,j)%z)**2)/(2*eigen_stuff(i)%evalue(j))*conversion_factor
-    tot_KE_rot = tot_KE_rot + KE_rot(i,j)
+    tot_ke_rot = tot_ke_rot + ke_rot(i,j)
   end do
-        
-  !       write (*,'(3f23.15)') KE_rot(i,1),KE_rot(i,2),KE_rot(i,3)
+
+  !       write (*,'(3f23.15)') ke_rot(i,1),ke_rot(i,2),ke_rot(i,3)
   !       calculate the kinetic energy
-  KE = 0.5 * tot_mass(i) * ((prev_mass_ave(i)%x-mass_ave(i)%x)**2+ &
+  ke = 0.5 * tot_mass(i) * ((prev_mass_ave(i)%x-mass_ave(i)%x)**2+ &
     (prev_mass_ave(i)%y-mass_ave(i)%y)**2+(prev_mass_ave(i)%z- &
     mass_ave(i)%z)**2) / frame_length**2 * conversion_factor
 
-  write(*,100, advance='no') KE, tot_KE_rot
+  write(*,100, advance='no') ke, tot_ke_rot
 100 format(2f12.3)
 end subroutine com_ke_calc
 
@@ -280,13 +280,13 @@ subroutine com_ke_put_mass(i)
   integer                                         ::      k,j,i,at
   real                                            ::      mass
 
-  if(i < 1 .or. i > Nmasks) return
+  if(i < 1 .or. i > nmasks) return
 
   tot_mass(i) = 0
   !put in masses into coords_mass
   k=1
   do j = 1, nat_pro
-    if (masks(i)%MASK(j)) then
+    if (masks(i)%mask(j)) then
       mass = iaclib(iac(j))%mass
       coords_mass(i)%mass(k) = mass
       tot_mass(i) = tot_mass(i) + mass
@@ -294,7 +294,7 @@ subroutine com_ke_put_mass(i)
     end if
   end do
 
-  write(*,168) "Total mass: ",tot_mass(i)
+  write(*,168) "total mass: ",tot_mass(i)
 168 format(a,f10.3)
 
 end subroutine com_ke_put_mass
@@ -302,7 +302,7 @@ end subroutine com_ke_put_mass
 subroutine com_ke_heading(i)
   integer                                         ::      i
 
-  write(*,'(a)', advance='no') 'Trans  Rot (kcal/mol)'
+  write(*,'(a)', advance='no') 'trans  rot (kcal/mol)'
 end subroutine com_ke_heading
 
 end module calc_com_ke

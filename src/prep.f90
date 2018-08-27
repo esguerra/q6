@@ -9,13 +9,13 @@
 !------------------------------------------------------------------------------!
 
 module prep
-  !!------------------------------------------------------------------------------
-  !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
-  !!  and Paul Bauer
-  !!  **module: prep.f90**
-  !!  by Johan Aqvist & John Marelius
-  !!  topology preparation, solvation, validation and PDB I/O
-  !!------------------------------------------------------------------------------
+!!------------------------------------------------------------------------------
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
+!!  **module: prep.f90**
+!!  by Johan Aqvist & John Marelius
+!!  topology preparation, solvation, validation and PDB I/O
+!!------------------------------------------------------------------------------
   use trj
   use parse
   use prmfile
@@ -583,7 +583,7 @@ subroutine changeimp
 
   write( * , '(/,a)') '      Two options:  1. change specified impropers'
   write( * , '(a)') '                                      2. change all with E > Emax(k <---> l)'
-  CALL prompt('-----> Which option [1/2]: ')
+  call prompt('-----> Which option [1/2]: ')
   read( *, * ) noptimp
 
   if(noptimp==1) then
@@ -6369,11 +6369,11 @@ subroutine writemol2
 end subroutine writemol2
 
 
+subroutine writetop
 !!-------------------------------------------------------------------------------
 !!  subroutine: writetop
 !!
 !!-------------------------------------------------------------------------------
-subroutine writetop
   ! *** local variables
   character(len=80)     :: filnam
   character(len=10)     :: answer
