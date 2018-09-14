@@ -11,7 +11,7 @@ before_install:
 - docker ps -a
 
 script:
-  - cd /root/Q6/src
+#  - cd /root/Q6/src
   - source ~/.bashrc
   - export
 #  - module load mpi/openmpi-x86_64

@@ -8,3 +8,4 @@ RUN dnf clean all
 
 RUN git clone https://github.com/esguerra/Q6.git /root/Q6
 RUN cd /root/Q6/src
+
