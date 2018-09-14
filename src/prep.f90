@@ -5,16 +5,17 @@
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
 !  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
-!  latest update: August 29, 2017                                              !
+!  latest update: September 4, 2018                                            !
 !------------------------------------------------------------------------------!
 
 module prep
 !!------------------------------------------------------------------------------
-!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
-!!  and Paul Bauer
 !!  **module: prep.f90**
 !!  by Johan Aqvist & John Marelius
 !!  topology preparation, solvation, validation and PDB I/O
+!!
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !!------------------------------------------------------------------------------
   use trj
   use parse
@@ -178,19 +179,19 @@ module prep
   integer                          :: nextrabnd
   type(bond_type)                  :: extrabnd(max_extrabnd)
 
-!     things needed for topology generation 
+!     variables needed for topology generation
 !-------------------------------------------------------------------------------
   logical, allocatable            :: makeh(:)
   integer, allocatable            :: nconn(:)
   integer, allocatable            :: iconn(:,:)
   real(8)                         :: pi, deg2rad
-  !temporary storage for solvent coordinates
+  ! temporary storage for solvent coordinates
   real(8), allocatable            :: xw(:,:,:) !solvent coordinates zyx,atom,molecule
-  !flag for solvent molecules not clashing with any solute heavy atom
+  ! flag for solvent molecules not clashing with any solute heavy atom
   logical, allocatable            :: keep(:)
-  !residue code for solvent
+  ! residue code for solvent
   integer                         :: irc_solvent
-  !residue name for solvent
+  ! residue name for solvent
   character(len=4)                :: solvent_name
 
 
@@ -207,10 +208,10 @@ module prep
 contains
 
 subroutine prep_startup
-  !!------------------------------------------------------------------------------
-  !!  **subroutine: prep_startup**
-  !!
-  !!------------------------------------------------------------------------------
+!!------------------------------------------------------------------------------
+!!  **subroutine: prep_startup**
+!!
+!!------------------------------------------------------------------------------
   logical                         :: l
   !initialize used modules
   call topo_startup               ! empty
@@ -238,10 +239,10 @@ end subroutine prep_startup
 
 
 subroutine allocate_for_pdb(atoms, residues, molecules)
-  !!------------------------------------------------------------------------------
-  !!  **subroutine: allocate_for_pdb**
-  !!
-  !!------------------------------------------------------------------------------
+!!------------------------------------------------------------------------------
+!!  **subroutine: allocate_for_pdb**
+!!
+!!------------------------------------------------------------------------------
   !arguments
   integer, intent(in)              :: atoms, residues, molecules
   allocate(xtop(3*atoms), heavy(atoms), makeH(atoms), &

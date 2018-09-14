@@ -8,14 +8,15 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
-!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
-!!  and Paul Bauer
-!!  program: **qfep**  
-!!  by Johan Aqvist, Karin Kolmodin, John Marelius, Johan Sund  
-!!  qfep free energy analysis program for FEP, EVB & Umbrella Sampling  
-!------------------------------------------------------------------------------!
+
 program qfep
+!!!--------------------------------------------------------------------------------!  
+!!  program  **qfep**  
+!!  by Johan Aqvist, Karin Kolmodin, John Marelius, Johan Sund  
+!!  qfep free energy analysis program for FEP, BAR, EVB, Umbrella Sampling  
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin  
+!!  and Paul Bauer  
+!!!--------------------------------------------------------------------------------!  
   use iso_fortran_env, only : compiler_version, compiler_options
   
   use nrgy
@@ -41,7 +42,7 @@ program qfep
 
   real(8) :: rt,gapmin,gapmax,sum,dv,gaprange,xint,dvg,veff1,veff2, &
              dGa,dGb,dGg,alpha_B,scale_Hij,veff,min,dlam,sumf,sumb, &
-             konst,fel,nfnr,nrnf
+             konst,fel,felcutoff,nfnr,nrnf
   real(8),dimension(mxbin) :: sumg,sumg2,avdvg,avc1,avc2,avc11,avc12,avc13, &
                               avc21,avc22,avc23,avc31,avc32,avc33,avr
 
@@ -87,13 +88,13 @@ program qfep
   call prompt ('--> Number of energy files: ')
   read (*,*) nfiles
   write (*,1) nfiles
-1 format('# Number of files                 =',i6)
+1 format('# Number of files                                  =',i6)
   call prompt ('--> No. of states, no. of predefined off-diag elements: ')
   read (*,*) nstates, noffd
   write (*,2) nstates, noffd
 
-2 format('# Number of states                 =',i6,/, &
-       '# Number of off-diagonal elements =',i6)
+2 format('# Number of states     =',i6,/, &
+       '# Number of off-diagonal elements                                              =',i6)
   !allocate size of secular determinant
   allocate(Hij(nstates,nstates),d(nstates),e(nstates),STAT=ERR)
   if(ERR /= 0) then
@@ -105,7 +106,7 @@ program qfep
   call prompt ('--> Give kT & num. of pts to skip & calculation mode: ')
   read(*,'(a)') iline
 
-  ! masoud reading an extra option for just calculating QQ energies
+  ! masoud read an extra option to compute QQ energies
   !print*, iline
   do i=1,4
     read (iline,*,iostat=error)(dummy,j=1,i)
@@ -127,19 +128,20 @@ program qfep
 
 ! read (*,*) rt,nskip
   write (*,3) rt,nskip,gas
-3 format('# kT                              =',f6.3,/, &
-         '# Number of data points to skip   =',i6,/, '# Only QQ interactions will be considered   = ',i3)
+3 format('# kT                     =',f6.3,/, &
+         '# Number of data points to skip                                                =',i6,/, &
+  '# Only QQ interactions will be considered                                      =',i6)
 
 
   call prompt ('--> Give number of gap-bins: ')
   read (*,*) nbins
   write (*,4) nbins
-4 format('# Number of gap-bins              =',i6)
+4 format('# Number of gap-bins                              =',i6)
 
   call prompt ('--> Give minimum # pts/bin: ')
   read (*,*) nmin
   write (*,5) nmin
-5 format('# Minimum number of points per bin=',i6)
+5 format('# Minimum number of points per bin                 =',i6)
 
   do istate=2,nstates
     write(line,7) istate
@@ -148,7 +150,7 @@ program qfep
     write (*,6) istate,alfa(istate)
   end do
 6 format('# Alpha for state ',i2,'              =',f6.2)
-7 format('--> Give alpha for state ',i2,':')
+7 format('--> Give alpha for state ',i2)
 
   scale_Hij=0.0
   if (noffd /=0) then
@@ -157,7 +159,7 @@ program qfep
     write (*,8) scale_Hij
 8   format('# Scale factor for Hij            =',f6.2)
   else
-    call prompt ('--> Number of off-diagonal elements:')
+    call prompt ('--> Number of off-diagonal elements: ')
     read (*,*) nnoffd
     write (*,9) nnoffd
     if(nnoffd >0) write(*,11) 
@@ -166,7 +168,7 @@ program qfep
       read (*,*) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
       write(*,12) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
     end do
-9   format('# Number of off-diagonal elements =',i6)
+9   format('# Number of off-diagonal elements         =',i6)
 11  format('#   i   j   A(i,j)  mu(i,j) eta(i,j) rxy0(i,j)')
 12  format('#',2i4,4f9.2) 
   end if
@@ -300,6 +302,11 @@ program qfep
 
       !-----------------------------------------------------------
       ! Ground state energy is calculated from secular determinant
+      ! This is all the semiempirical Q.M. evb ever does, which,
+      ! is just the same as Huckel did, pick a smaller matrix and
+      ! find its eigenvalues and eigenvectors, in other words,
+      ! diagonalize the matrix.
+      ! You can get a Nobel prize for this!
       !-----------------------------------------------------------
       if (nstates==2) then
         FEPtmp%vg(ipt)=0.5*(EQ(1)%total+EQ(2)%total)-  &
@@ -317,7 +324,7 @@ program qfep
       do istate=1,nstates
         FEPtmp%gap(ipt)=FEPtmp%gap(ipt)+FEPtmp%v(istate,ipt)*coeff(istate)
 !        print*, "LINEAR COMBINATION"
-!        print*, "FEPtmp%gap(ipt)        coeff(istate)                istate           nstates"        
+!        print*, "FEPtmp%gap(ipt)        coeff(istate)                istate           nstates"
 !        print*, FEPtmp%gap(ipt) ,coeff(istate), istate, nstates
       end do
 
@@ -378,7 +385,12 @@ program qfep
 17   format(a,t23,i2,1x,i6,1x,f8.6,14f8.2)
   end do  !ifile
 
-  if(nfiles > 1) then !the following is meaningless for a single file
+
+
+  !the following is meaningless for a single file
+  if(nfiles > 1) then
+  ! Do the forward calculation of delta G's according to Zwanzig.
+  ! boltzmann's constant beta = 1/rt
      dgf=0.
      dgfsum=0.
      sum=0.
@@ -392,10 +404,12 @@ program qfep
 999        format('File',i5,' contains only',i5,' points. Can''t skip',i5)
         end if
         do ipt=nskip+1,FEP(ifile)%npts
+           !print *, 'veff1, veff2 point counter (ipt) before =', veff1, veff2, ipt
            do istate=1,nstates
               veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)
               veff2=veff2+FEP(ifile+1)%lambda(istate)*FEP(ifile)%v(istate,ipt)
            end do
+           !print *, 'veff1, veff2, point counter (ipt) after =', veff1, veff2, ipt
            dv=veff2-veff1
            veff1=0.
            veff2=0.
@@ -407,7 +421,7 @@ program qfep
         sum=0.
      end do
 
-
+  ! Do the reverse calculation of delta G's according to Zwanzig.
      dgrsum=0.
      dgr=0.
      sum=0.
@@ -432,7 +446,7 @@ program qfep
      end do
 
 
-!!  Thermodynamic Integration
+!  Thermodynamic Integration
      dgtisum=0.
      dgti=0.
      sum=0.
@@ -460,7 +474,7 @@ program qfep
      end do
 
 
-!! Overlap Sampling
+! Overlap Sampling. Lu
      dglu=0.
      dglusum=0.
      sum=0.
@@ -468,8 +482,10 @@ program qfep
      veff2=0.
      dv=0.
      do ifile=1,nfiles-1
+       ! Note, similar to Zwanzig for the forward calculation
         do ipt=nskip+1,FEP(ifile)%npts
            do istate=1,nstates
+              !print *, 'veff1 = FEP(ifile)%lambda(istate) * FEP(ifile)%v(istate,ipt)', FEP(ifile)%lambda(istate), FEP(ifile)%v(istate,ipt), ifile, istate,ipt
               veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)
               veff2=veff2+FEP(ifile+1)%lambda(istate)*FEP(ifile)%v(istate,ipt)
            end do
@@ -480,6 +496,8 @@ program qfep
         end do
         sumf=sum/real(FEP(ifile)%npts-nskip)
         sum=0.
+
+        ! Note, similar to Zwanzig for the backward calculation
         do ipt=nskip+1,FEP(ifile+1)%npts
            do istate=1,nstates
               veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile+1)%v(istate,ipt)
@@ -491,13 +509,15 @@ program qfep
            sum=sum+exp(dv/rt)
         end do
         sumb=sum/real(FEP(ifile+1)%npts-nskip)
-        dglu(ifile)=-rt*dlog(sumf/sumb)
+
+        dglu(ifile)=-rt*dlog(sumf/sumb) ! used later as initial guess for bennetts's constant
         dglusum(ifile+1)=dglusum(ifile)+dglu(ifile)
         sum=0.
      end do
 
+     !print *, 'constant for the bennett formula from overlap sampling', dglu(1)
 
-!!  Bennet's Acceptance Ratio (BAR)
+!  Bennet's Acceptance Ratio (BAR)
      dgbar=0.
      dgbarsum=0.
      sum=0.
@@ -508,9 +528,14 @@ program qfep
      fel=1
      do ifile=1,nfiles-1
         konst=dglu(ifile)
-        do while (fel .gt. 0.001)
+        !print *, 'constant for the bennett formula initial', dglu(ifile)
+        felcutoff = 0.001
+        do while (fel > felcutoff)
            nfnr=real(FEP(ifile)%npts-nskip)/real(FEP(ifile+1)%npts-nskip)
            nrnf=real(FEP(ifile+1)%npts-nskip)/real(FEP(ifile)%npts-nskip)
+           !print *, 'optimization cutoff begin', 0.001
+           !print *, 'nfnr, nrnf, ifile = ', nfnr, nrnf, ifile
+
            do ipt=nskip+1,FEP(ifile)%npts
               do istate=1,nstates
                  veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)
@@ -522,6 +547,7 @@ program qfep
               sum=sum+1/((1+(nfnr*exp((dv-konst)/rt))))
            end do
            sumf=sum/real(FEP(ifile)%npts-nskip)
+
            sum=0.
            do ipt=nskip+1,FEP(ifile+1)%npts
               do istate=1,nstates
@@ -534,15 +560,20 @@ program qfep
               sum=sum+1/((1+(nrnf*exp((-dv+konst)/rt))))
            end do
            sumb=sum/real(FEP(ifile+1)%npts-nskip)
+
+
            dgbar(ifile)=-rt*dlog((sumf/sumb)*exp(-konst/rt)*nfnr)
            sum=0.
-           print *, 'The optimization constant is', fel
-           fel=ABS(konst-dgbar(ifile))
+           fel=abs(konst-dgbar(ifile))
            konst=dgbar(ifile)
+           !print *, 'optimization cutoff end', ifile, fel
         end do
+
+        !print *, 'constant for the bennett formula end', dglu(ifile)
         dgbarsum(ifile+1)=dgbarsum(ifile)+dgbar(ifile)
 !        print *, 'The optimization constant is', fel
         fel=1
+
      end do
 
 
@@ -742,14 +773,14 @@ program qfep
 
 
 
-
 contains
 
-  !----------------------------------------------------------------------------!
-  !!  subroutine: startup  
-  !!  Startup  
-  !----------------------------------------------------------------------------!
+
 subroutine startup
+!!!--------------------------------------------------------------------------------!  
+!!  subroutine  **startup**  
+!!  Startup message   
+!!!--------------------------------------------------------------------------------!  
   integer :: i
 
   print '(a)',  '--------------------------------------------------------------------------------'
@@ -771,9 +802,10 @@ end subroutine startup
 
 
 subroutine prompt (outtxt)
-!!---------------------------------------------------------------------------!
-!!  subroutine: prompt
-!!---------------------------------------------------------------------------!
+!!!--------------------------------------------------------------------------------!  
+!!  subroutine  **prompt**  
+!!  When in interctive mode give a proper prompt.  
+!!!--------------------------------------------------------------------------------!  
     character( * ) outtxt
 #if defined (__osf__)
     !prompt to STDERR using unit 5=STDIN on OSF/1=DEC UNIX
@@ -789,7 +821,7 @@ subroutine prompt (outtxt)
     !write (f1,'($,a)') outtxt
 #else
     !otherwise prompt to STDOUT
-    integer, parameter              :: f = 6
+    integer, parameter              :: f=6
     !write (f2,'($,a)') outtxt
 #endif
     write ( f ,'(a,$)') outtxt
@@ -797,10 +829,11 @@ subroutine prompt (outtxt)
 end subroutine prompt
 
 
-  !----------------------------------------------------------------------------!
-  !!  subroutine: commandlineoptions  
-  !----------------------------------------------------------------------------!
 subroutine commandlineoptions
+!!!--------------------------------------------------------------------------------!  
+!!  subroutine  **commandlineoptions**  
+!!  Provide command line options such as help and version.  
+!!!--------------------------------------------------------------------------------!  
   do k = 1, command_argument_count()
     call get_command_argument(k, arg)
     select case (arg)
@@ -818,10 +851,12 @@ subroutine commandlineoptions
   end do
 end subroutine commandlineoptions
 
-  !----------------------------------------------------------------------------!
-  !!  subroutine: print_help  
-  !----------------------------------------------------------------------------!
+
 subroutine print_help()
+!!!--------------------------------------------------------------------------------!  
+!!  subroutine  **print_help**  
+!!  Text to accompany the --help argument value.  
+!!!--------------------------------------------------------------------------------!  
     print '(a)', 'usage:'
     print '(a)', 'qfep [OPTION]'
     print '(a)', '  or'
@@ -835,171 +870,171 @@ subroutine print_help()
     print '(a)', '  -h, --help        print usage information and exit'
 end subroutine print_help
 
-  
-subroutine tred2(A,N,NP,D,E)
-    !------------------------------------------------------------
-    ! This subroutine reduces a symmetric matrix to tridiagonal
-    ! form. The tridiagonal matrix can further be diagonalized by
-    ! the subroutine tqli.
-    ! These subroutines were copied by Karin Kolmodin 20 Nov. 1997
-    ! from http://rsc.anu.au/HWS/COURSES/MATHMETH/node70.html
-    ! and rewritten in f90.
-    !------------------------------------------------------------ 
-    real(8),dimension(:)   :: D,E
-    real(8),dimension(:,:) :: A
-    integer                :: NP,I,J,K,L,N,ERR
-    real(8)                :: SCALE,F,G,H,HH
 
-    IF(N.GT.1)THEN
-       DO I=N,2,-1  
-          L=I-1
-          H=0.
-          SCALE=0.
-          IF(L.GT.1)THEN
-             DO K=1,L
-                SCALE=SCALE+ABS(A(I,K))
-             end do
-             IF(SCALE.EQ.0.)THEN
-                E(I)=A(I,L)
-             ELSE
-                DO K=1,L
-                   A(I,K)=A(I,K)/SCALE
-                   H=H+A(I,K)**2
-                end do
-                F=A(I,L)
-                G=-SIGN(SQRT(H),F)
-                E(I)=SCALE*G
-                H=H-F*G
-                A(I,L)=F-G
-                F=0.
-                DO J=1,L
-                   A(J,I)=A(I,J)/H
-                   G=0.
-                   DO K=1,J
-                      G=G+A(J,K)*A(I,K)
-                   end do
-                   IF(L.GT.J)THEN
-                      DO K=J+1,L
-                         G=G+A(K,J)*A(I,K)
-                      end do
-                   END IF
-                   E(J)=G/H
-                   F=F+E(J)*A(I,J)
-                end do
-                HH=F/(H+H)
-                DO J=1,L
-                   F=A(I,J)
-                   G=E(J)-HH*F
-                   E(J)=G
-                   DO K=1,J
-                      A(J,K)=A(J,K)-F*E(K)-G*A(I,K)
-                   end do
-                end do
-             END IF
-          ELSE
-             E(I)=A(I,L)
-          END IF
-          D(I)=H
-       end do
-    END IF
-    D(1)=0.
-    E(1)=0.
-    DO I=1,N
-       L=I-1
-       IF(D(I).NE.0.)THEN
-          DO J=1,L
-             G=0.
-             DO K=1,L
-                G=G+A(I,K)*A(K,J)
-             end do
-             DO K=1,L
-                A(K,J)=A(K,J)-G*A(K,I)
-             end do
-          end do
-       END IF
-       D(I)=A(I,I)
-       A(I,I)=1.
-       IF(L.GE.1)THEN
-          DO J=1,L
-             A(I,J)=0.
-             A(J,I)=0.
-          end do
-       END IF
-    end do
+subroutine tred2(A,N,NP,D,E)
+!!!--------------------------------------------------------------------------------!  
+!! This subroutine reduces a symmetric matrix to tridiagonal  
+!! form. The tridiagonal matrix can further be diagonalized by  
+!! the subroutine tqli.  
+!! These subroutines were copied by Karin Kolmodin 20 Nov. 1997  
+!! from http://rsc.anu.au/HWS/COURSES/MATHMETH/node70.html  
+!! and rewritten in f90.  
+!!!--------------------------------------------------------------------------------!  
+  real(8),dimension(:)   :: D,E
+  real(8),dimension(:,:) :: A
+  integer                :: NP,I,J,K,L,N,ERR
+  real(8)                :: SCALE,F,G,H,HH
+
+  IF(N.GT.1)THEN
+     DO I=N,2,-1  
+        L=I-1
+        H=0.
+        SCALE=0.
+        IF(L.GT.1)THEN
+           DO K=1,L
+              SCALE=SCALE+ABS(A(I,K))
+           end do
+           IF(SCALE.EQ.0.)THEN
+              E(I)=A(I,L)
+           ELSE
+              DO K=1,L
+                 A(I,K)=A(I,K)/SCALE
+                 H=H+A(I,K)**2
+              end do
+              F=A(I,L)
+              G=-SIGN(SQRT(H),F)
+              E(I)=SCALE*G
+              H=H-F*G
+              A(I,L)=F-G
+              F=0.
+              DO J=1,L
+                 A(J,I)=A(I,J)/H
+                 G=0.
+                 DO K=1,J
+                    G=G+A(J,K)*A(I,K)
+                 end do
+                 IF(L.GT.J)THEN
+                    DO K=J+1,L
+                       G=G+A(K,J)*A(I,K)
+                    end do
+                 END IF
+                 E(J)=G/H
+                 F=F+E(J)*A(I,J)
+              end do
+              HH=F/(H+H)
+              DO J=1,L
+                 F=A(I,J)
+                 G=E(J)-HH*F
+                 E(J)=G
+                 DO K=1,J
+                    A(J,K)=A(J,K)-F*E(K)-G*A(I,K)
+                 end do
+              end do
+           END IF
+        ELSE
+           E(I)=A(I,L)
+        END IF
+        D(I)=H
+     end do
+  END IF
+  D(1)=0.
+  E(1)=0.
+  DO I=1,N
+     L=I-1
+     IF(D(I).NE.0.)THEN
+        DO J=1,L
+           G=0.
+           DO K=1,L
+              G=G+A(I,K)*A(K,J)
+           end do
+           DO K=1,L
+              A(K,J)=A(K,J)-G*A(K,I)
+           end do
+        end do
+     END IF
+     D(I)=A(I,I)
+     A(I,I)=1.
+     IF(L.GE.1)THEN
+        DO J=1,L
+           A(I,J)=0.
+           A(J,I)=0.
+        end do
+     END IF
+  end do
 end subroutine tred2
-!-----------------------------------
+
 
 subroutine tqli(D,E,N,NP,Z)
-    !------------------------------------------------------------ 
-    ! This subroutine diagonalizes a tridiagonal matrix which has 
-    ! been prepared by the subroutine tred2.
-    ! These subroutines were copied by Karin Kolmodin 20 Nov. 1997
-    ! from http://rsc.anu.au/HWS/COURSES/MATHMETH/node70.html
-    ! and rewritten in f90
-    !------------------------------------------------------------  
-    implicit none
-    real(8),dimension(:)   :: D,E
-    real(8),dimension(:,:) :: Z
-    integer                :: I,N,NP,K,L,M,ITER
-    real(8)                :: DD,G,R,S,C,P,F,B
+!!!--------------------------------------------------------------------------------!  
+!! This subroutine diagonalizes a tridiagonal matrix which has   
+!! been prepared by the subroutine tred2.  
+!! These subroutines were copied by Karin Kolmodin 20 Nov. 1997  
+!! from http://rsc.anu.au/HWS/COURSES/MATHMETH/node70.html  
+!! and rewritten in f90  
+!!!--------------------------------------------------------------------------------!  
+  implicit none
+  real(8),dimension(:)   :: D,E
+  real(8),dimension(:,:) :: Z
+  integer                :: I,N,NP,K,L,M,ITER
+  real(8)                :: DD,G,R,S,C,P,F,B
 
-    IF (N.GT.1) THEN
-       DO I=2,N
-          E(I-1)=E(I)
-       end do
-       E(N)=0.
-       DO L=1,N
-          ITER=0
-1         DO M=L,N-1
-             DD=ABS(D(M))+ABS(D(M+1))
-             IF (ABS(E(M))+DD.EQ.DD) GO TO 2
-          end do
-          M=N
-2         IF(M.NE.L)THEN
-             IF(ITER.EQ.30)STOP 'too many iterations'
-             ITER=ITER+1
-             G=(D(L+1)-D(L))/(2.*E(L))
-             R=SQRT(G**2+1.)
-             G=D(M)-D(L)+E(L)/(G+SIGN(R,G))
-             S=1.
-             C=1.
-             P=0.
-             DO I=M-1,L,-1
-                F=S*E(I)
-                B=C*E(I)
-                IF(ABS(F).GE.ABS(G))THEN
-                   C=G/F
-                   R=SQRT(C**2+1.)
-                   E(I+1)=F*R
-                   S=1./R
-                   C=C*S
-                ELSE
-                   S=F/G
-                   R=SQRT(S**2+1.)
-                   E(I+1)=G*R
-                   C=1./R  
-                   S=S*C
-                END IF
-                G=D(I+1)-P
-                R=(D(I)-G)*S+2.*C*B
-                P=S*R
-                D(I+1)=G+P
-                G=C*R-B
-                DO K=1,N
-                   F=Z(K,I+1)
-                   Z(K,I+1)=S*Z(K,I)+C*F
-                   Z(K,I)=C*Z(K,I)-S*F
-                end do
-             end do
-             D(L)=D(L)-P
-             E(L)=G
-             E(M)=0.
-             GO TO 1
-          END IF
-       end do
-    END IF
-    RETURN
+  IF (N.GT.1) THEN
+     DO I=2,N
+        E(I-1)=E(I)
+     end do
+     E(N)=0.
+     DO L=1,N
+        ITER=0
+1       DO M=L,N-1
+           DD=ABS(D(M))+ABS(D(M+1))
+           IF (ABS(E(M))+DD.EQ.DD) GO TO 2
+        end do
+        M=N
+2       IF(M.NE.L)THEN
+           IF(ITER.EQ.30)STOP 'too many iterations'
+           ITER=ITER+1
+           G=(D(L+1)-D(L))/(2.*E(L))
+           R=SQRT(G**2+1.)
+           G=D(M)-D(L)+E(L)/(G+SIGN(R,G))
+           S=1.
+           C=1.
+           P=0.
+           DO I=M-1,L,-1
+              F=S*E(I)
+              B=C*E(I)
+              IF(ABS(F).GE.ABS(G))THEN
+                 C=G/F
+                 R=SQRT(C**2+1.)
+                 E(I+1)=F*R
+                 S=1./R
+                 C=C*S
+              ELSE
+                 S=F/G
+                 R=SQRT(S**2+1.)
+                 E(I+1)=G*R
+                 C=1./R  
+                 S=S*C
+              END IF
+              G=D(I+1)-P
+              R=(D(I)-G)*S+2.*C*B
+              P=S*R
+              D(I+1)=G+P
+              G=C*R-B
+              DO K=1,N
+                 F=Z(K,I+1)
+                 Z(K,I+1)=S*Z(K,I)+C*F
+                 Z(K,I)=C*Z(K,I)-S*F
+              end do
+           end do
+           D(L)=D(L)-P
+           E(L)=G
+           E(M)=0.
+           GO TO 1
+        END IF
+     end do
+  END IF
+  RETURN
 end subroutine tqli
-!-----------------------------------
+
 
 end program qfep

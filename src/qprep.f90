@@ -8,14 +8,14 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
-!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
-!!  and Paul Bauer
-!>  program: **qprep**
-!!  by Johan Aqvist & John Marelius  
-!!  qprep topology preparation main program  
-!------------------------------------------------------------------------------!
+
 program qprep
+!!  program: qprep
+!!  author: Johan Aqvist and John Marelius
+!!  qprep topology preparation main program  
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin  
+!!  and Paul Bauer  
+!!-----------------------------------------------------------------------------!  
   use iso_fortran_env
 
   use prep
@@ -54,11 +54,12 @@ program qprep
 contains
 
 
-!------------------------------------------------------------------------------!
-!>  subroutine: **qprep_from_inputfile**
-!!  Read input from file and execute commands
-!------------------------------------------------------------------------------!
-  subroutine qprep_from_inputfile(filename)
+
+
+subroutine qprep_from_inputfile(filename)
+!!  subroutine: qprep_from_inputfile
+!!  Read input from file and execute commands  
+!!-----------------------------------------------------------------------------!  
   character(200)  :: filename
   character(200)  :: command
   logical         :: readable
@@ -81,14 +82,13 @@ contains
     end select
   enddo
 
-  end subroutine qprep_from_inputfile
+end subroutine qprep_from_inputfile
 
 
-  !----------------------------------------------------------------------------!
-  !>  subroutine: qprep_from_commandline
-  !!  Read input from command line and execute commands  
-  !----------------------------------------------------------------------------!
-  subroutine qprep_from_commandline
+subroutine qprep_from_commandline
+!!  subroutine: qprep_from_commandline
+!!  Read input from command line and execute commands  
+!!-----------------------------------------------------------------------------!  
   character(200) :: command
 
   do
@@ -103,14 +103,13 @@ contains
     end select
   enddo
 
-  end subroutine qprep_from_commandline
+end subroutine qprep_from_commandline
 
 
-  !----------------------------------------------------------------------------!
-  !>  subroutine: parse_command(command)
-  !!  Parse a command and call corresponding subroutine  
-  !----------------------------------------------------------------------------!
-  subroutine parse_command(command)
+subroutine parse_command(command)
+!!  subroutine: parse_command(command)
+!!  Parse a command and call corresponding subroutine  
+!----------------------------------------------------------------------------!  
   character(*), intent(IN) :: command
   ! --- Command loop
   select case (command)
@@ -181,14 +180,13 @@ contains
     case default
           write( * , '(/,a,a,a,/)') 'unrecognized command "', trim(command), '" (type ? for help)'
   end select
-  end subroutine parse_command
+end subroutine parse_command
 
 
-  !----------------------------------------------------------------------------!
-  !>  subroutine: help
-  !!  Give help on commands  
-  !----------------------------------------------------------------------------!
-  subroutine help
+subroutine help
+!!  subroutine: help
+!!  Give help on commands  
+!!----------------------------------------------------------------------------!  
   write( *, * )
   write( * , '(a)') &
   'command      argument            description', &
@@ -278,14 +276,13 @@ contains
   'xl          xlink'
   write( *, * )
 
-  end subroutine help
+end subroutine help
 
 
-  !----------------------------------------------------------------------------!
-  !>  subroutine: startup
-  !!  Startup  
-  !----------------------------------------------------------------------------!
 subroutine startup
+!!  subroutine: startup
+!!  Startup  
+!!----------------------------------------------------------------------------!  
   print '(a)',  '--------------------------------------------------------------------------------'
   print '(4a)', 'Welcome to ', program_name, ' version: ', program_version
   print '(a)',  ' '
@@ -306,77 +303,76 @@ subroutine startup
 end subroutine startup
 
 
-  !----------------------------------------------------------------------------!
-  !>  subroutine: shutdown
-  !!  Shutdown call
-  !----------------------------------------------------------------------------!
-  subroutine shutdown
-    call prep_shutdown
-    stop 'qprep ended normally'
-  end subroutine shutdown
+subroutine shutdown
+!!  subroutine: shutdown
+!!  Shutdown call  
+!!----------------------------------------------------------------------------!  
+  call prep_shutdown
+  stop 'qprep ended normally'
+end subroutine shutdown
 
   
-  !----------------------------------------------------------------------------!
-  !>  subroutine: commandlineoptions
-  !----------------------------------------------------------------------------!
-  subroutine commandlineoptions
-  do i = 1, command_argument_count()
-    call get_command_argument(i, arg)
-    select case (arg)
-    case ('-v', '--version')
-      print '(3a)', PROGRAM_NAME, ' version ', PROGRAM_VERSION
-      stop
-    case ('-h', '--help')
-      call print_help()
-      stop
-    case default
-      print '(a,a,/)', 'Unrecognized command-line option: ', arg
-      call print_help()
-      stop
-    end select
-  end do
-  end subroutine commandlineoptions
-
-  !----------------------------------------------------------------------------!
-  !>  subroutine: print_help
-  !----------------------------------------------------------------------------!
-  subroutine print_help()
-    print '(a)', 'usage:'
-    print '(a)', 'qprep [OPTION]'
-    print '(a)', '  or'
-    print '(a)', 'qprep < inputfile.inp > outputfile.out'
-    print '(a)', ''
-    print '(a)', 'Without options, qprep goes into interactive mode.'
-    print '(a)', ''
-    print '(a)', 'qprep [OPTION]:'
-    print '(a)', ''
-    print '(a)', '  -v, --version     print version information and exit'
-    print '(a)', '  -h, --help        print usage information and exit'
-  end subroutine print_help
+subroutine commandlineoptions
+!!  subroutine: commandlineoptions
+!!  
+!!----------------------------------------------------------------------------!  
+do i = 1, command_argument_count()
+  call get_command_argument(i, arg)
+  select case (arg)
+  case ('-v', '--version')
+    print '(3a)', PROGRAM_NAME, ' version ', PROGRAM_VERSION
+    stop
+  case ('-h', '--help')
+    call print_help()
+    stop
+  case default
+    print '(a,a,/)', 'Unrecognized command-line option: ', arg
+    call print_help()
+    stop
+  end select
+end do
+end subroutine commandlineoptions
 
 
-  !----------------------------------------------------------------------------!
-  !> function: check_inputfile
-  !! Determine if qprep is to be run from command line or from input file  
-  !----------------------------------------------------------------------------!
-  logical function check_inputfile(infilename)
-    !local variables
-    integer :: num_args
-    character(200), intent(OUT) :: infilename
-    character(300) :: text
+subroutine print_help()
+!!  subroutine: print_help
+!!  
+!!----------------------------------------------------------------------------!  
+  print '(a)', 'usage:'
+  print '(a)', 'qprep [OPTION]'
+  print '(a)', '  or'
+  print '(a)', 'qprep < inputfile.inp > outputfile.out'
+  print '(a)', ''
+  print '(a)', 'Without options, qprep goes into interactive mode.'
+  print '(a)', ''
+  print '(a)', 'qprep [OPTION]:'
+  print '(a)', ''
+  print '(a)', '  -v, --version     print version information and exit'
+  print '(a)', '  -h, --help        print usage information and exit'
+end subroutine print_help
 
-    ! read name of input file from the command line
-    num_args = command_argument_count()
-    if (num_args .lt. 1) then
-      check_inputfile = .false.
-      return
-    endif
 
-    call getarg(num_args, infilename)
-    text = 'Reading input from '//infilename
-    call centered_heading(trim(text), '-')
-    check_inputfile = .true.
-  end function check_inputfile
+logical function check_inputfile(infilename)
+!! function: check_inputfile
+!! Determine if qprep is to be run from command line or from input file  
+!!----------------------------------------------------------------------------!  
+  !local variables
+  integer :: num_args
+  character(200), intent(OUT) :: infilename
+  character(300) :: text
+
+  ! read name of input file from the command line
+  num_args = command_argument_count()
+  if (num_args .lt. 1) then
+    check_inputfile = .false.
+    return
+  endif
+
+  call getarg(num_args, infilename)
+  text = 'Reading input from '//infilename
+  call centered_heading(trim(text), '-')
+  check_inputfile = .true.
+end function check_inputfile
 
 
 end program qprep

@@ -152,24 +152,27 @@ fortran and \textbf{cpp} for the GNU Compiler Collection (GCC).
 
 \subsection{Documentation}
 \label{documentation}
-To document the code we've selected ford, a package by Chris
-MacMackin. It's a python package so it can be installed with pip.
+To document the code we've selected \textbf{FORD} version 6, a package by Chris
+MacMackin. It's a python package so it can be installed with pip:
+
+\begin{Verbatim}
+    pip install ford
+\end{Verbatim}
+\noindent
 To run it we use:
 \begin{Verbatim}
     ford -d ../../src -o devdocs forddocs.md
 \end{Verbatim}
 
-One exclamation mark ignored, two exclamation marks taken as FORD
-documentation.
-FORD by default documents after the function, or subroutine, or so, but
-to make it document with what is prior to the, say, subroutine, after
-version 1.10 one should use a greater than symbol after the
-exclamation mark.
+\noindent
+One exclamation mark ignored, two exclamation marks taken as \textbf{FORD}
+documentation. Also markdown rules apply to the text.
+\textbf{FORD} by default documents after the function, or subroutine.
 
 \begin{Verbatim}
 !------------------------------------------------------------------------------!
-!>  **subroutine: put_ene**
-!!    defines what goes in the energy files.
+!!  **subroutine: put_ene**  
+!!    defines what goes in the energy files.  
 !------------------------------------------------------------------------------!
   subroutine put_ene(unit, e2, offd)
 \end{Verbatim}

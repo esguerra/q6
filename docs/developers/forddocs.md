@@ -1,14 +1,17 @@
+---
 project: Q-FEP-MD
 summary: Developer docs for Q
 author: John Marelius, Johan Aqvist, and others.
 author_description: Research group at Uppsala
+src_dir: ../../../src 
 project_dir: ../../../src 
-output_dir: ./devdocs
-media_dir: ./media
-project_github: https://github.com/qusers/qsource
+output_dir: ./devdocs/
+media_dir: ./media/
+project_github: https://github.com/esguerra/Q6
 project_website: http://qdyn.no-ip.org
-source: false
-graph: true 
+source: false  
+warn: false  
+graph: true   
 macro: TEST LOGIC=.true.
 github: http://www.icm.uu.se/cbbi/aqvist-lab 
 email: johan.aqvist@icm.uu.se
@@ -16,8 +19,11 @@ predocmark: >
 predocmark_alt: <
 docmark: !
 coloured_edges: true
-display: public protected private
+display: public
+         protected
+         private
 sort: alpha
+---
 
 
 
@@ -40,11 +46,9 @@ for in-node parallelization.
 License  
 =======
 
-For a  non-commerical license agreement please  fill-out the following
-form and send it
-to Johan Aqvist.  
+Q is a free simulation package that is distributed under the GNU
+General Public License, Version 2.0 (GPLv2).  
 
-[LICENSE](http://www.icm.uu.se/digitalAssets/211/211337_3q_license.pdf)  
 
-In return you will be given access to the code.  
+
 
