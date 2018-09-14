@@ -1,4 +1,4 @@
-FROM fedora
+FROM fedora:27
 
 MAINTAINER mauricioesguerra <mauricio.esguerra@gmail.com>
 
