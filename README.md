@@ -1,47 +1,71 @@
 Qsource development.
 ================================================================================
 
-This a fork of Q6 with a large amount of differences from that
+This a fork of **Q6** with a large amount of differences from that
 original code.   
-**Use at your own risk.**
+**--Use at your own risk.--**
 
 The forked code is released under a GNU General Public License, Version 2.0
 (GPLv2), that means that all modifications done here belong to the 
 Public license owners, that is, Paul Bauer, j. marelius, j. aqvist,
 s. c. l. kamerlin.
 
+
 Status
 ------
 [![Build Status](https://img.shields.io/travis/esguerra/Q6/master.svg?style=plastic)](https://travis-ci.org/esguerra/Q6)
 
 
-The main idea of this fork is to aim for clean and readable Q code.  
+Aim
+---
+The main idea of this fork is to aim for clean and readable **Q** code.  
 The code is in the process of being reorganized and cleaned-up
 according to best coding practices.  
 
-We are starting to document the code using doxygen and ford.   
+
+Compilation
+-----------
+
+You will need to install a current version of fortran, and if you want
+to use the parallel version you will also need to have an MPI
+installation in your computer. We compile the code regularly with
+intel-fortran and with gnu-fortran and because of this recommend to
+compile using the Gnu Compiler Collection (GCC) in as current a
+version as possible. The following compilation example has been tested
+in Fedora28 using:
+
+    sudo dnf install gcc-gfortran openmpi  
+	git clone https://github.com/esguerra/q6.git  
+	cd q6/src  
+    make all COMP=gcc  
+	make mpi COMP=gcc  
+
+Developer Docs
+--------------
+
+We are starting to document the code using doxygen and FORD.   
+Obviously you will need to install doxygen and or FORD (ver. 6.0.0) in
+order to generate the documentation.
+
 To generate the doxygen documentation do:  
 
     cd docs/developers  
     doxygen DoxygenConfigFortran  
 
 
-To generate the ford docs:  
+To generate the FORD (version >= 6.0.0) docs:  
     
     cd docs/developers  
     ford -d ../../src -o devdocs forddocs.md  
 
 
-Some basic development rules somewhat similar to those of the
-**gromacs** developers team follow.
-
 
 Coding Standards
 ----------------
 
-The **GROMACS** developers have identified the following important main
-points for taking into account when organizing a molecular dynamics
-code.  
+We are following the example of the **GROMACS** developers which have
+identified the following important main points for taking into account
+when organizing a molecular dynamics code.  
 
 1.  **Code formatting** - how to indent code, how to start and end subroutines
     etc.  
