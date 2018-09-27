@@ -34,7 +34,7 @@ compile using the Gnu Compiler Collection (GCC) in as current a
 version as possible. The following compilation example has been tested
 in Fedora28 using:
 
-    sudo dnf install gcc-gfortran openmpi  
+    sudo dnf install gcc-gfortran libgfortran-static openmpi  
 	git clone https://github.com/esguerra/q6.git  
 	cd q6/src  
     make all COMP=gcc  
