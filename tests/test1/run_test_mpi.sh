@@ -41,7 +41,7 @@ FAILED="(\033[0;31m FAILED \033[0m)"
 for step in {1..5}
 do
  echo -n "Running equilibration step ${step} of 5                         "
- if time mpirun -np $CORES $bindir/qdynp eq${step}.inp > eq${step}.log
+ if time mpirun --allow-run-as-root -np $CORES $bindir/qdynp eq${step}.inp > eq${step}.log
  then echo -e "$OK"
  else 
   echo -e "$FAILED"
@@ -54,7 +54,7 @@ done
 for step in {1..5}
 do
  echo -n "Running production run step ${step} of 5                        "
- if time mpirun -np $CORES $bindir/qdynp dc${step}.inp > dc${step}.log
+ if time mpirun --allow-run-as-root -np $CORES $bindir/qdynp dc${step}.inp > dc${step}.log
   then echo -e "$OK"
  else 
   echo -e "$FAILED"
