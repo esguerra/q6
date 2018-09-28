@@ -94,7 +94,7 @@ module topo
   character(len=256)               :: title = ''
   character(len=256)               :: forcefield = ''
   character(len=256)               :: creation_date
-  character(len=256)               :: pdb_file = ''
+  character(len=256)               :: pdb_file
   character(len=256)               :: lib_files = ''
   character(len=256)               :: prm_file
 
