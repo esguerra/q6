@@ -59,7 +59,7 @@ contains
 subroutine qprep_from_inputfile(filename)
 !!  subroutine: qprep_from_inputfile
 !!  Read input from file and execute commands  
-!!-----------------------------------------------------------------------------!  
+!!-------------------------------------------------------------------------------
   character(200)  :: filename
   character(200)  :: command
   logical         :: readable
@@ -88,7 +88,7 @@ end subroutine qprep_from_inputfile
 subroutine qprep_from_commandline
 !!  subroutine: qprep_from_commandline
 !!  Read input from command line and execute commands  
-!!-----------------------------------------------------------------------------!  
+!!-------------------------------------------------------------------------------
   character(200) :: command
 
   do
@@ -109,7 +109,7 @@ end subroutine qprep_from_commandline
 subroutine parse_command(command)
 !!  subroutine: parse_command(command)
 !!  Parse a command and call corresponding subroutine  
-!----------------------------------------------------------------------------!  
+!!-------------------------------------------------------------------------------
   character(*), intent(IN) :: command
   ! --- Command loop
   select case (command)
@@ -186,7 +186,7 @@ end subroutine parse_command
 subroutine help
 !!  subroutine: help
 !!  Give help on commands  
-!!----------------------------------------------------------------------------!  
+!!-------------------------------------------------------------------------------
   write( *, * )
   write( * , '(a)') &
   'command      argument            description', &
@@ -282,7 +282,7 @@ end subroutine help
 subroutine startup
 !!  subroutine: startup
 !!  Startup  
-!!----------------------------------------------------------------------------!  
+!!-------------------------------------------------------------------------------
   print '(a)',  '--------------------------------------------------------------------------------'
   print '(4a)', 'Welcome to ', program_name, ' version: ', program_version
   print '(a)',  ' '
@@ -306,7 +306,7 @@ end subroutine startup
 subroutine shutdown
 !!  subroutine: shutdown
 !!  Shutdown call  
-!!----------------------------------------------------------------------------!  
+!!-------------------------------------------------------------------------------
   call prep_shutdown
   stop 'qprep ended normally'
 end subroutine shutdown
@@ -315,7 +315,7 @@ end subroutine shutdown
 subroutine commandlineoptions
 !!  subroutine: commandlineoptions
 !!  
-!!----------------------------------------------------------------------------!  
+!!-------------------------------------------------------------------------------
 do i = 1, command_argument_count()
   call get_command_argument(i, arg)
   select case (arg)
@@ -337,7 +337,7 @@ end subroutine commandlineoptions
 subroutine print_help()
 !!  subroutine: print_help
 !!  
-!!----------------------------------------------------------------------------!  
+!!-------------------------------------------------------------------------------
   print '(a)', 'usage:'
   print '(a)', 'qprep [OPTION]'
   print '(a)', '  or'
@@ -355,7 +355,7 @@ end subroutine print_help
 logical function check_inputfile(infilename)
 !! function: check_inputfile
 !! Determine if qprep is to be run from command line or from input file  
-!!----------------------------------------------------------------------------!  
+!!-------------------------------------------------------------------------------
   !local variables
   integer :: num_args
   character(200), intent(OUT) :: infilename

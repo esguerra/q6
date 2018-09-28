@@ -8,14 +8,15 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module topo
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!  topo.f90
-!  by John Marelius & Johan Aqvist
-!  molecular topology data and I/O
-!------------------------------------------------------------------------------!
-module topo
+!!  **module topo**
+!!  by John Marelius & Johan Aqvist
+!!  molecular topology data and I/O
+!!-------------------------------------------------------------------------------
   use sizes
   use misc
 
@@ -99,421 +100,456 @@ module topo
 
   !atom information
   !nat_pro = total # of atoms in topology, nat_solute = # solute atoms (no water)
-  integer                          ::      nat_pro, nat_solute, max_atom
-  real(8), allocatable             ::      xtop(:)                 ! topology/coordinates
-  integer(tiny), allocatable       ::      iac(:)                  ! integer atom codes
-  logical, allocatable             ::      heavy(:)                ! boolean flag, true if atom >= he
-  real, allocatable                ::      crg(:)                  ! charges
-  integer(ai), allocatable         ::      cgpatom(:)              ! charge groups
-  integer, parameter               ::      solvent_spc=0, solvent_3atom=1, solvent_general=2
-  integer                          ::      solvent_type
-  integer,allocatable              ::      glb_cofactor(:) ! 0 = protein or ligand atom, 1,2,3...= cofactor 1, 2, 3...
+  integer                          :: nat_pro, nat_solute, max_atom
+  real(8), allocatable             :: xtop(:)                 ! topology/coordinates
+  integer(tiny), allocatable       :: iac(:)                  ! integer atom codes
+  logical, allocatable             :: heavy(:)                ! boolean flag, true if atom >= he
+  real, allocatable                :: crg(:)                  ! charges
+  integer(ai), allocatable         :: cgpatom(:)              ! charge groups
+  integer, parameter               :: solvent_spc=0, solvent_3atom=1, solvent_general=2
+  integer                          :: solvent_type
+  integer,allocatable              :: glb_cofactor(:) ! 0 = protein or ligand atom, 1,2,3...= cofactor 1, 2, 3...
 
-  integer, public :: ligand_offset ! topology index offset for ligand. xtop(1:ligand_offset) = protein
+  integer, public                  :: ligand_offset ! topology index offset for ligand. xtop(1:ligand_offset) = protein
 
   !sphere information
   !!sim. sphere & water sphere centers
-  real(8)                                         ::      xpcent(3), xwcent(3) 
-  real(8)                                         ::      rwat !solvation radius
-  real(8)                                         ::      rexcl_o,rexcl_i
-  integer                                         ::      nexats, nshellats, nexwat
-  logical, allocatable            ::      shell(:)
-  logical, allocatable            ::      excl(:)
+  real(8)                          :: xpcent(3), xwcent(3) 
+  real(8)                          :: rwat !solvation radius
+  real(8)                          :: rexcl_o,rexcl_i
+  integer                          :: nexats, nshellats, nexwat
+  logical, allocatable             :: shell(:)
+  logical, allocatable             :: excl(:)
 
   !box information
-  real(8)                                         ::      boxlength(3) !length of the boxedges
-  real(8)                                         ::      boxcenter(3) !center coordinates of the box
-  real(8)                                         ::      inv_boxl(3)  !inverse of the boxedges
+  real(8)                          :: boxlength(3) !length of the boxedges
+  real(8)                          :: boxcenter(3) !center coordinates of the box
+  real(8)                          :: inv_boxl(3)  !inverse of the boxedges
 
   !flag indication if simulation sphere (.false.) or periodic box (.true.)is used. 
-  logical                                         ::      use_pbc = .false.
+  logical                          :: use_pbc = .false.
 
   !bond information
-  integer                         :: nbonds, nbonds_solute, max_bonds
-  type(bond_type), allocatable    :: bnd(:)
-
-  integer                                         ::      nbndcod, max_bondlib
-  type(bondlib_type), allocatable:: bondlib(:)
-  character(len=3), allocatable:: sybyl_bond_type(:)
+  integer                          :: nbonds, nbonds_solute, max_bonds
+  type(bond_type), allocatable     :: bnd(:)
+  integer                          :: nbndcod, max_bondlib
+  type(bondlib_type), allocatable  :: bondlib(:)
+  character(len=3), allocatable    :: sybyl_bond_type(:)
 
   !angle information
-  integer                                         ::      nangles, nangles_solute, max_angles
-  type(ang_type), allocatable     ::      ang(:)
-
-  integer                                         ::      nangcod, max_anglib
-  type(anglib_type), allocatable:: anglib(:)
+  integer                          :: nangles, nangles_solute, max_angles
+  type(ang_type), allocatable      :: ang(:)
+  integer                          :: nangcod, max_anglib
+  type(anglib_type), allocatable   :: anglib(:)
 
   !torsion information
-  integer                                         ::      ntors, ntors_solute, ntorcod
-  integer                                         ::      max_tors, max_torlib
-  integer                                         ::      nimps, nimps_solute, nimpcod
-  integer                                         ::      max_imps, max_implib, imp_type
-  type(tor_type),target,allocatable:: tor(:)
-  type(tor_type), target,allocatable:: imp(:)
-  type(torlib_type), target,allocatable:: torlib(:)
-  type(implib_type), target, allocatable:: implib(:)
+  integer                          :: ntors, ntors_solute, ntorcod
+  integer                          :: max_tors, max_torlib
+  integer                          :: nimps, nimps_solute, nimpcod
+  integer                          :: max_imps, max_implib, imp_type
+  type(tor_type),target,allocatable      :: tor(:)
+  type(tor_type), target,allocatable     :: imp(:)
+  type(torlib_type), target,allocatable  :: torlib(:)
+  type(implib_type), target, allocatable :: implib(:)
 
   !charge group information
-  integer                                         ::      ncgp, ncgp_solute, max_cgp
-  type(cgp_type), allocatable     ::      cgp(:)
+  integer                          :: ncgp, ncgp_solute, max_cgp
+  type(cgp_type), allocatable      :: cgp(:)
 
   !atom type information
-  integer                                                                                         ::      natyps, max_atyps
-  integer                                                                                         ::      nlj2, max_lj2
-  type(iac_type),allocatable              ::      iaclib(:)
-  character(len=5),allocatable    ::      sybyl_atom_type(:)
-  character(len=8), allocatable ::        tac(:) !text atom codes
-  type(lj2_type), allocatable             ::      lj2(:)
+  integer                          :: natyps, max_atyps
+  integer                          :: nlj2, max_lj2
+  type(iac_type),allocatable       :: iaclib(:)
+  character(len=5),allocatable     :: sybyl_atom_type(:)
+  character(len=8), allocatable    :: tac(:) !text atom codes
+  type(lj2_type), allocatable      :: lj2(:)
 
   !force field options
-  integer                                         ::      ivdw_rule !combination rule
-  integer, parameter                      ::      vdw_geometric=1, vdw_arithmetic=2
-  real(8)                                         ::      el14_scale !scaling of 1-4 electrostatics
-  integer                                         ::      iuse_switch_atom !switching atoms in charge group
-  real(8)                                         ::      coulomb_constant !constant in coulombs law
+  integer                          :: ivdw_rule !combination rule
+  integer, parameter               :: vdw_geometric=1, vdw_arithmetic=2
+  real(8)                          :: el14_scale !scaling of 1-4 electrostatics
+  integer                          :: iuse_switch_atom !switching atoms in charge group
+  real(8)                          :: coulomb_constant !constant in coulombs law
   !type of forcefield, one of ff_gromos, ff_amber, ff_charmm
   !this only (right now) affects how improper parameters are assigned
-  integer                                         ::      ff_type
-  integer, parameter                      ::      ff_gromos=1, ff_amber=2, ff_charmm=3
+  integer                          :: ff_type
+  integer, parameter               :: ff_gromos=1, ff_amber=2, ff_charmm=3
 
   !neighbour lists
-  integer                                         ::      n14nbrs
-  integer                                         ::      nexnbrs, max_exbnrs
-  integer                                         ::      n14long, max_14long
-  integer                                         ::      nexlong, max_exlong
-  logical, allocatable            ::      list14(:,:)
-  logical, allocatable            ::      listex(:,:)
-  integer(ai), allocatable        ::      list14long(:,:)
+  integer                          :: n14nbrs
+  integer                          :: nexnbrs, max_exbnrs
+  integer                          :: n14long, max_14long
+  integer                          :: nexlong, max_exlong
+  logical, allocatable             :: list14(:,:)
+  logical, allocatable             :: listex(:,:)
+  integer(ai), allocatable         :: list14long(:,:)
   !listexlong may be reallocated to include special exclusions
-  integer(ai), pointer            ::      listexlong(:,:)
+  integer(ai), pointer             :: listexlong(:,:)
 
   !residue and molecule bookkeeping information 
-  integer                                         ::      nres, nres_solute, max_res
-  type(residue_type), allocatable ::      res(:)
-
-  integer                                         ::      nmol, max_mol
-  integer, allocatable            ::      istart_mol(:)
+  integer                          :: nres, nres_solute, max_res
+  type(residue_type), allocatable  :: res(:)
+  integer                          :: nmol, max_mol
+  integer, allocatable             :: istart_mol(:)
 
   contains
 
-  !----------------------------------------------------------------------
 
-  subroutine topo_startup
-  end subroutine topo_startup
 
-  !----------------------------------------------------------------------
 
-  subroutine topo_set_max(max, max_lib, max_nbr)
-    !arguments
-    integer                                         ::      max, max_lib, max_nbr
+subroutine topo_startup
+!!-------------------------------------------------------------------------------
+!!  **subroutine topo_startup**
+!!  dummy subroutine which is probably not doing anything.
+!!  TODO check if it's needed.
+!!-------------------------------------------------------------------------------
+end subroutine topo_startup
 
-    max_atom        = max
-    max_bonds       = 2*max
-    max_angles      = 3*max
-    max_tors        = 12*max
-    max_imps        = max
 
-    if(max_lib > MAX_SHRT) then
-       write(*,*) 'ERROR: Cannot have larger libraries than ',MAX_SHRT,&
-            ' with current word length.'
-       stop 255
+subroutine topo_set_max(max, max_lib, max_nbr)
+!!-------------------------------------------------------------------------------
+!!  **subroutine topo_set_max**
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  integer                        :: max, max_lib, max_nbr
+
+  max_atom        = max
+  max_bonds       = 2*max
+  max_angles      = 3*max
+  max_tors        = 12*max
+  max_imps        = max
+
+  if(max_lib > MAX_SHRT) then
+    write(*,*) 'ERROR: Cannot have larger libraries than ',MAX_SHRT,&
+      ' with current word length.'
+    stop 255
+  end if
+
+  max_bondlib = max_lib
+  max_anglib      = max_lib
+  max_torlib      = max_lib
+  max_implib      = max_lib
+  max_lj2         = max_lib
+
+  max_14long      = max_nbr
+  max_exlong      = max_nbr
+  max_cgp         = max
+
+  max_res         = max
+  max_mol         = max
+
+end subroutine topo_set_max
+
+
+subroutine topo_allocate_potential(stat_out)
+!!-------------------------------------------------------------------------------
+!!  **subroutine topo_allocate_potential**
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  integer, optional, intent(out)::        stat_out
+
+  !!$                bnd(max_bonds), &
+  !!$             bondlib(max_bondlib), &
+  !!$             SYBYL_bond_type(max_bondlib), &
+  !!$             ang(max_angles), &
+  !!$             anglib(max_anglib), &
+  !!$             tor(max_tors), &
+  !!$             torlib(max_torlib), &
+  !!$             imp(max_imps), &
+  !!$             implib(max_implib), &
+  !!$             lj2(max_lj2), &
+  allocate(iaclib(max_atyps), &
+    tac(max_atyps), &
+    SYBYL_atom_type(max_atyps), &
+    list14long(2, max_14long), &
+    listexlong(2, max_exlong), &
+    cgp(max_cgp), &
+    stat = alloc_status)
+
+  if(alloc_status /= 0) then
+    write(*,*) 'ERROR: Out of memory when allocating topology arrays'
+    if(.not. present(stat_out)) then
+      stop 255
+    else
+      stat_out = alloc_status
+      return
     end if
+  end if
+end subroutine topo_allocate_potential
 
-    max_bondlib = max_lib
-    max_anglib      = max_lib
-    max_torlib      = max_lib
-    max_implib      = max_lib
-    max_lj2         = max_lib
 
-    max_14long      = max_nbr
-    max_exlong      = max_nbr
-    max_cgp         = max 
+subroutine topo_allocate_atom(stat_out)
+!!-------------------------------------------------------------------------------
+!!  **subroutine topo_allocate_atom**
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  integer, optional, intent(out)   :: stat_out
 
-    max_res         = max 
-    max_mol         = max 
+  allocate(glb_cofactor(max_atom), &
+    iac(max_atom), &
+    crg(max_atom), &
+    xtop(3*max_atom), &
+    heavy(max_atom), &
+    cgpatom(max_atom), &
+    list14(max_nbr_range, max_atom), &
+    listex(max_nbr_range, max_atom), &
+    excl(max_atom), shell(max_atom), &
+    stat=alloc_status)
 
-  end subroutine topo_set_max
-
-  !----------------------------------------------------------------------
-
-  subroutine topo_allocate_potential(stat_out)
-    !arguments
-    integer, optional, intent(out)::        stat_out
-
-!!$                bnd(max_bonds), &
-!!$             bondlib(max_bondlib), &
-!!$             SYBYL_bond_type(max_bondlib), &
-!!$             ang(max_angles), &
-!!$             anglib(max_anglib), &
-!!$             tor(max_tors), &
-!!$             torlib(max_torlib), &
-!!$             imp(max_imps), &
-!!$             implib(max_implib), &
-!!$             lj2(max_lj2), &
-    allocate(iaclib(max_atyps), &
-         tac(max_atyps), &
-         SYBYL_atom_type(max_atyps), &
-         list14long(2, max_14long), &
-         listexlong(2, max_exlong), &
-         cgp(max_cgp), &
-         stat = alloc_status)
-
-    if(alloc_status /= 0) then
-       write(*,*) 'ERROR: Out of memory when allocating topology arrays'
-       if(.not. present(stat_out)) then
-          stop 255
-       else
-          stat_out = alloc_status
-          return
-       end if
+  if(alloc_status /= 0) then
+    write(*,*) 'ERROR: Out of memory when allocating topology arrays'
+    if(.not. present(stat_out)) then
+      stop 255
+    else
+      stat_out = alloc_status
+      return
     end if
-  end subroutine topo_allocate_potential
+  end if
 
-  !----------------------------------------------------------------------
+end subroutine topo_allocate_atom
 
-  subroutine topo_allocate_atom(stat_out)
-    !arguments
-    integer, optional, intent(out)::        stat_out
 
-    allocate(glb_cofactor(max_atom), &
-         iac(max_atom), &
-         crg(max_atom), &
-         xtop(3*max_atom), &
-         heavy(max_atom), &
-         cgpatom(max_atom), &
-         list14(max_nbr_range, max_atom), &
-         listex(max_nbr_range, max_atom), &
-         excl(max_atom), shell(max_atom), &
-         stat=alloc_status)
+subroutine topo_deallocate (keep_ff)
+!!-------------------------------------------------------------------------------
+!!  **subroutine topo_deallocate**
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  logical, optional, intent(in)    :: keep_ff
+  !locals
+  logical                          :: keep
 
-    if(alloc_status /= 0) then
-       write(*,*) 'ERROR: Out of memory when allocating topology arrays'
-       if(.not. present(stat_out)) then
-          stop 255
-       else
-          stat_out = alloc_status
-          return
-       end if
-    end if
+  keep = .false.
 
-  end subroutine topo_allocate_atom
+  if(present(keep_ff)) then
+    if(keep_ff) keep = .true.
+  end if
 
-  !----------------------------------------------------------------------
+  if(.not. keep .and. allocated(iaclib)) deallocate(iaclib)
+  if(.not. keep .and. allocated(SYBYL_atom_type)) deallocate(SYBYL_atom_type)
+  if(.not. keep .and. allocated(lj2)) deallocate(lj2)
+  if(.not. keep .and. allocated(tac)) deallocate(tac)
+  if(allocated(glb_cofactor)) deallocate(glb_cofactor)
+  if(allocated(bnd)) deallocate(bnd)
+  if(allocated(bondlib)) deallocate(bondlib)
+  if(allocated(SYBYL_bond_type)) deallocate(SYBYL_bond_type)
+  if(allocated(ang)) deallocate(ang)
+  if(allocated(anglib)) deallocate(anglib)
+  if(allocated(tor)) deallocate(tor)
+  if(allocated(torlib)) deallocate(torlib)
+  if(allocated(imp)) deallocate(imp)
+  if(allocated(implib)) deallocate(implib)
+  if(allocated(iac)) deallocate(iac)
+  if(allocated(crg)) deallocate(crg)
+  if(allocated(xtop)) deallocate(xtop)
+  if(allocated(heavy)) deallocate(heavy)
+  if(allocated(cgpatom)) deallocate(cgpatom)
+  if(allocated(list14)) deallocate(list14)
+  if(allocated(listex)) deallocate(listex)
+  if(allocated(res)) deallocate(res)
+  if(allocated(istart_mol)) deallocate(istart_mol)
+  if(allocated(cgp)) deallocate(cgp)
+  if(allocated(list14long)) deallocate(list14long)
+  if(allocated(excl)) deallocate(excl)
+  if(allocated(shell)) deallocate(shell)
+  deallocate(listexlong, stat=alloc_status)
+end subroutine topo_deallocate
 
-  subroutine topo_deallocate (keep_ff)
-    !arguments
-    logical, optional, intent(in):: keep_ff
-    !locals
-    logical                                         ::      keep
 
-    keep = .false.
+subroutine topo_reallocate_xtop(atoms)
+!!-------------------------------------------------------------------------------
+!!  **subroutine topo_reallocate_xtop**
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  integer                          :: atoms
+  real(8), allocatable             :: r8temp(:)
+  integer                          :: nat3old_array(1), nat3old
 
-    if(present(keep_ff)) then
-       if(keep_ff) keep = .true.
-    end if
+  nat3old_array = ubound(xtop)
+  nat3old = nat3old_array(1)
+  allocate(r8temp(nat3old), stat=alloc_status)
+  call topo_check_alloc('reallocating topology atom array')
+  r8temp(1:nat3old) = xtop(1:nat3old)
+  deallocate(xtop)
+  allocate(xtop(atoms*3),  stat=alloc_status)
+  call topo_check_alloc('reallocating topology atom array')
+  xtop(1:nat3old) = r8temp(1:nat3old)
+  deallocate(r8temp)
 
-    if(.not. keep .and. allocated(iaclib)) deallocate(iaclib)
-    if(.not. keep .and. allocated(SYBYL_atom_type)) deallocate(SYBYL_atom_type)
-    if(.not. keep .and. allocated(lj2)) deallocate(lj2)
-    if(.not. keep .and. allocated(tac)) deallocate(tac)
-    if(allocated(glb_cofactor)) deallocate(glb_cofactor)
-    if(allocated(bnd)) deallocate(bnd)
-    if(allocated(bondlib)) deallocate(bondlib)
-    if(allocated(SYBYL_bond_type)) deallocate(SYBYL_bond_type)
-    if(allocated(ang)) deallocate(ang)
-    if(allocated(anglib)) deallocate(anglib)
-    if(allocated(tor)) deallocate(tor)
-    if(allocated(torlib)) deallocate(torlib)
-    if(allocated(imp)) deallocate(imp)
-    if(allocated(implib)) deallocate(implib)
-    if(allocated(iac)) deallocate(iac)
-    if(allocated(crg)) deallocate(crg)
-    if(allocated(xtop)) deallocate(xtop)
-    if(allocated(heavy)) deallocate(heavy)
-    if(allocated(cgpatom)) deallocate(cgpatom)
-    if(allocated(list14)) deallocate(list14)
-    if(allocated(listex)) deallocate(listex)
-    if(allocated(res)) deallocate(res)
-    if(allocated(istart_mol)) deallocate(istart_mol)
-    if(allocated(cgp)) deallocate(cgp)
-    if(allocated(list14long)) deallocate(list14long)
-    if(allocated(excl)) deallocate(excl)
-    if(allocated(shell)) deallocate(shell)
-    deallocate(listexlong, stat=alloc_status)
-  end subroutine topo_deallocate
+end subroutine topo_reallocate_xtop
 
-  !----------------------------------------------------------------------
 
-  subroutine topo_reallocate_xtop(atoms)
-    !arguments
-    integer                                         ::      atoms
+subroutine topo_reallocate(oldatoms, atoms, waters)
+!!-------------------------------------------------------------------------------
+!!  **subroutine topo_reallocate**
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  integer                          :: oldatoms, atoms, waters
+  !locals
+  integer                          :: oldbonds, bonds
+  integer                          :: oldangles, angles
+  real, allocatable                :: r4temp(:)
+  integer(1), allocatable          :: i1temp(:)
+  type(BOND_TYPE), allocatable     :: bndtemp(:)
+  type(ANG_TYPE), allocatable      :: angtemp(:)
 
-    real(8), allocatable            ::      r8temp(:)
-    integer                                         ::      nat3old_array(1), nat3old
+  oldbonds = nbonds
+  bonds = oldbonds + 2*waters
+  oldangles = nangles
+  angles = oldangles + 2*waters
 
-    nat3old_array = ubound(xtop)
-    nat3old = nat3old_array(1) 
-    allocate(r8temp(nat3old), stat=alloc_status)
-    call topo_check_alloc('reallocating topology atom array')
-    r8temp(1:nat3old) = xtop(1:nat3old)
-    deallocate(xtop)
-    allocate(xtop(atoms*3),  stat=alloc_status)
-    call topo_check_alloc('reallocating topology atom array')
-    xtop(1:nat3old) = r8temp(1:nat3old)
-    deallocate(r8temp)
+  !realloc bonds
+  allocate(bndtemp(oldbonds),  stat=alloc_status)
+  call topo_check_alloc('reallocating atom arrays')
+  bndtemp(1:oldbonds) = bnd(1:oldbonds)
+  deallocate(bnd)
+  allocate(bnd(bonds),  stat=alloc_status)
+  call topo_check_alloc('reallocating atom arrays')
+  bnd(1:oldbonds) = bndtemp(1:oldbonds)
+  deallocate(bndtemp)
 
-  end subroutine topo_reallocate_xtop
+  !realloc angles
+  allocate(angtemp(oldangles),  stat=alloc_status)
+  call topo_check_alloc('reallocating atom arrays')
+  angtemp(1:oldangles) = ang(1:oldangles)
+  deallocate(ang)
+  allocate(ang(angles),  stat=alloc_status)
+  call topo_check_alloc('reallocating atom arrays')
+  ang(1:oldangles) = angtemp(1:oldangles)
+  deallocate(angtemp)
 
-  !----------------------------------------------------------------------
+  allocate(r4temp(oldatoms), stat=alloc_status)
+  call topo_check_alloc('reallocating atom arrays')
 
-  subroutine topo_reallocate(oldatoms, atoms, waters)
-    !arguments
-    integer                                         ::      oldatoms, atoms, waters
-    !locals 
-    integer                                         ::      oldbonds, bonds
-    integer                                         ::      oldangles, angles
-    real, allocatable                       ::      r4temp(:)
-    integer(1), allocatable         ::      i1temp(:)
-    type(BOND_TYPE), allocatable::  bndtemp(:)
-    type(ANG_TYPE), allocatable     ::      angtemp(:)
+  !realloc. crg
+  r4temp(1:oldatoms) = crg(1:oldatoms)
+  deallocate(crg)
+  allocate(crg(atoms), stat=alloc_status)
+  call topo_check_alloc('reallocating atom arrays')
+  crg(1:oldatoms) = r4temp(1:oldatoms)
 
-    oldbonds = nbonds
-    bonds = oldbonds + 2*waters
-    oldangles = nangles
-    angles = oldangles + 2*waters
+  !done with real's
+  deallocate(r4temp)
+  allocate(i1temp(oldatoms), stat=alloc_status)
+  call topo_check_alloc('reallocating atom arrays')
 
-    !realloc bonds
-    allocate(bndtemp(oldbonds),  stat=alloc_status)
-    call topo_check_alloc('reallocating atom arrays')
-    bndtemp(1:oldbonds) = bnd(1:oldbonds)
-    deallocate(bnd)
-    allocate(bnd(bonds),  stat=alloc_status)
-    call topo_check_alloc('reallocating atom arrays')
-    bnd(1:oldbonds) = bndtemp(1:oldbonds)
-    deallocate(bndtemp)
+  !realloc. iac
+  i1temp(1:oldatoms) = iac(1:oldatoms)
+  deallocate(iac)
+  allocate(iac(atoms), stat=alloc_status)
+  call topo_check_alloc('reallocating atom arrays')
+  iac(1:oldatoms) = i1temp(1:oldatoms)
 
-    !realloc angles
-    allocate(angtemp(oldangles),  stat=alloc_status)
-    call topo_check_alloc('reallocating atom arrays')
-    angtemp(1:oldangles) = ang(1:oldangles)
-    deallocate(ang)
-    allocate(ang(angles),  stat=alloc_status)
-    call topo_check_alloc('reallocating atom arrays')
-    ang(1:oldangles) = angtemp(1:oldangles)
-    deallocate(angtemp)
+  !done with i1's
+  deallocate(i1temp)
 
-    allocate(r4temp(oldatoms), stat=alloc_status)
-    call topo_check_alloc('reallocating atom arrays')
+end subroutine topo_reallocate
 
-    !realloc. crg
-    r4temp(1:oldatoms) = crg(1:oldatoms)
-    deallocate(crg)
-    allocate(crg(atoms), stat=alloc_status)
-    call topo_check_alloc('reallocating atom arrays')
-    crg(1:oldatoms) = r4temp(1:oldatoms)
 
-    !done with real's
-    deallocate(r4temp)
-    allocate(i1temp(oldatoms), stat=alloc_status)
-    call topo_check_alloc('reallocating atom arrays')
 
-    !realloc. iac
-    i1temp(1:oldatoms) = iac(1:oldatoms)
-    deallocate(iac)
-    allocate(iac(atoms), stat=alloc_status)
-    call topo_check_alloc('reallocating atom arrays')
-    iac(1:oldatoms) = i1temp(1:oldatoms)
+subroutine topo_check_alloc(message)
+!!-------------------------------------------------------------------------------
+!!  **subroutine topo_check_alloc**
+!!
+!!-------------------------------------------------------------------------------  
+  implicit none
 
-    !done with i1's
-    deallocate(i1temp)
+  character(*) message
 
-  end subroutine topo_reallocate
+  if(alloc_status .ne. 0) then
+    write(*,*) &
+      '>>> Out of memory trying to allocate ', message
+    stop 255
+  end if
+end subroutine topo_check_alloc
 
-  !----------------------------------------------------------------------
 
-  subroutine topo_check_alloc(message)
-    implicit none
 
-    character(*) message
+logical function topo_load(filename, require_version)
+!!-------------------------------------------------------------------------------
+!!  **function topo_load**
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  character(*)                     :: filename
+  real, intent(in)                 :: require_version
 
-    if(alloc_status .ne. 0) then
-       write(*,*) &
-            '>>> Out of memory trying to allocate ', message
-       stop 255
-    end if
-  end subroutine topo_check_alloc
+  !locals
+  integer                          :: u, readflag
 
-  !----------------------------------------------------------------------
+  topo_load = .false.
 
-  logical function topo_load(filename, require_version)
-    !arguments
-    character(*)                    ::      filename
-    real, intent(in)                ::      require_version
+  ! try opening the file
+  u = topo_open(filename)
+  if(u <= 0) then
+    write(*,'(a,a)') 'ERROR: Failed to open topology file ', &
+      trim(filename)
+    return
+  end if
 
-    !locals
-    integer                                 ::      u, readflag
+  ! topo_read
+  topo_load = topo_read(u, require_version)
 
-    topo_load = .false.
+  ! close file
+  close(u)
+end function topo_load
 
-    ! try opening the file
-    u = topo_open(filename)
-    if(u <= 0) then
-       write(*,'(a,a)') 'ERROR: Failed to open topology file ', &
-            trim(filename)
-       return
-    end if
 
-    ! topo_read
-    topo_load = topo_read(u, require_version)
+integer function topo_open(filename)
+!!-------------------------------------------------------------------------------
+!!  **function topo_open**
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  character(*)                    :: filename
 
-    ! close file
-    close(u)
-  end function topo_load
+  !locals
+  integer                         :: u, stat_out
 
-  !----------------------------------------------------------------------
+  u = freefile()
 
-  integer function topo_open(filename)
-    !arguments
-    character(*)                    ::      filename
+  open(unit = u, file=filename, status='old',form='formatted', &
+    action='read', iostat = stat_out)
+  if(stat_out /= 0) then
+    write(*,10) trim(filename)
+    topo_open = 0
+    return
+  end if
 
-    !locals
-    integer                                 ::      u, stat_out
+  topo_open = u
 
-    u = freefile()
+10 format('ERROR: Failed to open topology file ', a)
 
-    open(unit = u, file=filename, status='old',form='formatted', &
-         action='read', iostat = stat_out)
-    if(stat_out /= 0) then
-       write(*,10) trim(filename)
-       topo_open = 0
-       return
-    end if
+end function topo_open
 
-    topo_open = u
 
-10  format('ERROR: Failed to open topology file ', a)
-
-  end function topo_open
-
-!------------------------------------------------------------------------------
 logical function topo_read(u, require_version, extrabonds)
+!!-------------------------------------------------------------------------------
+!!  **function topo_read**
+!!
+!!-------------------------------------------------------------------------------
   ! arguments
-  integer                      :: u
-  real, intent(in)             :: require_version
-  integer, optional,intent(in) :: extrabonds
+  integer                          :: u
+  real, intent(in)                 :: require_version
+  integer, optional,intent(in)     :: extrabonds
 
   ! local variables
-  integer                      :: rd
-  integer                      :: nat3, nwat
-  integer                      :: i,j,k,n, si
-  integer                      :: nhyds
-  integer                      :: paths
-  character(len=256)           :: line, restofline
-  character(len=10)            :: key, boundary_type !PWadded
-  integer                      :: filestat
-  integer(1), allocatable      :: temp_list(:,:)
-  integer                      :: extra
-  real(8)                      :: deprecated
+  integer                          :: rd
+  integer                          :: nat3, nwat
+  integer                          :: i,j,k,n, si
+  integer                          :: nhyds
+  integer                          :: paths
+  character(len=256)               :: line, restofline
+  character(len=10)                :: key, boundary_type !PWadded
+  integer                          :: filestat
+  integer(1), allocatable          :: temp_list(:,:)
+  integer                          :: extra
+  real(8)                          :: deprecated
 
   topo_read = .false.
   ! get rid of old topology
@@ -988,7 +1024,7 @@ logical function topo_read(u, require_version, extrabonds)
 
     read(unit=u, fmt=*, err=1000) solvent_type
 
-    !******PWadded input reading 2001-10-10
+    !******Petra W added input reading 2001-10-10
     read (u, '(a)', err=1000) line
     read(line, *, err=1000) boundary_type
     if(boundary_type == 'PBC') then
@@ -1042,312 +1078,317 @@ logical function topo_read(u, require_version, extrabonds)
 1101 format('>>>>> ERROR: Incompatible topology version ',f5.2, &
          ' found. Version >= ',f5.2,' required.')
     return
-  end function topo_read
-
-  !----------------------------------------------------------------------
-  subroutine topo_save(name)
-    !arguments
-    character(*)                            :: name
-
-    !locals
-    integer                                         :: i, j, u, ig, si
-    integer(1), allocatable         :: temp_list(:,:)
-    real                        :: crgtot
-
-10  format(a, t29,': ')
-20  format(i6)
-30  format(f6.2)
-    u = freefile() !get an unused unit number
-    open(unit=u, file=name, status='unknown', form='formatted', &
-         action='write', err = 100)
-    call centered_heading('Writing topology file', '-')
-    !---  HEADER
-2   format(a,t12,a)
-4   format(a,t12,i1)
-
-    write(u, '(a)') 'Q topology file'
-    if(title > '') write(u, 2) 'TITLE', trim(title)
-    write(u, 2) 'DATE', trim(creation_date)
-    write(u, '(a,t12,f5.2)') 'VERSION', MODULE_VERSION
-    if(pdb_file > '') write(u, 2) 'PDB_FILE', trim(pdb_file)
-    if(lib_files > '') write(u, 2) 'LIB_FILES', trim(lib_files)
-    if(forcefield > '') write(u,2) 'FORCEFIELD', trim(forcefield)
-    write(u, 4) 'FF_TYPE', ff_type
-    write(u, 2) 'PRM_FILE', trim(prm_file)
-    write(u, 2) 'END', 'of header'
-
-    write(*, 10, advance='no') 'solute atoms'
-    write(*, 20) nat_solute
-    write(*, 10, advance='no') 'solvent atoms'
-    write(*, 20) nat_pro-nat_solute
-
-    ! --- NAT_PRO / COORDINATES
-    write(*, 10, advance='no') 'coordinates'
-    write(u, '(2i8,a)') nat_pro, nat_solute, &
-         ' = Total no. of atoms, no. of solute atoms. Coordinates: (2*3 per line)'
-    if(nat_pro > 0) write(u, '(2(3(f9.3,1x),1x))') ( xtop(si), si = 1,3*nat_pro )
-    write(*, 20) 3*nat_pro
-
-    ! --- INTEGER ATOM CODES
-    write(*, 10, advance='no') 'integer atom codes'
-    write(u, '(i8,a)') nat_pro, ' = No. of integer atom codes. iac''s: '
-    if(nat_pro > 0) write(u, '(16(i4,1x))') iac(1:nat_pro)
-    write(*, 20) nat_pro
-
-    ! --- BONDS
-    write(*, 10, advance='no') 'solute bonds'
-    write(u, '(2i8,a)') nbonds, nbonds_solute, &
-         ' = No. of bonds, no. of solute bonds. i - j - icode: (5 per line)'
-    if(nbonds>0) write(u, '(5(i5,1x,i5,1x,i3,1x))') ( bnd(si), si = 1,nbonds ) 
-    write(*, 20) nbonds_solute
-    write(*, 10, advance='no') 'solvent bonds'
-    write(*, 20) nbonds-nbonds_solute
-
-    write(*, 10, advance='no') 'bond parameters'
-    write(u, '(i8,a)') nbndcod, ' = No. of bond codes. Parameters: '
-    DO i = 1, nbndcod
-       write(u, '(i5,f9.3,1x,f10.4,1x,a2)') i, bondlib(i), SYBYL_bond_type(i)
-    enddo
-    write(*, 20) nbndcod
-    ! --- ANGLES
-    write(*, 10, advance='no') 'solute angles'
-    write(u, '(2i8,a)') nangles, nangles_solute, &
-         ' = No. of angles, no. of solute angles. i - j - k - icode: (3 per line)'
-    if(nangles>0) write(u, '(3(i5,1x,i5,1x,i5,1x,i3,1x))') ( ang(si), si = 1,nangles )
-    write(*, 20) nangles_solute
-    write(*, 10, advance='no') 'solvent angles'
-    write(*, 20) nangles-nangles_solute
-
-    write(*, 10, advance='no') 'angle parameters'
-    write(u, '(i8,a)') nangcod, ' = No. of angle codes. Parameters:'
-    DO i = 1, nangcod
-       write(u, '(i5,f9.3,1x,f9.3,1x,f9.3,1x,f11.5)') i, anglib(i)
-    enddo
-    write(*, 20) nangcod
-
-    ! --- TORSIONS
-    write(*, 10, advance='no') 'torsions'
-    write(u, '(2i8,a)') ntors, ntors_solute, &
-         ' = No. of torsions, solute torsions. i - j - k - l - icode: (2 per line)'
-    if(ntors>0) write(u, '(2(4(i5,1x),i3,1x))') (tor(si), si = 1,ntors)
+end function topo_read
 
 
+subroutine topo_save(name)
+!!-------------------------------------------------------------------------------
+!!  **subroutine topo_save**
+!!
+!!-------------------------------------------------------------------------------
+  !arguments
+  character(*)                     :: name
 
-    write(*, 20) ntors
+  !locals
+  integer                          :: i, j, u, ig, si
+  integer(1), allocatable          :: temp_list(:,:)
+  real                             :: crgtot
 
-    write(*, 10, advance='no') 'torsion parameters'
-    write(u, '(i8,a)') ntorcod, ' = No. of torsion codes. Parameters:'
-    DO i = 1, ntorcod
-       !%paths is a real but we write it as an integer for compatibility
-       write(u, '(i5,3(f9.3,1x),i5 )') i, &
-            torlib(i)%fk , torlib(i)%rmult, torlib(i)%deltor, int(torlib(i)%paths)
-    enddo
-    write(*, 20) ntorcod
+10 format(a, t29,': ')
+20 format(i6)
+30 format(f6.2)
+  u = freefile() !get an unused unit number
+  open(unit=u, file=name, status='unknown', form='formatted', &
+    action='write', err = 100)
+  call centered_heading('Writing topology file', '-')
 
-    ! --- IMPROPERS
-    write(*, 10, advance='no') 'impropers'
-    write(u, '(2i8,a)') nimps, nimps_solute, &
-         ' = No. of impropers, solute impr. i - j - k - l - icode: (2 per line)'
-    if(nimps>0) write(u, '(2(4(i5,1x),i3,1x))') imp(1:nimps)
-    write(*, 20) nimps
+  !---  HEADER
+2 format(a,t12,a)
+4 format(a,t12,i1)
 
-    write(*, 10, advance='no') 'improper parameters'
-    write(u, '(2i8,a)') nimpcod, imp_type, &
-         ' = No. of improper codes, type (1=harmonic,2=periodic). Parameters:'
-    DO i = 1, nimpcod
-       write(u, '(i5,f10.3,1x,f10.3)') i, implib(i)
-    enddo
-    write(*, 20) nimpcod
+  write(u, '(a)') 'Q topology file'
+  if(title > '') write(u, 2) 'TITLE', trim(title)
+  write(u, 2) 'DATE', trim(creation_date)
+  write(u, '(a,t12,f5.2)') 'VERSION', MODULE_VERSION
+  if(pdb_file > '') write(u, 2) 'PDB_FILE', trim(pdb_file)
+  if(lib_files > '') write(u, 2) 'LIB_FILES', trim(lib_files)
+  if(forcefield > '') write(u,2) 'FORCEFIELD', trim(forcefield)
+  write(u, 4) 'FF_TYPE', ff_type
+  write(u, 2) 'PRM_FILE', trim(prm_file)
+  write(u, 2) 'END', 'of header'
 
-    ! --- CHARGES
-    write(*, 10, advance='no') 'charges'
-    write(u, '(i8,a)') nat_pro, ' = No. of atomic charges'
-    if(nat_pro >0) write(u, '(10(f7.4,1x))') crg(1:nat_pro)
-    write(*, 20) nat_pro
+  write(*, 10, advance='no') 'solute atoms'
+  write(*, 20) nat_solute
+  write(*, 10, advance='no') 'solvent atoms'
+  write(*, 20) nat_pro-nat_solute
 
-    crgtot = 0.0
-    if (use_PBC) then
-       do i = 1, nat_solute
-          crgtot = crgtot + crg(i)
-       end do
-       write(*, 10, advance='no') 'total charge of system'
-    else
-       do i = 1, nat_solute
-          if (.not. excl(i)) crgtot = crgtot + crg(i)
-       end do
-       write(*, 10, advance='no') 'total charge of not excluded'
-    end if
-    write (*, 30) crgtot
+  ! --- NAT_PRO / COORDINATES
+  write(*, 10, advance='no') 'coordinates'
+  write(u, '(2i8,a)') nat_pro, nat_solute, &
+    ' = Total no. of atoms, no. of solute atoms. Coordinates: (2*3 per line)'
+  if(nat_pro > 0) write(u, '(2(3(f9.3,1x),1x))') ( xtop(si), si = 1,3*nat_pro )
+  write(*, 20) 3*nat_pro
 
-    ! --- CHARGE GROUPS
-    write(*, 10, advance='no') 'charge groups'
-    write(u, '(3i8,a)') ncgp, ncgp_solute, iuse_switch_atom, &
-         ' = No. of charge groups, no of solvent cgps, switch atoms flag. nat_cgp, iswitch / atom list: '
-    DO ig = 1, ncgp
-       write(u, '(i5,1x,i5)') cgp(ig)%last - cgp(ig)%first + 1, cgp(ig)%iswitch
-       write(u, '(13(i5,1x))') cgpatom(cgp(ig)%first : cgp(ig)%last)
-    enddo
-    write(*, 20) ncgp
+  ! --- INTEGER ATOM CODES
+  write(*, 10, advance='no') 'integer atom codes'
+  write(u, '(i8,a)') nat_pro, ' = No. of integer atom codes. iac''s: '
+  if(nat_pro > 0) write(u, '(16(i4,1x))') iac(1:nat_pro)
+  write(*, 20) nat_pro
 
-    ! --- ATOM TYPES
-    write(*, 10, advance='no') 'atom type parameters'
-    write(u, '(i8,a)') max_atyps, ' = No. of atom types'
-    write(u, '(i8,a)') ivdw_rule, &
-         ' = vdW combination rule (1 = Geom. / 2 = Arit.)'
-    write(u, '(f8.5,f9.4,a)') el14_scale, coulomb_constant, &
-         ' = Electrostatic 1-4 scaling factor and  Coulomb constant'
+  ! --- BONDS
+  write(*, 10, advance='no') 'solute bonds'
+  write(u, '(2i8,a)') nbonds, nbonds_solute, &
+    ' = No. of bonds, no. of solute bonds. i - j - icode: (5 per line)'
+  if(nbonds>0) write(u, '(5(i5,1x,i5,1x,i3,1x))') ( bnd(si), si = 1,nbonds )
+  write(*, 20) nbonds_solute
+  write(*, 10, advance='no') 'solvent bonds'
+  write(*, 20) nbonds-nbonds_solute
 
-    write(u, '(a)') 'Masses: '
-    write(u, '(10(f7.3,1x))') (iaclib(i)%mass, i=1, max_atyps)
-    IF(ivdw_rule==VDW_GEOMETRIC) then
-       write(u, '(a)') 'sqrt (Aii) normal:'
-       write(u, '(8(f8.2,1x))') (iaclib(i)%avdw(1), i=1, max_atyps)
-       write(u, '(a)') 'sqrt (Bii) normal:'
-       write(u, '(8(f8.2,1x))') (iaclib(i)%bvdw(1), i=1, max_atyps)
-       write(u, '(a)') 'sqrt (Aii) polar:'
-       write(u, '(8(f8.2,1x))') (iaclib(i)%avdw(2), i=1, max_atyps)
-       write(u, '(a)') 'sqrt (Bii) polar:'
-       write(u, '(8(f8.2,1x))') (iaclib(i)%bvdw(2), i=1, max_atyps)
-       write(u, '(a)') 'sqrt (Aii) 1-4:'
-       write(u, '(8(f8.2,1x))') (iaclib(i)%avdw(3), i=1, max_atyps)
-       write(u, '(a)') 'sqrt (Bii) 1-4:'
-       write(u, '(8(f8.2,1x))') (iaclib(i)%bvdw(3), i=1, max_atyps)
-    elseif(ivdw_rule==VDW_ARITHMETIC) then
-       write(u, '(a)') 'R* normal:'
-       write(u, '(8(f7.4,1x))') (iaclib(i)%avdw(1), i=1, max_atyps)
-       write(u, '(a)') 'epsilon normal:'
-       write(u, '(8(f10.7,1x))') (iaclib(i)%bvdw(1), i=1, max_atyps)
-       write(u, '(a)') 'R* polar:'
-       write(u, '(8(f8.4,1x))') (iaclib(i)%avdw(2), i=1, max_atyps)
-       write(u, '(a)') 'epsilon polar:'
-       write(u, '(8(f10.7,1x))') (iaclib(i)%bvdw(2), i=1, max_atyps)
-       write(u, '(a)') 'R* 1-4:'
-       write(u, '(8(f8.4,1x))') (iaclib(i)%avdw(3), i=1, max_atyps)
-       write(u, '(a)') 'epsilon 1-4:'
-       write(u, '(8(f10.7,1x))') (iaclib(i)%bvdw(3), i=1, max_atyps)
-    ENDIF
-    write(*, 20) max_atyps
+  write(*, 10, advance='no') 'bond parameters'
+  write(u, '(i8,a)') nbndcod, ' = No. of bond codes. Parameters: '
+  DO i = 1, nbndcod
+    write(u, '(i5,f9.3,1x,f10.4,1x,a2)') i, bondlib(i), SYBYL_bond_type(i)
+  enddo
+  write(*, 20) nbndcod
 
-    write(*, 10, advance='no') 'polar LJ pairs'
-    write(u, '(i8,a)') nlj2, ' = No. of type-2 vdW interactions. pairs: '
-    DO i = 1, nlj2
-       write(u, '(i4,1x,i4)') lj2(i)
-    enddo
-    write(*, 20) nlj2
+  ! --- ANGLES
+  write(*, 10, advance='no') 'solute angles'
+  write(u, '(2i8,a)') nangles, nangles_solute, &
+    ' = No. of angles, no. of solute angles. i - j - k - icode: (3 per line)'
+  if(nangles>0) write(u, '(3(i5,1x,i5,1x,i5,1x,i3,1x))') ( ang(si), si = 1,nangles )
+  write(*, 20) nangles_solute
+  write(*, 10, advance='no') 'solvent angles'
+  write(*, 20) nangles-nangles_solute
 
-    ! --- 1-4 NEIGHBOUR LIST
+  write(*, 10, advance='no') 'angle parameters'
+  write(u, '(i8,a)') nangcod, ' = No. of angle codes. Parameters:'
+  DO i = 1, nangcod
+    write(u, '(i5,f9.3,1x,f9.3,1x,f9.3,1x,f11.5)') i, anglib(i)
+  enddo
+  write(*, 20) nangcod
 
-    write(*, 10, advance='no') 'neighbour list'
-    write(u, '(i8,a)') n14nbrs, ' = No. of 1-4 neighbours. nborlist (range=max_nbr_range): '
+  ! --- TORSIONS
+  write(*, 10, advance='no') 'torsions'
+  write(u, '(2i8,a)') ntors, ntors_solute, &
+    ' = No. of torsions, solute torsions. i - j - k - l - icode: (2 per line)'
+  if(ntors>0) write(u, '(2(4(i5,1x),i3,1x))') (tor(si), si = 1,ntors)
 
-    ! work-around to preserve file format
-    !       write(u, '(80i1)') list14(1:max_nbr_range, 1:nat_solute) 
-    allocate(temp_list(max_nbr_range,nat_solute), stat=alloc_status)
-    call topo_check_alloc('temporary neighbor list')
-    temp_list(:,:) = 0
-    do j=1,nat_solute
-       do i=1,max_nbr_range
-          if (list14(i,j)) temp_list(i,j) = 1
-       end do
+  write(*, 20) ntors
+
+  write(*, 10, advance='no') 'torsion parameters'
+  write(u, '(i8,a)') ntorcod, ' = No. of torsion codes. Parameters:'
+  DO i = 1, ntorcod
+    !%paths is a real but we write it as an integer for compatibility
+    write(u, '(i5,3(f9.3,1x),i5 )') i, &
+      torlib(i)%fk , torlib(i)%rmult, torlib(i)%deltor, int(torlib(i)%paths)
+  enddo
+  write(*, 20) ntorcod
+
+  ! --- IMPROPERS
+  write(*, 10, advance='no') 'impropers'
+  write(u, '(2i8,a)') nimps, nimps_solute, &
+    ' = No. of impropers, solute impr. i - j - k - l - icode: (2 per line)'
+  if(nimps>0) write(u, '(2(4(i5,1x),i3,1x))') imp(1:nimps)
+  write(*, 20) nimps
+
+  write(*, 10, advance='no') 'improper parameters'
+  write(u, '(2i8,a)') nimpcod, imp_type, &
+    ' = No. of improper codes, type (1=harmonic,2=periodic). Parameters:'
+  DO i = 1, nimpcod
+    write(u, '(i5,f10.3,1x,f10.3)') i, implib(i)
+  enddo
+  write(*, 20) nimpcod
+
+  ! --- CHARGES
+  write(*, 10, advance='no') 'charges'
+  write(u, '(i8,a)') nat_pro, ' = No. of atomic charges'
+  if(nat_pro >0) write(u, '(10(f7.4,1x))') crg(1:nat_pro)
+  write(*, 20) nat_pro
+
+  crgtot = 0.0
+  if (use_PBC) then
+    do i = 1, nat_solute
+      crgtot = crgtot + crg(i)
     end do
-    if(nat_solute > 0) write(u, '(80i1)') temp_list(1:max_nbr_range, 1:nat_solute) 
-
-    write(*, 20) n14nbrs
-    write(*, 10, advance='no') 'long-range neighbour list'
-    write(u, '(i8,a)') n14long, &
-         ' = No. of long 1-4 nbrs (>max_nbr_range). pairlist: '
-    DO i = 1, n14long
-       write(u, '(i5,1x,i5)') list14long(1:2, i)
-    enddo
-    write(*, 20) n14long
-
-    ! --- EXCLUSION NEIGHBOUR LIST
-    write(*, 10, advance='no') 'neighbour exclusion list'
-    write(u, '(i8,a)') nexnbrs, &
-         ' = No. of exclusions. exclusion list (range=max_nbr_range): '
-
-    ! work-around to preserve file format
-    !       write(u, '(80i1)') listex(1:max_nbr_range, 1:nat_solute)
-    temp_list(:,:) = 0
-    do j=1,nat_solute
-       do i=1,max_nbr_range
-          if (listex(i,j)) temp_list(i,j) = 1
-       end do
+    write(*, 10, advance='no') 'total charge of system'
+  else
+    do i = 1, nat_solute
+      if (.not. excl(i)) crgtot = crgtot + crg(i)
     end do
-    if(nat_solute > 0) write(u, '(80i1)') temp_list(1:max_nbr_range, 1:nat_solute) 
-    deallocate(temp_list)
+    write(*, 10, advance='no') 'total charge of not excluded'
+  end if
+  write (*, 30) crgtot
 
-    write(*, 20) nexnbrs
-    write(*, 10, advance='no') 'long-range exclusions'
-    write(u, '(i8,a)') nexlong, &
-         ' = No. of long exclusions (>max_nbr_range). pairlist: '
-    if(nexlong > 0) write(u, '(i5,1x,i5)') listexlong(1:2, 1:nexlong) 
-    write(*, 20) nexlong
+  ! --- CHARGE GROUPS
+  write(*, 10, advance='no') 'charge groups'
+  write(u, '(3i8,a)') ncgp, ncgp_solute, iuse_switch_atom, &
+    ' = No. of charge groups, no of solvent cgps, switch atoms flag. nat_cgp, iswitch / atom list: '
+  DO ig = 1, ncgp
+    write(u, '(i5,1x,i5)') cgp(ig)%last - cgp(ig)%first + 1, cgp(ig)%iswitch
+    write(u, '(13(i5,1x))') cgpatom(cgp(ig)%first : cgp(ig)%last)
+  enddo
+  write(*, 20) ncgp
 
-    ! --- RESIDUE/MOLECULE BOOKKEEPING
-    write(*, 10, advance='no') 'residues'
-    if(nres_solute < nres) then
-       write(u, '(2i8,a)') nres, nres_solute, ' = No. of residues, No of solute residues. start atoms: '
-    else
-       write(u, '(i8,a)') nres, ' = No. of residues. start atoms: '
-    end if
-    if(nres > 0) write(u, '(13(i5,1x))') res(1:nres)%start
+  ! --- ATOM TYPES
+  write(*, 10, advance='no') 'atom type parameters'
+  write(u, '(i8,a)') max_atyps, ' = No. of atom types'
+  write(u, '(i8,a)') ivdw_rule, &
+    ' = vdW combination rule (1 = Geom. / 2 = Arit.)'
+  write(u, '(f8.5,f9.4,a)') el14_scale, coulomb_constant, &
+    ' = Electrostatic 1-4 scaling factor and  Coulomb constant'
 
-    write(u, '(a)') 'Sequence: '
-    if(nres > 0) write(u, '(16(a4,1x))') res(1:nres)%name
-    write(*, 20) nres
+  write(u, '(a)') 'Masses: '
+  write(u, '(10(f7.3,1x))') (iaclib(i)%mass, i=1, max_atyps)
+  IF(ivdw_rule==VDW_GEOMETRIC) then
+    write(u, '(a)') 'sqrt (Aii) normal:'
+    write(u, '(8(f8.2,1x))') (iaclib(i)%avdw(1), i=1, max_atyps)
+    write(u, '(a)') 'sqrt (Bii) normal:'
+    write(u, '(8(f8.2,1x))') (iaclib(i)%bvdw(1), i=1, max_atyps)
+    write(u, '(a)') 'sqrt (Aii) polar:'
+    write(u, '(8(f8.2,1x))') (iaclib(i)%avdw(2), i=1, max_atyps)
+    write(u, '(a)') 'sqrt (Bii) polar:'
+    write(u, '(8(f8.2,1x))') (iaclib(i)%bvdw(2), i=1, max_atyps)
+    write(u, '(a)') 'sqrt (Aii) 1-4:'
+    write(u, '(8(f8.2,1x))') (iaclib(i)%avdw(3), i=1, max_atyps)
+    write(u, '(a)') 'sqrt (Bii) 1-4:'
+    write(u, '(8(f8.2,1x))') (iaclib(i)%bvdw(3), i=1, max_atyps)
+  elseif(ivdw_rule==VDW_ARITHMETIC) then
+    write(u, '(a)') 'R* normal:'
+    write(u, '(8(f7.4,1x))') (iaclib(i)%avdw(1), i=1, max_atyps)
+    write(u, '(a)') 'epsilon normal:'
+    write(u, '(8(f10.7,1x))') (iaclib(i)%bvdw(1), i=1, max_atyps)
+    write(u, '(a)') 'R* polar:'
+    write(u, '(8(f8.4,1x))') (iaclib(i)%avdw(2), i=1, max_atyps)
+    write(u, '(a)') 'epsilon polar:'
+    write(u, '(8(f10.7,1x))') (iaclib(i)%bvdw(2), i=1, max_atyps)
+    write(u, '(a)') 'R* 1-4:'
+    write(u, '(8(f8.4,1x))') (iaclib(i)%avdw(3), i=1, max_atyps)
+    write(u, '(a)') 'epsilon 1-4:'
+    write(u, '(8(f10.7,1x))') (iaclib(i)%bvdw(3), i=1, max_atyps)
+  ENDIF
+  write(*, 20) max_atyps
 
-    write(*, 10, advance='no') 'molecules'
-    write(u, '(i8,a)') nmol, &
-         ' = No. of separate molecules. start atoms:'
-    if(nmol > 0) write(u, '(13(i5,1x))') istart_mol(1:nmol)
-    write(*, 20) nmol
-
-    write(*, 10, advance='no') 'Atom type names'
-    write(u, '(i8,a)') max_atyps, &
-         ' = No. of atom types:'
-    if(max_atyps > 0) write(u, '(8(a8,1x))') tac(1:max_atyps)
-    write(*, 20) max_atyps
-
-    write(*, 10, advance='no') 'SYBYL type information'
-    write(u, '(i8,a)') max_atyps, &
-         ' = No. of SYBYL atom types:'
-    if(max_atyps > 0) write(u, '(13(a5,1x))') SYBYL_atom_type(1:max_atyps)
-    write(*, 20) max_atyps
-
-    !solvent type & atom types
-    write(u, '(i8,a)') solvent_type, &
-         ' = solvent type (0=SPC,1=3-atom,2=general)'
-
-    !boundary
-    !******PWedited this part
-    if( use_PBC ) then !use periodic box
-       write(u,'(a8,a)') 'PBC', ' = kind of boundary'
-       !PBC-parameters
-       write(u,'(3f8.3, a)') boxlength(:), ' = Size of box, x y z'
-       write(u,'(3f8.3, a)') boxcenter(:), ' = Center coordinate of box'
-    else !use simulation sphere
-       !radii & centers
-       write(u, '(2f8.3,a)') rexcl_o, rwat, &
-            ' = Exclusion, solvent radii'
-       write(u, '(3f8.3,a)') xpcent(:), ' = Solute center'
-       write(u, '(3f8.3,a)') xwcent(:), ' = Solvent center'
-       !exluded atoms
-       write(*, 10, advance='no') 'excluded atom list'
-       write(u, '(2i8,a)') nexats, nexwat, &
-            ' = No. of excluded atoms (incl. water), no. of excluded waters'
-       write(u, fmt='(80l1)') excl(1:nat_pro)
-       write(*, 20) nexats
-    end if
+  write(*, 10, advance='no') 'polar LJ pairs'
+  write(u, '(i8,a)') nlj2, ' = No. of type-2 vdW interactions. pairs: '
+  DO i = 1, nlj2
+    write(u, '(i4,1x,i4)') lj2(i)
+  enddo
+  write(*, 20) nlj2
 
 
-    close(u)
-    write(*,*)
-    return
+  ! --- 1-4 NEIGHBOUR LIST
+  write(*, 10, advance='no') 'neighbour list'
+  write(u, '(i8,a)') n14nbrs, ' = No. of 1-4 neighbours. nborlist (range=max_nbr_range): '
 
+  ! work-around to preserve file format
+  !       write(u, '(80i1)') list14(1:max_nbr_range, 1:nat_solute)
+  allocate(temp_list(max_nbr_range,nat_solute), stat=alloc_status)
+  call topo_check_alloc('temporary neighbor list')
+  temp_list(:,:) = 0
+  do j=1,nat_solute
+    do i=1,max_nbr_range
+      if (list14(i,j)) temp_list(i,j) = 1
+    end do
+  end do
+  if(nat_solute > 0) write(u, '(80i1)') temp_list(1:max_nbr_range, 1:nat_solute)
+
+  write(*, 20) n14nbrs
+  write(*, 10, advance='no') 'long-range neighbour list'
+  write(u, '(i8,a)') n14long, &
+    ' = No. of long 1-4 nbrs (>max_nbr_range). pairlist: '
+  DO i = 1, n14long
+    write(u, '(i5,1x,i5)') list14long(1:2, i)
+  enddo
+  write(*, 20) n14long
+
+
+  ! --- EXCLUSION NEIGHBOUR LIST
+  write(*, 10, advance='no') 'neighbour exclusion list'
+  write(u, '(i8,a)') nexnbrs, &
+    ' = No. of exclusions. exclusion list (range=max_nbr_range): '
+
+  ! work-around to preserve file format
+  !       write(u, '(80i1)') listex(1:max_nbr_range, 1:nat_solute)
+  temp_list(:,:) = 0
+  do j=1,nat_solute
+    do i=1,max_nbr_range
+      if (listex(i,j)) temp_list(i,j) = 1
+    end do
+  end do
+  if(nat_solute > 0) write(u, '(80i1)') temp_list(1:max_nbr_range, 1:nat_solute)
+  deallocate(temp_list)
+
+  write(*, 20) nexnbrs
+  write(*, 10, advance='no') 'long-range exclusions'
+  write(u, '(i8,a)') nexlong, &
+    ' = No. of long exclusions (>max_nbr_range). pairlist: '
+  if(nexlong > 0) write(u, '(i5,1x,i5)') listexlong(1:2, 1:nexlong)
+  write(*, 20) nexlong
+
+
+  ! --- RESIDUE/MOLECULE BOOKKEEPING
+  write(*, 10, advance='no') 'residues'
+  if(nres_solute < nres) then
+    write(u, '(2i8,a)') nres, nres_solute, ' = No. of residues, No of solute residues. start atoms: '
+  else
+    write(u, '(i8,a)') nres, ' = No. of residues. start atoms: '
+  end if
+  if(nres > 0) write(u, '(13(i5,1x))') res(1:nres)%start
+
+  write(u, '(a)') 'Sequence: '
+  if(nres > 0) write(u, '(16(a4,1x))') res(1:nres)%name
+  write(*, 20) nres
+
+  write(*, 10, advance='no') 'molecules'
+  write(u, '(i8,a)') nmol, &
+    ' = No. of separate molecules. start atoms:'
+  if(nmol > 0) write(u, '(13(i5,1x))') istart_mol(1:nmol)
+  write(*, 20) nmol
+
+  write(*, 10, advance='no') 'Atom type names'
+  write(u, '(i8,a)') max_atyps, &
+    ' = No. of atom types:'
+  if(max_atyps > 0) write(u, '(8(a8,1x))') tac(1:max_atyps)
+  write(*, 20) max_atyps
+
+  write(*, 10, advance='no') 'SYBYL type information'
+  write(u, '(i8,a)') max_atyps, &
+    ' = No. of SYBYL atom types:'
+  if(max_atyps > 0) write(u, '(13(a5,1x))') SYBYL_atom_type(1:max_atyps)
+  write(*, 20) max_atyps
+
+  !solvent type & atom types
+  write(u, '(i8,a)') solvent_type, &
+    ' = solvent type (0=SPC,1=3-atom,2=general)'
+
+  !boundary
+  !******Petra W edited this part
+  if( use_PBC ) then !use periodic box
+    write(u,'(a8,a)') 'PBC', ' = kind of boundary'
+    !PBC-parameters
+    write(u,'(3f8.3, a)') boxlength(:), ' = Size of box, x y z'
+    write(u,'(3f8.3, a)') boxcenter(:), ' = Center coordinate of box'
+  else !use simulation sphere
+    !radii & centers
+    write(u, '(2f8.3,a)') rexcl_o, rwat, &
+      ' = Exclusion, solvent radii'
+    write(u, '(3f8.3,a)') xpcent(:), ' = Solute center'
+    write(u, '(3f8.3,a)') xwcent(:), ' = Solvent center'
+    !exluded atoms
+    write(*, 10, advance='no') 'excluded atom list'
+    write(u, '(2i8,a)') nexats, nexwat, &
+      ' = No. of excluded atoms (incl. water), no. of excluded waters'
+    write(u, fmt='(80l1)') excl(1:nat_pro)
+    write(*, 20) nexats
+  end if
+
+
+  close(u)
+  write(*,*)
+  return
 100 write(*,*) 'ERROR: Failed to open topology file ', trim(name)
-  end subroutine topo_save
 
-  !----------------------------------------------------------------------
+end subroutine topo_save
+
 
 end module topo

@@ -10,7 +10,7 @@
 
 module prep
 !!------------------------------------------------------------------------------
-!!  **module: prep.f90**
+!!  **module prep.f90**
 !!  by Johan Aqvist & John Marelius
 !!  topology preparation, solvation, validation and PDB I/O
 !!
@@ -209,7 +209,7 @@ contains
 
 subroutine prep_startup
 !!------------------------------------------------------------------------------
-!!  **subroutine: prep_startup**
+!!  **subroutine prep_startup**
 !!
 !!------------------------------------------------------------------------------
   logical                         :: l
@@ -240,7 +240,7 @@ end subroutine prep_startup
 
 subroutine allocate_for_pdb(atoms, residues, molecules)
 !!------------------------------------------------------------------------------
-!!  **subroutine: allocate_for_pdb**
+!!  **subroutine allocate_for_pdb**
 !!
 !!------------------------------------------------------------------------------
   !arguments
@@ -259,7 +259,7 @@ end subroutine allocate_for_pdb
 
 subroutine prep_shutdown
 !!------------------------------------------------------------------------------  
-!!  **subroutine: prep_shutdown**  
+!!  **subroutine prep_shutdown**
 !!  
 !!------------------------------------------------------------------------------    
   call topo_deallocate
@@ -271,7 +271,7 @@ end subroutine prep_shutdown
 
 subroutine clearlib
 !!------------------------------------------------------------------------------  
-!!  **subroutine: clearlib**  
+!!  **subroutine clearlib**
 !!  
 !!------------------------------------------------------------------------------    
   lib_files = ''
@@ -281,7 +281,7 @@ end subroutine clearlib
 
 subroutine check_alloc(message)
 !!------------------------------------------------------------------------------  
-!!  **subroutine: check_alloc**  
+!!  **subroutine check_alloc**
 !!  
 !!------------------------------------------------------------------------------  
 !arguments
@@ -297,7 +297,7 @@ end subroutine check_alloc
 
 subroutine addbond
 !!------------------------------------------------------------------------------  
-!!  **subroutine: addbond**  
+!!  **subroutine addbond**
 !!  
 !!------------------------------------------------------------------------------    
   ! *** local variables
@@ -373,7 +373,7 @@ end subroutine addbond
 
 subroutine clearbond
 !!------------------------------------------------------------------------------  
-!!  **subroutine: clearbond**  
+!!  **subroutine clearbond**
 !!  
 !!------------------------------------------------------------------------------    
   !clear extra bonds
@@ -383,7 +383,7 @@ end subroutine clearbond
 
 subroutine angle_ene(emax, nlarge, av_ene)
 !!------------------------------------------------------------------------------  
-!!  **subroutine: angle_ene**  
+!!  **subroutine angle_ene**
 !!  
 !!------------------------------------------------------------------------------  
 ! *** local variables
@@ -443,7 +443,7 @@ end subroutine angle_ene
 
 integer function anglecode(taci, tacj, tack)
 !!------------------------------------------------------------------------------
-!!  function: anglecode
+!!  function anglecode
 !!
 !!------------------------------------------------------------------------------  
 !arguments
@@ -478,7 +478,7 @@ end function anglecode
 
 subroutine bond_ene(emax, nlarge, av_ene)
 !!-------------------------------------------------------------------------------
-!! subroutine: bond_ene
+!! subroutine bond_ene
 !!
 !!-------------------------------------------------------------------------------  
   ! *** local variables
@@ -523,7 +523,7 @@ end subroutine bond_ene
 
 character(keylength) function wildcard_tac(taci)
 !!-------------------------------------------------------------------------------  
-!! **function: wildcard_tac**  
+!! **function wildcard_tac**
 !!
 !!-------------------------------------------------------------------------------  
 !arguments
@@ -542,7 +542,7 @@ end function wildcard_tac
 
 integer function bondcode(taci, tacj)
 !!------------------------------------------------------------------------------
-!!  **function: bondcode**
+!!  **function bondcode**
 !!
 !!------------------------------------------------------------------------------
   !arguments
@@ -575,7 +575,7 @@ end function bondcode
 
 subroutine changeimp
 !!-------------------------------------------------------------------------------
-!! subroutine: changeimp
+!! subroutine changeimp
 !!
 !!-------------------------------------------------------------------------------  
   ! *** local variables
@@ -618,7 +618,7 @@ end subroutine changeimp
 
 subroutine checkangs
 !-------------------------------------------------------------------------------
-!!  subroutine: checkangs
+!!  subroutine checkangs
 !
 !-------------------------------------------------------------------------------
   ! *** local variables
@@ -637,7 +637,7 @@ end subroutine checkangs
 
 subroutine checkbonds
 !-------------------------------------------------------------------------------
-!!  subroutine: checkbonds
+!!  subroutine checkbonds
 !
 !-------------------------------------------------------------------------------
   ! *** local variables
@@ -656,7 +656,7 @@ end subroutine checkbonds
 
 subroutine checkimps
 !-------------------------------------------------------------------------------
-!!  subroutine: checkimps
+!!  subroutine checkimps
 !
 !-------------------------------------------------------------------------------
   ! *** local variables
@@ -677,7 +677,7 @@ end subroutine checkimps
 
 subroutine checktors
 !-------------------------------------------------------------------------------
-!!  subroutine: checktors
+!!  subroutine checktors
 !
 !-------------------------------------------------------------------------------
   ! *** local variables
@@ -697,7 +697,7 @@ end subroutine checktors
 
 function cross_product(a, b)
 !-------------------------------------------------------------------------------
-!!  function: cross_product
+!!  function cross_product
 !
 !-------------------------------------------------------------------------------
   real(8) :: a(3), b(3), cross_product(3)
@@ -709,7 +709,7 @@ end function cross_product
 
 subroutine xlink
 !-------------------------------------------------------------------------------
-!!  subroutine: xlink
+!!  subroutine xlink
 !
 !-------------------------------------------------------------------------------
   !add cross-linking bonds like SS-bridges
@@ -791,7 +791,7 @@ end subroutine xlink
 
 integer function impcode(taci, tacj, tack, tacl)
 !!-------------------------------------------------------------------------------
-!!  function: impcode
+!!  function impcode
 !!
 !!-------------------------------------------------------------------------------
 !arguments
@@ -1112,7 +1112,7 @@ end function impcode
 
 subroutine impr_ene(emax, nlarge, av_ene, mode)
 !!-------------------------------------------------------------------------------
-!!  subroutine: impr_ene
+!!  subroutine impr_ene
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -1200,7 +1200,7 @@ end subroutine impr_ene
 
 subroutine listres
 !-------------------------------------------------------------------------------
-!!  subroutine: listres
+!!  subroutine listres
 !!  Shows the atom name and atom types corresponding to a residue number
 !-------------------------------------------------------------------------------
   ! *** local variables
@@ -1227,10 +1227,10 @@ end subroutine listres
 
 
 subroutine listseq
-!-------------------------------------------------------------------------------
-!!  subroutine: listseq
+!!-------------------------------------------------------------------------------
+!!  subroutine listseq
 !
-!-------------------------------------------------------------------------------
+!!-------------------------------------------------------------------------------
 ! *** local variables
   integer i
 
@@ -1243,7 +1243,7 @@ end subroutine listseq
 
 subroutine make14list
 !!-------------------------------------------------------------------------------
-!!  **subroutine: make14list**
+!!  **subroutine make14list**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -1304,7 +1304,7 @@ end subroutine make14list
 
 subroutine makeangles
 !!-------------------------------------------------------------------------------
-!!  **subroutine: makeangles**
+!!  **subroutine makeangles**
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -1415,7 +1415,7 @@ end subroutine makeangles
 
 subroutine make_solute_bonds
 !!-------------------------------------------------------------------------------
-!!  **subroutine: make_solute_bonds**
+!!  **subroutine make_solute_bonds**
 !!  make solute bond list
 !!  used only by xlink routine to make solute bond list to check new
 !!  bonds against
@@ -1441,7 +1441,7 @@ end subroutine make_solute_bonds
 
 subroutine makebonds
 !!-------------------------------------------------------------------------------
-!!  **subroutine: makebonds**
+!!  **subroutine makebonds**
 !!
 !!-------------------------------------------------------------------------------
   !locals
@@ -1472,7 +1472,7 @@ end subroutine makebonds
 
 integer function makeextrabonds()
 !!-------------------------------------------------------------------------------
-!!  **function: makeextrabonds**
+!!  **function makeextrabonds**
 !!
 !!-------------------------------------------------------------------------------
   !locals
@@ -1509,7 +1509,7 @@ end function makeextrabonds
 
 subroutine set_bondcodes
 !!-------------------------------------------------------------------------------
-!!  **subroutine: set_bondcodes**
+!!  **subroutine set_bondcodes**
 !!
 !!-------------------------------------------------------------------------------
 !locals
@@ -1554,7 +1554,7 @@ end subroutine set_bondcodes
 
 integer function makesomebonds(startres, endres)
 !!-------------------------------------------------------------------------------
-!!  **function: makesomebonds**
+!!  **function makesomebonds**
 !!
 !!-------------------------------------------------------------------------------
 !arguments
@@ -1604,7 +1604,7 @@ end function makesomebonds
 
 subroutine makeexlist
 !!-------------------------------------------------------------------------------
-!!  **subroutine: makeexlist**
+!!  **subroutine makeexlist**
 !!  Make a list of excluded neighbors
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -1677,7 +1677,7 @@ end subroutine makeexlist
 
 subroutine makehyds
 !!-------------------------------------------------------------------------------
-!!  **subroutine: makehyds**
+!!  **subroutine makehyds**
 !!  Most likely routine that creates hydrogens not present in input
 !!  structure but present in library definition.
 !!-------------------------------------------------------------------------------
@@ -1724,7 +1724,7 @@ end subroutine makehyds
 
 integer function genh(j, residue)
 !!-------------------------------------------------------------------------------
-!!  **subroutine: genh**
+!!  **subroutine genh**
 !!
 !!-------------------------------------------------------------------------------
   !arguments
@@ -1978,7 +1978,7 @@ end function genh
 
 subroutine makeimps
 !!-------------------------------------------------------------------------------
-!!  **subroutine: makeimps**
+!!  **subroutine makeimps**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2003,7 +2003,7 @@ end subroutine makeimps
 
 subroutine imp_params
 !!-------------------------------------------------------------------------------
-!!  **subroutine: imp_params**
+!!  **subroutine imp_params**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2055,7 +2055,7 @@ end subroutine imp_params
 
 integer function find_atom(ires, atom)
 !!-------------------------------------------------------------------------------
-!!  **function: find_atom**
+!!  **function find_atom**
 !!
 !!-------------------------------------------------------------------------------
   !arguments
@@ -2118,7 +2118,7 @@ end function find_atom
 
 subroutine makeimps_explicit
 !!-------------------------------------------------------------------------------
-!!  **subroutine: makeimps_explicit**
+!!  **subroutine makeimps_explicit**
 !!  generate impropers using definitions in library file
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2150,7 +2150,7 @@ end subroutine makeimps_explicit
 
 subroutine maketop
 !!-------------------------------------------------------------------------------
-!!  **subroutine: maketop**
+!!  **subroutine maketop**
 !!
 !!-------------------------------------------------------------------------------
   !check if library is loaded
@@ -2299,7 +2299,7 @@ end subroutine maketop
 
 subroutine set_default_mask
 !!-------------------------------------------------------------------------------
-!!  **subroutine: set_default_mask**
+!!  **subroutine set_default_mask**
 !!  make atom mask including all atoms
 !!-------------------------------------------------------------------------------
   !first get rid of old mask
@@ -2313,7 +2313,7 @@ end subroutine set_default_mask
 
 subroutine makeconn
 !!-------------------------------------------------------------------------------
-!!  **subroutine: makeconn**
+!!  **subroutine makeconn**
 !!  make connections to each atom
 !!-------------------------------------------------------------------------------
   !locals
@@ -2338,7 +2338,7 @@ end subroutine makeconn
 
 subroutine maketors
 !!-------------------------------------------------------------------------------
-!!  **subroutine: maketors**
+!!  **subroutine maketors**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2435,7 +2435,7 @@ end subroutine maketors
 
 subroutine prompt(outtxt)
 !!-------------------------------------------------------------------------------
-!!  **subroutine: prompt**
+!!  **subroutine prompt**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2447,7 +2447,7 @@ end subroutine prompt
 
 real function randm(seed, seed_only)
 !!-------------------------------------------------------------------------------
-!!  **subroutine: randm**
+!!  **subroutine randm**
 !!
 !!-------------------------------------------------------------------------------
   !arguments
@@ -2487,7 +2487,7 @@ end function randm
 
 subroutine oldreadlib(filnam)
 !!-------------------------------------------------------------------------------
-!!  **subroutine: oldreadlib**
+!!  **subroutine oldreadlib**
 !!
 !!-------------------------------------------------------------------------------
 !arguments
@@ -2637,7 +2637,7 @@ subroutine oldreadlib(filnam)
 
 subroutine readlib(file)
 !!-------------------------------------------------------------------------------
-!!  subroutine: readlib
+!!  subroutine readlib
 !!  Read library files, known as topologies in other MD programs.
 !!-------------------------------------------------------------------------------
   ! arguments
@@ -2998,7 +2998,7 @@ end subroutine readlib
 
 subroutine check_overload(resnam)
 !!-------------------------------------------------------------------------------
-!!  subroutine: check_overload
+!!  subroutine check_overload
 !!
 !!-------------------------------------------------------------------------------
   ! arguments
@@ -3019,7 +3019,7 @@ end subroutine check_overload
 
 subroutine oldreadparm(flag)
 !!-------------------------------------------------------------------------------
-!!  subroutine: oldreadparm
+!!  subroutine oldreadparm
 !!
 !!-------------------------------------------------------------------------------
   !  arguments
@@ -3202,7 +3202,7 @@ end subroutine oldreadparm
 
 subroutine readff
 !!-------------------------------------------------------------------------------
-!!  subroutine: readff
+!!  subroutine readff
 !!
 !!-------------------------------------------------------------------------------
   !read parameters
@@ -3231,7 +3231,7 @@ end subroutine readff
 
 subroutine readparm(filnam)
 !!-------------------------------------------------------------------------------
-!!  subroutine: readparm
+!!  subroutine readparm
 !!
 !!-------------------------------------------------------------------------------
 ! arguments
@@ -3723,7 +3723,7 @@ end subroutine readparm
 
 subroutine clearpdb
 !!-------------------------------------------------------------------------------
-!!  subroutine: clearpdb
+!!  subroutine clearpdb
 !!
 !!-------------------------------------------------------------------------------
   nres = 0
@@ -3742,7 +3742,7 @@ end subroutine clearpdb
 
 subroutine cleartop
 !!-------------------------------------------------------------------------------
-!!  subroutine: cleartop
+!!  subroutine cleartop
 !!
 !!-------------------------------------------------------------------------------
   !forget the name of the parameter file
@@ -3755,7 +3755,7 @@ end subroutine cleartop
 
 logical function countpdb(pdb_fileno, atoms, residues, molecules)
 !!-------------------------------------------------------------------------------
-!!  function: countpdb
+!!  function countpdb
 !!  count atoms, residues and molecules in a pdb file
 !!-------------------------------------------------------------------------------
   !arguments
@@ -3860,7 +3860,7 @@ end function countpdb
 
 subroutine readpdb()
 !!-------------------------------------------------------------------------------
-!!  subroutine: readpdb
+!!  subroutine readpdb
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -4118,7 +4118,7 @@ end subroutine readpdb
 
 subroutine readtop
 !!-------------------------------------------------------------------------------
-!!  subroutine: readtop
+!!  subroutine readtop
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -4197,7 +4197,7 @@ end subroutine readtop
 
 subroutine readx
 !!-------------------------------------------------------------------------------
-!!  subroutine: readx
+!!  subroutine readx
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -4234,7 +4234,7 @@ end subroutine readx
 
 subroutine readnext
 !!-------------------------------------------------------------------------------
-!!  subroutine: readnext
+!!  subroutine readnext
 !!
 !!-------------------------------------------------------------------------------
   integer                          :: filestat, nat3
@@ -4262,7 +4262,7 @@ end subroutine readnext
 
 subroutine readframe
 !!-------------------------------------------------------------------------------
-!!  subroutine: readframe
+!!  subroutine readframe
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -4277,7 +4277,7 @@ end subroutine readframe
 
 subroutine trajectory
 !!-------------------------------------------------------------------------------
-!!  subroutine: trajectory
+!!  subroutine trajectory
 !!
 !!-------------------------------------------------------------------------------
 !locals
@@ -4308,7 +4308,7 @@ end subroutine trajectory
 
 subroutine modify_mask
 !!-------------------------------------------------------------------------------
-!!  subroutine: modify_mask
+!!  subroutine modify_mask
 !!
 !!-------------------------------------------------------------------------------
   !locals
@@ -4339,7 +4339,7 @@ end subroutine modify_mask
 
 subroutine set_cgp
 !!-------------------------------------------------------------------------------
-!!  subroutine: set_cgp
+!!  subroutine set_cgp
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -4445,7 +4445,7 @@ end subroutine set_cgp
 
 subroutine set_crg
 !!-------------------------------------------------------------------------------
-!!  subroutine: set_cgp
+!!  subroutine set_cgp
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -4472,7 +4472,7 @@ end subroutine set_crg
 
 subroutine set_iac
 !!-------------------------------------------------------------------------------
-!!  subroutine: set_iac
+!!  subroutine set_iac
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -4518,7 +4518,7 @@ end subroutine set_iac
 
 logical function set_irc_solvent()
 !!-------------------------------------------------------------------------------
-!!  function: set_irc_solvent
+!!  function set_irc_solvent
 !!
 !!-------------------------------------------------------------------------------
   set_irc_solvent = .false.
@@ -4542,7 +4542,7 @@ end function set_irc_solvent
 
 subroutine set_solvent_type
 !!-------------------------------------------------------------------------------
-!!  subroutine: set_solvent_type
+!!  subroutine set_solvent_type
 !!  set solvent type (SPC-like, TIP3P-like or general)
 !!-------------------------------------------------------------------------------
   !locals
@@ -4585,7 +4585,7 @@ end subroutine set_solvent_type
 
 integer function get_atom_from_descriptor(aid)
 !!------------------------------------------------------------------------------
-!!  function: get_atom_from_descriptor
+!!  function get_atom_from_descriptor
 !!
 !!------------------------------------------------------------------------------
   !arguments
@@ -4611,12 +4611,11 @@ integer function get_atom_from_descriptor(aid)
 end function get_atom_from_descriptor
 
 
-!Routine to call from other modules
 subroutine define_boundary_condition
-!------------------------------------------------------------------------------!
-!!  subroutine: define_boundary_condition
-!!
-!------------------------------------------------------------------------------!
+!!-------------------------------------------------------------------------------
+!!  subroutine define_boundary_condition
+!!  Routine to call from other modules
+!!-------------------------------------------------------------------------------
   if (.not. set_boundary_condition()) then
     call parse_reset ! clear command line
     return
@@ -4624,13 +4623,11 @@ subroutine define_boundary_condition
 end subroutine define_boundary_condition
 
 
-
-!Set the boundary condition & read parameterts connected to the boundary. 
 logical function set_boundary_condition()
-!------------------------------------------------------------------------------!
-!!  function: set_boundary_condition
-!!
-!------------------------------------------------------------------------------!
+!!-------------------------------------------------------------------------------
+!!  function set_boundary_condition
+!!  Set the boundary condition & read parameterts connected to the boundary.
+!!-------------------------------------------------------------------------------
   !locals
   character(len=80)                :: kind_of_boundary
 
@@ -4673,7 +4670,7 @@ end function set_boundary_condition
 
 logical function set_simulation_sphere()
 !!-------------------------------------------------------------------------------
-!!  subroutine: set_simulation_sphere
+!!  subroutine set_simulation_sphere
 !!  get center coordinates
 !!  as residue_number:atom_name or x y z
 !!-------------------------------------------------------------------------------
@@ -4730,7 +4727,7 @@ end function set_simulation_sphere
 
 logical function set_solvent_box()
 !!-------------------------------------------------------------------------------
-!!  subroutine: set_solvent_box
+!!  subroutine set_solvent_box
 !!
 !!-------------------------------------------------------------------------------
   !locals
@@ -4800,7 +4797,7 @@ end function set_solvent_box
 
 subroutine solvate
 !!-------------------------------------------------------------------------------
-!!  subroutine: solvate
+!!  subroutine solvate
 !!
 !!-------------------------------------------------------------------------------
   ! Make sure boundary condition is set.
@@ -4819,7 +4816,7 @@ end subroutine solvate
 
 subroutine solvate_box
 !------------------------------------------------------------------------------!
-!!  subroutine: solvate_box
+!!  subroutine solvate_box
 !
 !------------------------------------------------------------------------------!
   character(len=80)                :: solvate_mode
@@ -4856,7 +4853,7 @@ end subroutine solvate_box
 
 subroutine solvate_box_grid
 !!-------------------------------------------------------------------------------
-!!  subroutine: solvate_box_grid
+!!  subroutine solvate_box_grid
 !!  solvate box using grid
 !!-------------------------------------------------------------------------------
   !locals
@@ -4937,7 +4934,7 @@ end subroutine solvate_box_grid
 
 subroutine solvate_box_file
 !!-------------------------------------------------------------------------------
-!!  subroutine: solvate_box_file
+!!  subroutine solvate_box_file
 !!
 !!-------------------------------------------------------------------------------
 !local variables
@@ -5149,7 +5146,7 @@ end subroutine solvate_box_file
 
 subroutine solvate_sphere
 !!-------------------------------------------------------------------------------
-!!  subroutine: solvate_sphere
+!!  subroutine solvate_sphere
 !!
 !!-------------------------------------------------------------------------------
   character(len=80)                :: solvate_mode
@@ -5183,7 +5180,7 @@ end subroutine solvate_sphere
 
 logical function set_solvent_sphere()
 !!-------------------------------------------------------------------------------
-!!  function: set_solvent_sphere
+!!  function set_solvent_sphere
 !!
 !!-------------------------------------------------------------------------------
   !locals
@@ -5250,7 +5247,7 @@ end function set_solvent_sphere
 
 subroutine solvate_sphere_grid
 !!-------------------------------------------------------------------------------
-!!  subroutine: solvate_sphere_grid
+!!  subroutine solvate_sphere_grid
 !!  solvate sphere using grid
 !!-------------------------------------------------------------------------------
   !locals
@@ -5329,7 +5326,7 @@ end subroutine solvate_sphere_grid
 
 subroutine solvate_sphere_file(shift)
 !!-------------------------------------------------------------------------------
-!!  subroutine: solvate_sphere_file
+!!  subroutine solvate_sphere_file
 !!
 !!-------------------------------------------------------------------------------
   ! parameters
@@ -5532,7 +5529,7 @@ end subroutine solvate_sphere_file
 
 subroutine solvate_restart
 !!-------------------------------------------------------------------------------
-!!  subroutine: solvate_restart
+!!  subroutine solvate_restart
 !!
 !!-------------------------------------------------------------------------------
   !locals
@@ -5594,7 +5591,7 @@ end subroutine solvate_restart
 
 subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens, pack)
 !!-------------------------------------------------------------------------------
-!!  subroutine: add_solvent_to_topology
+!!  subroutine add_solvent_to_topology
 !!
 !!-------------------------------------------------------------------------------
   !arguments
@@ -5728,7 +5725,7 @@ end subroutine add_solvent_to_topology
 
 subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
 !!-------------------------------------------------------------------------------
-!!  subroutine: grow_arrays_for_solvent
+!!  subroutine grow_arrays_for_solvent
 !!  make space for nmore more water molecules
 !!-------------------------------------------------------------------------------
   !arguments
@@ -5813,7 +5810,7 @@ end subroutine grow_arrays_for_solvent
 
 real function rwat_eff()
 !!-------------------------------------------------------------------------------
-!!  function: rwat_eff
+!!  function rwat_eff
 !!
 !!-------------------------------------------------------------------------------
   ! local variables
@@ -5868,7 +5865,7 @@ end function rwat_eff
 
 type(tor_codes) function torcode(taci, tacj, tack, tacl)
 !!-------------------------------------------------------------------------------
-!!  function: torcode
+!!  function torcode
 !!
 !!-------------------------------------------------------------------------------
   !arguments
@@ -5967,7 +5964,7 @@ end function torcode
 
 subroutine tors_ene(emax, nlarge, av_ene)
 !!-------------------------------------------------------------------------------
-!!  subroutine: tors_ene
+!!  subroutine tors_ene
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -6042,7 +6039,7 @@ end subroutine tors_ene
 
 logical function check_residues()
 !!-------------------------------------------------------------------------------
-!!  function: check_residues
+!!  function check_residues
 !!
 !!-------------------------------------------------------------------------------
   !locals
@@ -6074,7 +6071,7 @@ end function check_residues
 
 subroutine writepdb
 !!-------------------------------------------------------------------------------
-!!  subroutine: writepdb
+!!  subroutine writepdb
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -6215,7 +6212,7 @@ end subroutine writepdb
 
 subroutine writemol2
 !!-------------------------------------------------------------------------------
-!!  subroutine: writemol2
+!!  subroutine writemol2
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -6372,7 +6369,7 @@ end subroutine writemol2
 
 subroutine writetop
 !!-------------------------------------------------------------------------------
-!!  subroutine: writetop
+!!  subroutine writetop
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -6399,7 +6396,7 @@ end subroutine writetop
 
 subroutine listprefs
 !!-------------------------------------------------------------------------------
-!!  **subroutine: listprefs**
+!!  **subroutine listprefs**
 !!
 !!-------------------------------------------------------------------------------
   call pref_list('Preferences (use set command to change):')
@@ -6407,10 +6404,10 @@ end subroutine listprefs
 
 
 subroutine set
-!!------------------------------------------------------------------------------
-!!  **subroutine: set**
+!!-------------------------------------------------------------------------------
+!!  **subroutine set**
 !!
-!!------------------------------------------------------------------------------
+!!-------------------------------------------------------------------------------
   !locals
   character(len=PREF_LEN)         :: name, value
   logical                         :: l
@@ -6424,7 +6421,7 @@ end subroutine set
 
 subroutine make_shell2
 !!------------------------------------------------------------------------------
-!!  **subroutine: make_shell2**
+!!  **subroutine make_shell2**
 !!
 !!  Sort out atoms in restrained shell. Use protein center to calculate distance.
 !!  Use coordinates from topology unless 'implicit_rstr_from_file' is specified
@@ -6469,7 +6466,7 @@ end subroutine make_shell2
 
 logical function get_center_by_mass(center)
 !!------------------------------------------------------------------------------
-!!  **function: get_center_by_mass**
+!!  **function get_center_by_mass**
 !!
 !!  Returns true if center of mass can be assigned
 !!  and returns center of mass for a mask of atoms in the vector 'center'

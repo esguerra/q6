@@ -4,10 +4,11 @@
 # Uncomment or modify the next two lines depending on your system
 # openmpi or impi version, and the path to your Q binaries.
 #################################################################
-module load rocks-openmpi
-module load gcc/6.2.0
-export bindir="/home/esguerra/software/qsource/bin"
-#export bindir="/Users/esguerra/software/qsource/development/esguerra/bin"
+#module load rocks-openmpi
+#module load gcc/6.2.0
+module load mpi/openmpi-x86_64
+export bindir="../../bin"
+
 
 if [ "x$bindir" == "x" ]
 then 
@@ -26,9 +27,9 @@ fi
 # cpu cores: 4
 # The cores need then to be added to get the total number of cores available per node.
 # For now bc is doing the sum, but BEWARE, maybe bc is not installed on all nodes.
-# CORES=`grep processor /proc/cpuinfo | wc -l`
-# CORES=`grep cores /proc/cpuinfo | awk '{print $4}' | paste -sd+ | bc`
-CORES=16
+CORES=`grep processor /proc/cpuinfo | wc -l`
+# CORES=`grep "cpu cores" /proc/cpuinfo | awk '{print $4}' | paste -sd+ | bc`
+# CORES=16
 echo "Running simulation on $CORES cores."
 
 rm -f eq{1..5}.log dc{1..5}.log >& /dev/null
