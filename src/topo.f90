@@ -195,8 +195,6 @@ module topo
   contains
 
 
-
-
 subroutine topo_startup
 !!-------------------------------------------------------------------------------
 !!  **subroutine topo_startup**
@@ -1110,8 +1108,11 @@ subroutine topo_save(name)
   if(title > '') write(u, 2) 'TITLE', trim(title)
   write(u, 2) 'DATE', trim(creation_date)
   write(u, '(a,t12,f5.2)') 'VERSION', MODULE_VERSION
-  if(pdb_file > '') write(u, 2) 'PDB_FILE', trim(pdb_file)
+!  if(pdb_file > '') write(u, 2) 'PDB_FILE', trim(pdb_file)
+  write(u, 2) 'PDB_FILE', trim(pdb_file)  
+!  if(lib_files > '') write(u, 2) 'LIB_FILES', trim(lib_files)
   if(lib_files > '') write(u, 2) 'LIB_FILES', trim(lib_files)
+
   if(forcefield > '') write(u,2) 'FORCEFIELD', trim(forcefield)
   write(u, 4) 'FF_TYPE', ff_type
   write(u, 2) 'PRM_FILE', trim(prm_file)

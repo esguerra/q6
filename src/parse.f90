@@ -8,14 +8,15 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module parse
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!  parse.f90
-!  by John Marelius
-!  command parser 
-!------------------------------------------------------------------------------!
-module parse
+!!  **module parse**
+!!  by John Marelius
+!!  command parser
+!-------------------------------------------------------------------------------
   use misc
   implicit none
 
@@ -38,24 +39,24 @@ module parse
 
 contains
 
-!------------------------------------------------------------------------------!
-!>  function: parse_startup
-!>
-!------------------------------------------------------------------------------!
+
 subroutine parse_startup()
+!!-------------------------------------------------------------------------------
+!!  **function parse_startup**
+!!
+!!-------------------------------------------------------------------------------
   argc = 0
   argp = 1
 end subroutine parse_startup
 
 
-!------------------------------------------------------------------------------!
-!>  function: parse_open_file
-!>
-!------------------------------------------------------------------------------!
 logical function parse_open_file(filename)
+!!-------------------------------------------------------------------------------
+!!  **function parse_open_file**
+!!
+!!-------------------------------------------------------------------------------
   character(*)    :: filename
   integer         :: stat
-
 
   parse_open_file = .false.
   read_from_file = .true.
@@ -73,18 +74,18 @@ logical function parse_open_file(filename)
 end function parse_open_file
 
 
-!------------------------------------------------------------------------------!
-!>  function: openit
-!!  Moved from Misc
-!!  split text in inbuf into 
-!------------------------------------------------------------------------------!
 integer function openit(lun, fil, stat, frm, mode)
+!!-------------------------------------------------------------------------------
+!!  **function openit**
+!!  Moved from misc
+!!  split text in inbuf into
+!!-------------------------------------------------------------------------------
   !arguments
-  INTEGER lun
-  CHARACTER( * ) fil, stat, frm
-  character(*)                            ::      mode
+  integer lun
+  character( * ) fil, stat, frm
+  character(*)                     :: mode
   !locals
-  integer                                         ::      errcode
+  integer                          :: errcode
         
   if(trim(fil).eq.'') write(*,*) 'Invalid filename'
 
@@ -105,17 +106,17 @@ integer function openit(lun, fil, stat, frm, mode)
 end function openit
 
 
-!------------------------------------------------------------------------------!
-!>  subroutine: split
-!!  split text in inbuf into 
-!------------------------------------------------------------------------------!
 subroutine split
-  integer                           :: p
-  logical                           :: ws_flag 
-  logical                           :: quote_flag 
-  character, save                   :: TAB = achar(9)
-  integer                           :: inlen
-  integer                           :: trimlen(1)
+!!-------------------------------------------------------------------------------
+!!  **subroutine split**
+!!  split text in inbuf into
+!!-------------------------------------------------------------------------------
+  integer                          :: p
+  logical                          :: ws_flag
+  logical                          :: quote_flag
+  character, save                  :: TAB = achar(9)
+  integer                          :: inlen
+  integer                          :: trimlen(1)
 
   argc = 0
   argp = 1
@@ -152,14 +153,14 @@ subroutine split
 end subroutine split
 
 
-!-------------------------------------------------------------------------------!
-!>  subroutine: **getline**
+subroutine getline()
+!!-------------------------------------------------------------------------------
+!!  **subroutine getline**
 !!  goes line by line in input files.
 !!  TODO: In case there is no quit card give a different error to:
 !!    Fortran runtime error: End of file
 !!  which is now the case.
-!-------------------------------------------------------------------------------!
-subroutine getline()
+!!-------------------------------------------------------------------------------
   do
     if (read_from_file) then
       read(INFILE, '(a200)') inbuf
@@ -174,11 +175,11 @@ subroutine getline()
 end subroutine getline
 
 
-!-------------------------------------------------------------------------------!
-!>  subroutine: **get_string_arg**
-!! 
-!-------------------------------------------------------------------------------!
 subroutine get_string_arg(arg, prompt)
+!!-------------------------------------------------------------------------------
+!!  **subroutine get_string_arg**
+!!
+!!-------------------------------------------------------------------------------
   !arguments
   character(*), intent(out)               :: arg
   character(*), optional, intent(in)      :: prompt
@@ -188,12 +189,15 @@ subroutine get_string_arg(arg, prompt)
     call getline
   end do
   arg = inbuf(argv(argp)%istart :argv(argp)%iend)
-  argp = argp + 1                
+  argp = argp + 1
 end subroutine get_string_arg
 
 
-!--------------------------------------------------------------------------
 subroutine get_line_arg(arg, prompt)
+!!-------------------------------------------------------------------------------
+!!  **subroutine get_line_arg**
+!!
+!!-------------------------------------------------------------------------------
   !arguments
   character(*), intent(out)               :: arg
   character(*), optional, intent(in)      :: prompt
@@ -207,13 +211,16 @@ subroutine get_line_arg(arg, prompt)
   call parse_reset !reset argument counter - new line next time
 end subroutine get_line_arg
 
-!--------------------------------------------------------------------------
 
 logical function get_string_single_line(arg, prompt)
+!!-------------------------------------------------------------------------------
+!!  **function get_string_single_line**
+!!
+!!-------------------------------------------------------------------------------
   !arguments
   character(*), intent(out)               :: arg
   character(*), optional, intent(in)      :: prompt
-        
+
   if(argc == 0) then
     if(present(prompt))     write(unit=*, fmt='(a)', advance='no') prompt
     call getline
@@ -226,19 +233,25 @@ logical function get_string_single_line(arg, prompt)
     argp = argp + 1
     get_string_single_line = .true.
   end if
-                
+
 end function get_string_single_line
 
 
-!--------------------------------------------------------------------------
 subroutine parse_reset
+!!-------------------------------------------------------------------------------
+!!  **subroutine parse_reset**
+!!
+!!-------------------------------------------------------------------------------
   argc = 0
   argp = 1
 end subroutine parse_reset
 
 
-!--------------------------------------------------------------------------
 integer function get_int_arg(prompt)
+!!-------------------------------------------------------------------------------
+!!  **function get_int_arg**
+!!
+!!-------------------------------------------------------------------------------
   !arguments
   character(*), optional, intent(in)      :: prompt
   !locals
@@ -262,8 +275,11 @@ integer function get_int_arg(prompt)
 end function get_int_arg
 
 
-!--------------------------------------------------------------------------
 real function get_real_arg(prompt)
+!!-------------------------------------------------------------------------------
+!!  **subroutine get_real_arg**
+!!
+!!-------------------------------------------------------------------------------
   !arguments
   character(*), optional, intent(in)      :: prompt
   !locals
@@ -285,6 +301,5 @@ real function get_real_arg(prompt)
   goto 1
 end function get_real_arg
 
-!--------------------------------------------------------------------------
 
 end module parse
