@@ -6,13 +6,13 @@ services:
   - docker
 
 before_install:
-- docker pull esguerra/q6
-- travis_wait 120 docker run esguerra/q6 bash -c "cd /root/q6/src; source ~/.bashrc; export; module load mpi/openmpi-x86_64; make all COMP=gcc; make mpi COMP=gcc"
+  - docker pull esguerra/q6
+  - docker run esguerra/q6 bash -c "cd /root/q6/src; source ~/.bashrc; export; module load mpi/openmpi-x86_64; make all COMP=gcc; make mpi COMP=gcc"
+  - docker run esguerra/q6 bash -c "pwd; cd /root/q6/tests/test1; pwd; module load mpi/openmpi-x86_64; module list; ls ../../bin"
 
 script:
-  - docker run esguerra/q6 bash -c "pwd; cd /root/q6/tests/test1; pwd; module load mpi/openmpi-x86_64; module list; ls ../../bin"
 # notice that if there's no docker call the commands are local to the travis machine, generally a ubuntu type.
-#  - export
+  - export
 #  - pwd
 
 #script:
