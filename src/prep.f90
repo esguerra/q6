@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -10,7 +10,7 @@
 
 module prep
 !!-------------------------------------------------------------------------------
-!!  **module prep.f90**
+!!  **module prep**
 !!  by Johan Aqvist & John Marelius
 !!  topology preparation, solvation, validation and PDB I/O
 !!
@@ -27,7 +27,7 @@ module prep
   implicit none
 
   !constants
-  character(*), private, parameter :: module_version = '5.7'
+  character(*), private, parameter :: module_version = '6.0.1'
   character(*), private, parameter :: module_date = '2015-02-22'
   integer,parameter,public :: CDK = selected_char_kind('DEFAULT')
 

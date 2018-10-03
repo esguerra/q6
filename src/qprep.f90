@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -23,7 +23,7 @@ program qprep
 
   implicit none
   character(*), parameter :: program_name = 'qprep'
-  character(*), parameter :: program_version = '5.7'
+  character(*), parameter :: program_version = '6.0.1'
   character(*), parameter :: program_date = '2015-04-01'
   character(*), parameter :: program_suffix  = ''
 !  character(*), parameter :: options = compiler_options()

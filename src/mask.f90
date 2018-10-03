@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -21,7 +21,7 @@ module atom_mask
   implicit none
 
   ! version data
-  character(*), private, parameter :: MODULE_VERSION = '5.7'
+  character(*), private, parameter :: MODULE_VERSION = '6.0.1'
   character(*), private, parameter :: MODULE_DATE = '2015-02-22'
 
   !private procedures

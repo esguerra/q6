@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -8,21 +8,22 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module calc_pmf
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!  calc_pmfscore.f90
-! Implementation by Peter Hanspers
-!------------------------------------------------------------------------------!
-module calc_pmf
-  use CALC_BASE
-  use MASKMANIP
-  use TRJ
-  use TOPO
-  use PRMFILE
-  use INDEXER
-  use QATOM
-  use MISC
+!!  **module calc_pmfscore**
+!! Implementation by Peter Hanspers
+!!-------------------------------------------------------------------------------
+  use calc_base
+  use maskmanip
+  use trj
+  use topo
+  use prmfile
+  use indexer
+  use qatom
+  use misc
 
   implicit none
 

@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -8,15 +8,16 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module calc_fit
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!  calc_fit.f90
-!  by John Marelius
-!  parts (C) 1979 W. F. van Gunsteren
-!  pair-wise superposition of coordidinate sets
-!------------------------------------------------------------------------------!
-module calc_fit
+!!  **module calc_fit**
+!!  by John Marelius
+!!  parts (C) 1979 W. F. van Gunsteren
+!!  pair-wise superposition of coordidinate sets
+!!-------------------------------------------------------------------------------
   use calc_base
   use maskmanip
   implicit none

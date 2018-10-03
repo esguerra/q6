@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -8,15 +8,16 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module md
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!!  md.f90                                                                     !
-!!  by Johan Aqvist, John Marelius, Anders Kaplan, Isabella Feierberg,         !
-!!  Martin Nervall & Martin Almlof                                             !
-!!  molecular dynamics                                                         !
-!------------------------------------------------------------------------------!
-module md
+!!  **module md**
+!!  by Johan Aqvist, John Marelius, Anders Kaplan, Isabella Feierberg,
+!!  Martin Nervall & Martin Almlof
+!!  molecular dynamics
+!!-------------------------------------------------------------------------------
   ! load modules
   use sizes
   use trj
@@ -35,7 +36,7 @@ module md
 !-------------------------------------------------------------------------------
 !       Constants
 !-------------------------------------------------------------------------------
-  character*(*), parameter  :: md_version = '5.7'
+  character*(*), parameter  :: md_version = '6.0.1'
   character*(*), parameter  :: md_date = '2015-02-22'
   real, parameter           :: rho_wat = 0.0335  ! molecules / A**3
   real, parameter           :: boltz = 0.001986
@@ -1907,419 +1908,423 @@ contains
   !-----------------------------------------------------------------------
 
 #if defined (USE_MPI)
-  !Defines and allocates variables needed in the md-calculations
-  !The node initiation is written for AI = 4. If changes are made to any size in
-  ! sizes.f90 the MPI-code must be changed accordingly. It is not dynamically
-  ! implemented yet.
-  subroutine init_nodes
-    !
-    ! initialize slave nodes, sending to slaves:
-    !
-    ! variables:
-    !  natom,nwat,nsteps,use_LRF,NBcycle,crg_ow,crg_hw,Rcpp,Rcww,Rcpw,Rcq,xpcent
-    !  nat_solute,ncgp,ncgp_solute,ivdw_rule,iuse_switch_atom,el14_scale,n14long
-    !  nexlong,natyps,nljtyp,rexcl_o,nstates,nqat,qvdw_flag,nqlib,RcLRF,
-    !  use_PBC, qswitch, nmol, nat_pro
-    !
-    ! arrays:
-    !  x,v,iqatom,ljcod,qconn,iwhich_cgp,lrf,excl,iac,crg,cgpatom,cgp,iaclib
-    !  list14,listex,list14long,listexlong,iqseq,qiac,qcrg,qavdw,qbvdw,EQ(:)%lambda,
-    !  boxlength, inv_boxl, boxcenter, sc_lookup 
-    !
-
-    integer, parameter              :: vars = 40 !increment this var when adding data to broadcast in batch 1
-    integer                         :: blockcnt(vars), ftype(vars) 
-    integer(kind=MPI_ADDRESS_KIND)  :: fdisp(vars)
-    integer                         :: mpitype_batch,mpitype_batch2
-    integer                         :: nat3
-    real(kind=dp), allocatable      :: temp_lambda(:)
-    integer, parameter              :: maxint=2147483647
-    real(kind=dp), parameter        :: maxreal=1E35
-    integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
-
-    !external MPI_Address
-    !external MPI_Bcast
-
-    !**********
-    !2002-11-28 
-    !MN-> This will work with new implementations of MPI standard >= 2
-    !The MPI library at PDC does not support these definitions when I tried to use them.
-    !Using these routines will allow a change made to the sizes in sizes.f90 to
-    ! affect the mpi. Without them the variables below marked (AI) and (TINY) will have to 
-    ! be changed manually.
-    !When using this part make sure the vars marked with comments (AI) and (TINY) are 
-    ! changed to MPI_AI_INTEGER and MPI_TINY_INTEGER.
-
-    !external MPI_Type_Create_F90_Integer
-    !external MPI_SizeOf
-
-    !Define data types
-    ! This is wrong, the 1:st param is "Precision, in decimal digits", not bits
-    !call MPI_Type_Create_F90_Integer((8*AI-1),MPI_AI_INTEGER,ierr)
-    !call MPI_Type_Create_F90_Integer((8*TINY-1),MPI_TINY_INTEGER,ierr)
-    !To check the size in bytes of the new types use
-    !call MPI_SizeOf(MPI_AI_INTEGER,size,ierr)
-    !call MPI_SizeOf(MPI_TINY_INTEGER,size,ierr)
-    !***************************
+subroutine init_nodes
+!!-------------------------------------------------------------------------------
+!!  subroutine  **init_nodes**
+!!  Defines and allocates variables needed in the md-calculations
+!!  The node initiation is written for AI = 4. If changes are made to any size in
+!!   sizes.f90 the MPI-code must be changed accordingly. It is not dynamically
+!!   implemented yet.
+!!
+!!   initialize slave nodes, sending to slaves:
+!!
+!!   variables:
+!!    natom,nwat,nsteps,use_LRF,NBcycle,crg_ow,crg_hw,Rcpp,Rcww,Rcpw,Rcq,xpcent
+!!    nat_solute,ncgp,ncgp_solute,ivdw_rule,iuse_switch_atom,el14_scale,n14long
+!!    nexlong,natyps,nljtyp,rexcl_o,nstates,nqat,qvdw_flag,nqlib,RcLRF,
+!!    use_PBC, qswitch, nmol, nat_pro
+!!
+!!   arrays:
+!!    x,v,iqatom,ljcod,qconn,iwhich_cgp,lrf,excl,iac,crg,cgpatom,cgp,iaclib
+!!    list14,listex,list14long,listexlong,iqseq,qiac,qcrg,qavdw,qbvdw,EQ(:)%lambda,
+!!    boxlength, inv_boxl, boxcenter, sc_lookup
+!!
+!!-------------------------------------------------------------------------------
 
 
-    if (nodeid .eq. 0) call centered_heading('Distributing data to slave nodes', '-')
+  integer, parameter              :: vars = 40 !increment this var when adding data to broadcast in batch 1
+  integer                         :: blockcnt(vars), ftype(vars)
+  integer(kind=MPI_ADDRESS_KIND)  :: fdisp(vars)
+  integer                         :: mpitype_batch,mpitype_batch2
+  integer                         :: nat3
+  real(kind=dp), allocatable      :: temp_lambda(:)
+  integer, parameter              :: maxint=2147483647
+  real(kind=dp), parameter        :: maxreal=1E35
+  integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
 
-    ! --- mandatory data, first batch ---
+  !external MPI_Address
+  !external MPI_Bcast
 
-    if (nodeid .eq. 0) write (*,'(80a)') 'MD data, first batch'
+  !**********
+  !2002-11-28
+  !MN-> This will work with new implementations of MPI standard >= 2
+  !The MPI library at PDC does not support these definitions when I tried to use them.
+  !Using these routines will allow a change made to the sizes in sizes.f90 to
+  ! affect the mpi. Without them the variables below marked (AI) and (TINY) will have to
+  ! be changed manually.
+  !When using this part make sure the vars marked with comments (AI) and (TINY) are
+  ! changed to MPI_AI_INTEGER and MPI_TINY_INTEGER.
 
-    ! Broadcast some initial variables
+  !external MPI_Type_Create_F90_Integer
+  !external MPI_SizeOf
 
-    ! run control constants: natom, nwat, nsteps, NBmethod, NBcycle
-    call MPI_Bcast(natom, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast natom')
-    call MPI_Bcast(nwat, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nwat')
-    call MPI_Bcast(nsteps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nsteps')
-    call MPI_Bcast(use_LRF, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast use_LRF')
-    call MPI_Bcast(NBcycle, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast NBcycle')
+  !Define data types
+  ! This is wrong, the 1:st param is "Precision, in decimal digits", not bits
+  !call MPI_Type_Create_F90_Integer((8*AI-1),MPI_AI_INTEGER,ierr)
+  !call MPI_Type_Create_F90_Integer((8*TINY-1),MPI_TINY_INTEGER,ierr)
+  !To check the size in bytes of the new types use
+  !call MPI_SizeOf(MPI_AI_INTEGER,size,ierr)
+  !call MPI_SizeOf(MPI_TINY_INTEGER,size,ierr)
+  !***************************
 
-    ! water parameters: crg_ow, crg_hw (used by nonbond_ww)
-    call MPI_Bcast(crg_ow, 1, MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg_ow')
-    call MPI_Bcast(crg_hw, 1, MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg_hw')
 
-    ! cutoffs: Rcpp, Rcww, Rcpw, Rcq, RcLRF (used by pair list generating functions)
-    call MPI_Bcast(Rcpp, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcpp')
-    call MPI_Bcast(Rcww, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcww')
-    call MPI_Bcast(Rcpw, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcpw')
-    call MPI_Bcast(Rcq, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcq')
-    call MPI_Bcast(RcLRF, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast RcLRF')
+  if (nodeid .eq. 0) call centered_heading('Distributing data to slave nodes', '-')
 
-    !Periodic Boudary Condition
-    call MPI_Bcast(use_PBC, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast use_PBC')
-    call MPI_Bcast(boxcenter, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxcenter')
-    call MPI_Bcast(boxlength, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxlength')
-    call MPI_Bcast(inv_boxl, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast inv_boxl')
-    call MPI_Bcast(qswitch, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qswitch')
-    call MPI_Bcast(constant_pressure, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast constant_pressure')
-    call MPI_Bcast(ivolume_cycle, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ivolume_cycle')
-    call MPI_Bcast(rigid_box_center, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rigid_box_center')
-    call MPI_Bcast(put_solvent_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast put_solvent_back_in_box')
-    call MPI_Bcast(put_solute_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast put_solute_back_in_box')
+  ! --- mandatory data, first batch ---
 
-    ! xpcent            from TOPO, needed for listgeneration
-    call MPI_Bcast(xpcent, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast xpcent')
+  if (nodeid .eq. 0) write (*,'(80a)') 'MD data, first batch'
 
-    !**MN-> Needed if SHAKE is to be parallelized
-    ! shake/temperature parameters
-    !call MPI_Bcast(shake_constraints, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)  !bara i init_shake & md_run
-    !if (ierr .ne. 0) call die('init_nodes/MPI_Bcast shake_constraints')
-    !call MPI_Bcast(shake_molecules, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
-    !call MPI_Bcast(Ndegf, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
-    !call MPI_Bcast(Ndegfree, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
+  ! Broadcast some initial variables
 
-    ! a bunch of vars from the TOPO module
-    call MPI_Bcast(nat_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nat_solute')
-    call MPI_Bcast(ncgp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ncgp')
-    call MPI_Bcast(ncgp_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ncgp_solute')
-    call MPI_Bcast(ivdw_rule, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ivdw_rule')
-    call MPI_Bcast(iuse_switch_atom, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iuse_switch_atom')
-    call MPI_Bcast(el14_scale, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast el14_scale')
-    call MPI_Bcast(n14long, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast n14long')
-    call MPI_Bcast(nexlong, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nexlong')
-    call MPI_Bcast(natyps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast natyps')
-    call MPI_Bcast(rexcl_o, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rexcl')
-    call MPI_Bcast(nmol, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nmol')
-    call MPI_Bcast(nat_pro, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nat_pro')
+  ! run control constants: natom, nwat, nsteps, NBmethod, NBcycle
+  call MPI_Bcast(natom, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast natom')
+  call MPI_Bcast(nwat, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nwat')
+  call MPI_Bcast(nsteps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nsteps')
+  call MPI_Bcast(use_LRF, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast use_LRF')
+  call MPI_Bcast(NBcycle, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast NBcycle')
 
-    !vars from QATOM
-    call MPI_Bcast(nstates, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nstates')
-    call MPI_Bcast(nqat, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nqat')
-    call MPI_Bcast(qvdw_flag, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qvdw_flag')
-    call MPI_Bcast(nqlib, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nqlib')
+  ! water parameters: crg_ow, crg_hw (used by nonbond_ww)
+  call MPI_Bcast(crg_ow, 1, MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg_ow')
+  call MPI_Bcast(crg_hw, 1, MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg_hw')
 
-    !Setting all vars not sent to slaves to 2147483647. To avoid hidden bugs.
-    if (nodeid .ne. 0) then 
-      shake_constraints=maxint
-      shake_molecules=maxint
-      Ndegf=maxint
-      Ndegfree=maxint
-      xwcent(:)=maxreal
-    end if
+  ! cutoffs: Rcpp, Rcww, Rcpw, Rcq, RcLRF (used by pair list generating functions)
+  call MPI_Bcast(Rcpp, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcpp')
+  call MPI_Bcast(Rcww, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcww')
+  call MPI_Bcast(Rcpw, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcpw')
+  call MPI_Bcast(Rcq, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcq')
+  call MPI_Bcast(RcLRF, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast RcLRF')
 
-    ! --- MD data, second batch ---s
-    if (nodeid .eq. 0) write (*,'(80a)') 'MD data, second batch'
+  !Periodic Boudary Condition
+  call MPI_Bcast(use_PBC, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast use_PBC')
+  call MPI_Bcast(boxcenter, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxcenter')
+  call MPI_Bcast(boxlength, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxlength')
+  call MPI_Bcast(inv_boxl, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast inv_boxl')
+  call MPI_Bcast(qswitch, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qswitch')
+  call MPI_Bcast(constant_pressure, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast constant_pressure')
+  call MPI_Bcast(ivolume_cycle, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ivolume_cycle')
+  call MPI_Bcast(rigid_box_center, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rigid_box_center')
+  call MPI_Bcast(put_solvent_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast put_solvent_back_in_box')
+  call MPI_Bcast(put_solute_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast put_solute_back_in_box')
+
+  ! xpcent            from TOPO, needed for listgeneration
+  call MPI_Bcast(xpcent, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast xpcent')
+
+  !**MN-> Needed if SHAKE is to be parallelized
+  ! shake/temperature parameters
+  !call MPI_Bcast(shake_constraints, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)  !bara i init_shake & md_run
+  !if (ierr .ne. 0) call die('init_nodes/MPI_Bcast shake_constraints')
+  !call MPI_Bcast(shake_molecules, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
+  !call MPI_Bcast(Ndegf, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
+  !call MPI_Bcast(Ndegfree, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
+
+  ! a bunch of vars from the TOPO module
+  call MPI_Bcast(nat_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nat_solute')
+  call MPI_Bcast(ncgp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ncgp')
+  call MPI_Bcast(ncgp_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ncgp_solute')
+  call MPI_Bcast(ivdw_rule, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ivdw_rule')
+  call MPI_Bcast(iuse_switch_atom, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iuse_switch_atom')
+  call MPI_Bcast(el14_scale, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast el14_scale')
+  call MPI_Bcast(n14long, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast n14long')
+  call MPI_Bcast(nexlong, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nexlong')
+  call MPI_Bcast(natyps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast natyps')
+  call MPI_Bcast(rexcl_o, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rexcl')
+  call MPI_Bcast(nmol, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nmol')
+  call MPI_Bcast(nat_pro, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nat_pro')
+
+  !vars from QATOM
+  call MPI_Bcast(nstates, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nstates')
+  call MPI_Bcast(nqat, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nqat')
+  call MPI_Bcast(qvdw_flag, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qvdw_flag')
+  call MPI_Bcast(nqlib, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nqlib')
+
+  !Setting all vars not sent to slaves to 2147483647. To avoid hidden bugs.
+  if (nodeid .ne. 0) then
+    shake_constraints=maxint
+    shake_molecules=maxint
+    Ndegf=maxint
+    Ndegfree=maxint
+    xwcent(:)=maxreal
+  end if
+
+  ! --- MD data, second batch ---s
+  if (nodeid .eq. 0) write (*,'(80a)') 'MD data, second batch'
+
+  ! allocate arrays
+  if (nodeid .ne. 0) then
+    call allocate_natom_arrays
+  end if
+
+  ! broadcast x, v and winv
+  nat3 = 3*natom
+  call MPI_Bcast(x, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
+  call MPI_Bcast(v, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast v')
+
+  !Setting all vars not sent to slaves to 2147483647. To avoid conflicts.
+  if (nodeid .ne. 0) then
+    winv=maxint
+  end if
+
+  !Broadcast iqatom
+  call MPI_Bcast(iqatom, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) !(TINY)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqatom')
+
+  !Broadcast ljcod
+  call MPI_Bcast(ljcod, size(ljcod), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ljcod')
+
+  !Broadcast qconn(nstates,nat_solute, nqat)
+  if (nodeid .ne. 0) then
+    allocate(qconn(nstates,nat_solute, nqat),stat=alloc_status)
+    call check_alloc('qconn')
+  end if
+  call MPI_Bcast(qconn, size(qconn), MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) ! (TINY)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qconn')
+
+
+  ! --- Periodic boundary condition data ---
+
+
+  ! --- shake data ---
+  !if (shake_solute .or. shake_solvent .or. shake_hydrogens) then
+  ! shake stuff
+
+  !if (nodeid .eq. 0) write (*,'(80a)') 'shake data'
+
+  !if (nodeid .ne. 0) then
+  ! allocate shake arrays
+  ! ADD CODE HERE to allocate shake array!
+  !end if
+
+  ! bake all shake data into a big packet & bcast
+  ! ADD CODE HERE to broadcast shake data
+  !end if
+
+  ! --- lrf data ---
+
+  if (use_LRF) then
+    ! lrf stuff
+
+    if (nodeid .eq. 0) write (*,'(80a)') 'lrf data'
 
     ! allocate arrays
-    if (nodeid .ne. 0) then
-      call allocate_natom_arrays
-    end if
+    if (nodeid .ne. 0) call allocate_lrf_arrays
 
-    ! broadcast x, v and winv
-    nat3 = 3*natom
-    call MPI_Bcast(x, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
-    call MPI_Bcast(v, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast v')
+    !MPI_INTEGER4 is used instead of MPI_AI_INTEGER
+    !Change to mpi_type_create, see note above or note2 in sizes.f90
+    ! iwhich_cgp
+    call MPI_Bcast(iwhich_cgp, natom, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
+    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast lrf parameters')
 
-    !Setting all vars not sent to slaves to 2147483647. To avoid conflicts.
-    if (nodeid .ne. 0) then 
-      winv=maxint
-    end if
-
-    !Broadcast iqatom
-    call MPI_Bcast(iqatom, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) !(TINY)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqatom')
-
-    !Broadcast ljcod
-    call MPI_Bcast(ljcod, size(ljcod), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ljcod')
-
-    !Broadcast qconn(nstates,nat_solute, nqat)
-    if (nodeid .ne. 0) then
-      allocate(qconn(nstates,nat_solute, nqat),stat=alloc_status)
-      call check_alloc('qconn')
-    end if
-    call MPI_Bcast(qconn, size(qconn), MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) ! (TINY)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qconn')
-
-
-    ! --- Periodic boundary condition data ---
-
-
-    ! --- shake data ---
-    !if (shake_solute .or. shake_solvent .or. shake_hydrogens) then
-    ! shake stuff
-
-    !if (nodeid .eq. 0) write (*,'(80a)') 'shake data'
-
-    !if (nodeid .ne. 0) then
-    ! allocate shake arrays
-    ! ADD CODE HERE to allocate shake array!
-    !end if
-
-    ! bake all shake data into a big packet & bcast
-    ! ADD CODE HERE to broadcast shake data
-    !end if
-
-    ! --- lrf data ---
-
-    if (use_LRF) then
-      ! lrf stuff
-
-      if (nodeid .eq. 0) write (*,'(80a)') 'lrf data'
-
-      ! allocate arrays
-      if (nodeid .ne. 0) call allocate_lrf_arrays
-
-      !MPI_INTEGER4 is used instead of MPI_AI_INTEGER
-      !Change to mpi_type_create, see note above or note2 in sizes.f90
-      ! iwhich_cgp
-      call MPI_Bcast(iwhich_cgp, natom, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
-      if (ierr .ne. 0) call die('init_nodes/MPI_Bcast lrf parameters')
-
-      ! lrf
-      ftype(:) = MPI_REAL8
-      blockcnt(1) = 3                                 ! real(8) cgp_cent(3)
-      fdisp(1) = 0
-      blockcnt(2) = 1                                 ! real(8) phi0
-      fdisp(2) = 3*8
-      blockcnt(3) = 3                                 ! real(8) phi1(3)
-      fdisp(3) = 3*8 + 8
-      blockcnt(4) = 9                                 ! real(8) phi2(9)
-      fdisp(4) = 3*8 + 8 + 3*8
-      blockcnt(5) = 27                                ! real(8) phi3(27)
-      fdisp(5) = 3*8 + 8 + 3*8 + 9*8
-      call MPI_Type_create_struct(5, blockcnt, fdisp, ftype, mpitype_batch, ierr)
-      if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
-      call MPI_Type_commit(mpitype_batch, ierr)
-      if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-      call MPI_Bcast(lrf, ncgp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-      if (ierr .ne. 0) call die('init_nodes/MPI_Bcast shake parameters')
-      call MPI_Type_free(mpitype_batch, ierr)
-      if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
-    end if !(use_LRF)
-
-    ! --- data from the TOPO module ---
-
-    if (nodeid .eq. 0) write (*,'(80a)') 'TOPO data'
-
-    ! allocate topology arrays
-    if (nodeid .ne. 0) then
-      ! don't allocate memory for stuff we don't need
-      ! these array size variables are actually used
-      max_cgp=ncgp
-      max_atyps = natyps
-      max_14long = n14long
-      max_exlong = nexlong
-      max_atom = natom
-
-      call topo_allocate_atom(alloc_status)
-      call check_alloc('topology arrays')
-      call topo_allocate_potential(alloc_status)
-      call check_alloc('topology arrays')
-      allocate(istart_mol(nmol+1), &
-        stat=alloc_status)
-      call check_alloc('topology arrays')
-    end if
-
-    ! broadcast excl
-    call MPI_Bcast(excl, natom, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast excl')
-    ! broadcast istart_mol
-    call MPI_Bcast(istart_mol, nmol+1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast istart_mol')
-
-    ! Bcast iac, crg and cgpatom 
-    call MPI_Bcast(iac, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iac')
-    call MPI_Bcast(crg, natom, MPI_REAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg')
-    call MPI_Bcast(cgpatom, natom, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast cgpatom')
-
-    ! cgp
-    !Use MPI_Type_create_struct here too
-    ftype(:) = MPI_INTEGER4 !(AI)
-    blockcnt(:) = 1
-    fdisp(1) = 0                            ! integer(AI) iswitch
-    fdisp(2) = AI                           ! integer(AI) first
-    fdisp(3) = AI + AI                      ! integer(AI) last
-    call MPI_Type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
-    call MPI_Type_commit(mpitype_batch, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-    call MPI_Bcast(cgp, ncgp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast cgp')
-    call MPI_Type_free(mpitype_batch, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
-
-    ! iaclib
+    ! lrf
     ftype(:) = MPI_REAL8
-    blockcnt(1) = 1                                 ! real(8) mass
+    blockcnt(1) = 3                                 ! real(8) cgp_cent(3)
     fdisp(1) = 0
-    blockcnt(2) = nljtyp                            ! real(8) avdw(nljtyp)
-    fdisp(2) = 8
-    blockcnt(3) = nljtyp                            ! real(8) bvdw(nljtyp)
-    fdisp(3) = 8 + 8*nljtyp
-    call MPI_Type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+    blockcnt(2) = 1                                 ! real(8) phi0
+    fdisp(2) = 3*8
+    blockcnt(3) = 3                                 ! real(8) phi1(3)
+    fdisp(3) = 3*8 + 8
+    blockcnt(4) = 9                                 ! real(8) phi2(9)
+    fdisp(4) = 3*8 + 8 + 3*8
+    blockcnt(5) = 27                                ! real(8) phi3(27)
+    fdisp(5) = 3*8 + 8 + 3*8 + 9*8
+    call MPI_Type_create_struct(5, blockcnt, fdisp, ftype, mpitype_batch, ierr)
     if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
     call MPI_Type_commit(mpitype_batch, ierr)
     if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-    call MPI_Bcast(iaclib, max_atyps, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iaclib')
+    call MPI_Bcast(lrf, ncgp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast shake parameters')
     call MPI_Type_free(mpitype_batch, ierr)
     if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
+  end if !(use_LRF)
 
-    ! list14 and listex share the same format: logical listxx(max_nbr_range,max_atom)
-    call MPI_Bcast(list14, size(list14), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14')
-    call MPI_Bcast(listex, size(listex), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listex')
+  ! --- data from the TOPO module ---
 
-    ! list14long and listexlong share the same format: integer(AI) listxxlong(2,max_nxxlong)
-    call MPI_Bcast(list14long, 2*n14long, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14long')
-    call MPI_Bcast(listexlong, 2*nexlong, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listexlong')
+  if (nodeid .eq. 0) write (*,'(80a)') 'TOPO data'
 
-    ! --- data from the QATOM module ---
+  ! allocate topology arrays
+  if (nodeid .ne. 0) then
+    ! don't allocate memory for stuff we don't need
+    ! these array size variables are actually used
+    max_cgp=ncgp
+    max_atyps = natyps
+    max_14long = n14long
+    max_exlong = nexlong
+    max_atom = natom
 
-    if (nodeid .eq. 0) write (*,'(80a)') 'QATOM data'
+    call topo_allocate_atom(alloc_status)
+    call check_alloc('topology arrays')
+    call topo_allocate_potential(alloc_status)
+    call check_alloc('topology arrays')
+    allocate(istart_mol(nmol+1), &
+      stat=alloc_status)
+    call check_alloc('topology arrays')
+  end if
 
-    ! allocate memory
-    if (nodeid .ne. 0) then
-      allocate(iqseq(nqat), &
-        qiac(nqat,nstates), &
-        qcrg(nqat,nstates), &
-        qavdw(nqlib,nljtyp), &
-        qbvdw(nqlib,nljtyp), &
-        EQ(nstates), &
-        sc_lookup(nqat,natyps+nqat,nstates), &
-        stat=alloc_status)
-      call check_alloc('Q-atom arrays')
-    end if
+  ! broadcast excl
+  call MPI_Bcast(excl, natom, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast excl')
+  ! broadcast istart_mol
+  call MPI_Bcast(istart_mol, nmol+1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast istart_mol')
 
-    !Broadcast sc_lookup(nqat,natyps+nqat,nstates)
-    call MPI_Bcast(sc_lookup, size(sc_lookup), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast sc_lookup')
+  ! Bcast iac, crg and cgpatom
+  call MPI_Bcast(iac, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iac')
+  call MPI_Bcast(crg, natom, MPI_REAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg')
+  call MPI_Bcast(cgpatom, natom, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast cgpatom')
 
-    ! integer(AI) ::  iqseq(nqat)
-    !Change to mpi_type_create  (AI)
-    call MPI_Bcast(iqseq, nqat, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqseq')
+  ! cgp
+  !Use MPI_Type_create_struct here too
+  ftype(:) = MPI_INTEGER4 !(AI)
+  blockcnt(:) = 1
+  fdisp(1) = 0                            ! integer(AI) iswitch
+  fdisp(2) = AI                           ! integer(AI) first
+  fdisp(3) = AI + AI                      ! integer(AI) last
+  call MPI_Type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
+  call MPI_Type_commit(mpitype_batch, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+  call MPI_Bcast(cgp, ncgp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast cgp')
+  call MPI_Type_free(mpitype_batch, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
-    !  integer ::  qiac(nqat,nstates)
-    call MPI_Bcast(qiac, size(qiac), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qiac')
+  ! iaclib
+  ftype(:) = MPI_REAL8
+  blockcnt(1) = 1                                 ! real(8) mass
+  fdisp(1) = 0
+  blockcnt(2) = nljtyp                            ! real(8) avdw(nljtyp)
+  fdisp(2) = 8
+  blockcnt(3) = nljtyp                            ! real(8) bvdw(nljtyp)
+  fdisp(3) = 8 + 8*nljtyp
+  call MPI_Type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
+  call MPI_Type_commit(mpitype_batch, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+  call MPI_Bcast(iaclib, max_atyps, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iaclib')
+  call MPI_Type_free(mpitype_batch, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
-    ! real(4) ::  qcrg(nqat,nstates)
-    call MPI_Bcast(qcrg, size(qcrg), MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qcrg')
+  ! list14 and listex share the same format: logical listxx(max_nbr_range,max_atom)
+  call MPI_Bcast(list14, size(list14), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14')
+  call MPI_Bcast(listex, size(listex), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listex')
 
-    if(qvdw_flag) then
-      !MN20030409-> Havn't tried with qvdw_flag == .true.
-      ! qavdw and qbvdw share the same format: real(8) qxvdw(nqlib,nljtyp)
-      call MPI_Bcast(qavdw, size(qavdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-      if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qavdw')
-      call MPI_Bcast(qbvdw, size(qbvdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-      if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qbvdw')
-    end if
+  ! list14long and listexlong share the same format: integer(AI) listxxlong(2,max_nxxlong)
+  call MPI_Bcast(list14long, 2*n14long, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14long')
+  call MPI_Bcast(listexlong, 2*nexlong, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listexlong')
 
-    if (nstates .gt. 0) then
-      ! Broadcast EQ(:)%lambda
-      allocate(temp_lambda(1:nstates), stat=alloc_status)
-      call check_alloc('Q-atom energy array')
-      if (nodeid .eq. 0) temp_lambda(1:nstates) = EQ(1:nstates)%lambda
-      call MPI_Bcast(temp_lambda, nstates, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-      if (ierr .ne. 0) call die('init_nodes/MPI_Bcast EQ%lambda')
-      if (nodeid .ne. 0) EQ(1:nstates)%lambda = temp_lambda(1:nstates)
-      deallocate(temp_lambda)
-    end if
+  ! --- data from the QATOM module ---
 
-    if (nodeid .eq. 0) then 
-      call centered_heading('End of initiation', '-')
-      print *
-    end if
+  if (nodeid .eq. 0) write (*,'(80a)') 'QATOM data'
 
-    !Finally allocate for  slaves:E_send, EQ_send
-    !For master :E_recv,d_recv
-    call allocate_mpi  
+  ! allocate memory
+  if (nodeid .ne. 0) then
+    allocate(iqseq(nqat), &
+      qiac(nqat,nstates), &
+      qcrg(nqat,nstates), &
+      qavdw(nqlib,nljtyp), &
+      qbvdw(nqlib,nljtyp), &
+      EQ(nstates), &
+      sc_lookup(nqat,natyps+nqat,nstates), &
+      stat=alloc_status)
+    call check_alloc('Q-atom arrays')
+  end if
 
-  end subroutine init_nodes
+  !Broadcast sc_lookup(nqat,natyps+nqat,nstates)
+  call MPI_Bcast(sc_lookup, size(sc_lookup), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast sc_lookup')
+
+  ! integer(AI) ::  iqseq(nqat)
+  !Change to mpi_type_create  (AI)
+  call MPI_Bcast(iqseq, nqat, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqseq')
+
+  !  integer ::  qiac(nqat,nstates)
+  call MPI_Bcast(qiac, size(qiac), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qiac')
+
+  ! real(4) ::  qcrg(nqat,nstates)
+  call MPI_Bcast(qcrg, size(qcrg), MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
+  if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qcrg')
+
+  if(qvdw_flag) then
+    !MN20030409-> Havn't tried with qvdw_flag == .true.
+    ! qavdw and qbvdw share the same format: real(8) qxvdw(nqlib,nljtyp)
+    call MPI_Bcast(qavdw, size(qavdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qavdw')
+    call MPI_Bcast(qbvdw, size(qbvdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qbvdw')
+  end if
+
+  if (nstates .gt. 0) then
+    ! Broadcast EQ(:)%lambda
+    allocate(temp_lambda(1:nstates), stat=alloc_status)
+    call check_alloc('Q-atom energy array')
+    if (nodeid .eq. 0) temp_lambda(1:nstates) = EQ(1:nstates)%lambda
+    call MPI_Bcast(temp_lambda, nstates, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast EQ%lambda')
+    if (nodeid .ne. 0) EQ(1:nstates)%lambda = temp_lambda(1:nstates)
+    deallocate(temp_lambda)
+  end if
+
+  if (nodeid .eq. 0) then
+    call centered_heading('End of initiation', '-')
+    print *
+  end if
+
+  !Finally allocate for  slaves:E_send, EQ_send
+  !For master :E_recv,d_recv
+  call allocate_mpi
+
+end subroutine init_nodes
 #endif
 
 

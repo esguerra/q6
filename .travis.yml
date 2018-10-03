@@ -11,9 +11,8 @@ before_install:
 
 script:
   - docker run esguerra/q6 bash -c "pwd; cd /root/q6; source ~/.bashrc; module avail"
-  - docker run esguerra/q6 bash -c "pwd; cd /root/q6/tests/test1; source ~/.bashrc; module avail; pwd"   
-# notice that if there's no docker call the commands are local to the
-# travis machine, generally a ubuntu type.
+  - docker run esguerra/q6 bash -c "pwd; cd /root/q6/tests/test1; source ~/.bashrc; module avail; pwd; module load mpi/openmpi-x86_64; ./run_test_mpi.sh"   
+# notice that if there's no docker call the commands are local to the travis machine, generally a ubuntu type.
   - export
   - pwd
 

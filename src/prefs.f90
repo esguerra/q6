@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -8,44 +8,44 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module prefs
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!  prefs.f90
-!  by John Marelius
-!  preference setting handler
-!------------------------------------------------------------------------------!
-module prefs
-
+!!  **module prefs**
+!!  by John Marelius
+!!  preference setting handler
+!!-------------------------------------------------------------------------------
   implicit none
 
   !constants
-  character(*), private, parameter        ::      MODULE_VERSION = '5.7'
-  character(*), private, parameter        ::      MODULE_DATE = '2015-02-22'
+  character(*), private, parameter :: MODULE_VERSION = '6.0.1'
+  character(*), private, parameter :: MODULE_DATE = '2015-02-22'
 
-  integer, private                        ::      max_prefs, nprefs
-  integer, parameter, private     ::      default_max = 20
-  integer, parameter                      ::  PREF_LEN=200
-  character(len=2), private       ::      separator
+  integer, private                 :: max_prefs, nprefs
+  integer, parameter, private      :: default_max = 20
+  integer, parameter               :: PREF_LEN=200
+  character(len=2), private        :: separator
 
   type, private :: PREF
-    character(len=40)               ::      name
-    logical                                 ::      is_integer, is_real, is_string
-    integer, pointer                ::      ival
-    real, pointer                   ::      rval
-    character(len=PREF_LEN), pointer                ::      sval
+    character(len=40)              ::      name
+    logical                        ::      is_integer, is_real, is_string
+    integer, pointer               ::      ival
+    real, pointer                  ::      rval
+    character(len=PREF_LEN), pointer :: sval
   end type PREF
         
-  type(PREF), private,allocatable ::      p(:)
+  type(PREF), private,allocatable  :: p(:)
 
   !private procedures
-  private                                         ::      lookup
+  private                          :: lookup
 
 contains
 
   subroutine pref_initialize(max)
     !args
-    integer, optional                       ::      max
+    integer, optional              :: max
 
     if(present(max)) then
       max_prefs = max
@@ -63,12 +63,13 @@ contains
     separator(2:2) = char(9)
   end subroutine pref_initialize
 
+
   logical function pref_add(name, ival, rval, sval)
     !args
-    character(*), target    ::      name
-    integer, target, optional::  ival
-    real, target, optional::  rval
-    character(*), target, optional::  sval
+    character(*), target           :: name
+    integer, target, optional      :: ival
+    real, target, optional         :: rval
+    character(*), target, optional :: sval
 
     if(nprefs == max_prefs) then
       pref_add = .false.
@@ -92,6 +93,7 @@ contains
       end if
     end if
   end function pref_add
+
 
   subroutine pref_list(heading)
     !args
@@ -117,6 +119,7 @@ contains
       end if
     end do
   end subroutine pref_list
+
 
   logical function pref_set(string, inval)
     !args
@@ -165,6 +168,7 @@ contains
       end if
     end if
   end function pref_set
+
 
   integer function lookup(name)
     !args

@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -8,15 +8,15 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module  mpiglob
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!  mpiglob.f90
-!  by John Marelius & Anders Kaplan
-!  global variables for MPI parallell qdyn
-!------------------------------------------------------------------------------!
-module  mpiglob
-
+!!  **module mpiglob**
+!!  by John Marelius & Anders Kaplan
+!!  global variables for MPI parallell qdyn
+!!-------------------------------------------------------------------------------
   use nrgy
 
   ! types and variables used for calculation assignment

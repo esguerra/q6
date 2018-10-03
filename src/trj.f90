@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -8,73 +8,76 @@
 !  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module trj
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!>  trj.f90                                                                    !
-!>  by John Marelius                                                           !
-!>  Q trajectory data, access and DCD format I/O module                        !
-!------------------------------------------------------------------------------!
-module trj
+!!  **module trj**
+!!  by John Marelius
+!!  Q trajectory data, access and DCD format I/O module
+!!-------------------------------------------------------------------------------
   use atom_mask
   use misc
   implicit none
 
-  character(*), private, parameter :: MODULE_VERSION = '5.7'
+  character(*), private, parameter :: MODULE_VERSION = '6.0.1'
   character(*), private, parameter :: MODULE_DATE = '2015-02-22'
 
-  type, private :: rec1
+  type, private                    :: rec1
     sequence
-     character(len=4) :: trj_type
-     integer(4)       :: n_frames, n_steps_before, interval, n_steps
-     integer(4)       :: interval_velcheck, unused6, unused7, n_degf
-     integer(4)       :: n_fixed, unused10, const_p, unused12
-     integer(4)       :: unused13, unused14, unused15, unused16
-     integer(4)       :: unused17, unused18, unused19, charmm_version
+     character(len=4)              :: trj_type
+     integer(4)                    :: n_frames, n_steps_before, interval, n_steps
+     integer(4)                    :: interval_velcheck, unused6, unused7, n_degf
+     integer(4)                    :: n_fixed, unused10, const_p, unused12
+     integer(4)                    :: unused13, unused14, unused15, unused16
+     integer(4)                    :: unused17, unused18, unused19, charmm_version
   end type rec1
 
-  type(rec1), private :: r1
+  type(rec1), private              :: r1
 
-  character(len=80), private :: topology
-  integer, private   :: mask_rows
-  integer, parameter :: max_mask_rows = 20
-  character(len=80)  :: mask_row(max_mask_rows)
+  character(len=80), private       :: topology
+  integer, private                 :: mask_rows
+  integer, parameter               :: max_mask_rows = 20
+  character(len=80)                :: mask_row(max_mask_rows)
 
-  integer, private   :: lun = 0
-  integer, private   :: current_frame = 0
+  integer, private                 :: lun = 0
+  integer, private                 :: current_frame = 0
 
   !mask   
-  integer, private   :: ncoords
-  real(4), private, allocatable :: xmasked(:)
-  type(mask_type), private :: mask
+  integer, private                 :: ncoords
+  real(4), private, allocatable    :: xmasked(:)
+  type(mask_type), private         :: mask
+
 
 contains
 
-!------------------------------------------------------------------------------!
-!>  subroutine: trj_startup
-!   Testing docs from ford
-!------------------------------------------------------------------------------!
-  subroutine trj_startup
-    mask_rows = 0
-    call mask_startup
-  end subroutine trj_startup
+
+subroutine trj_startup
+!!-------------------------------------------------------------------------------
+!!  **subroutine trj_startup**
+!!   Testing docs from ford
+!!-------------------------------------------------------------------------------
+  mask_rows = 0
+  call mask_startup
+end subroutine trj_startup
 
 
-!------------------------------------------------------------------------------!
-!>  subroutine: trj_shutdown
-!>
-!------------------------------------------------------------------------------!
-  subroutine trj_shutdown
+subroutine trj_shutdown
+!!------------------------------------------------------------------------------
+!!  subroutine trj_shutdown
+!!
+!!------------------------------------------------------------------------------
     call trj_close
     call mask_shutdown
-  end subroutine trj_shutdown
+end subroutine trj_shutdown
 
 
-!------------------------------------------------------------------------------!
-!>  subroutine: trj_initialize
-!>
-!------------------------------------------------------------------------------!
-  subroutine trj_initialize(frames, steps_before, interval, steps, degf, topfile)
+subroutine trj_initialize(frames, steps_before, interval, steps, degf, topfile)
+!!-----------------------------------------------------------------------------
+!!  subroutine trj_initialize
+!!
+!!-----------------------------------------------------------------------------
     !arguments
     integer, intent(in)      :: frames, steps_before, interval, steps
     integer, intent(in)      :: degf
@@ -100,13 +103,14 @@ contains
 
     call mask_initialize(mask)
 
-  end subroutine trj_initialize
+end subroutine trj_initialize
 
-!------------------------------------------------------------------------------!
-!>  function: trj_add
-!>
-!------------------------------------------------------------------------------!
-  integer function trj_add(line)
+
+integer function trj_add(line)
+!!------------------------------------------------------------------------------
+!!  function trj_add
+!!
+!!------------------------------------------------------------------------------
     !arguments
     character(*)         :: line
 
@@ -124,14 +128,14 @@ contains
 900    format('>>>>> ERROR: Too many trajectory atom mask rows (max',i3,').')
        trj_add = 0
     end if
-  end function trj_add
+end function trj_add
 
 
-!------------------------------------------------------------------------------!
-!>  function: trj_store_mask
-!>
-!------------------------------------------------------------------------------!
-  logical function trj_store_mask(line)
+logical function trj_store_mask(line)
+!!------------------------------------------------------------------------------
+!!  function trj_store_mask
+!!
+!!------------------------------------------------------------------------------
     !arguments
     character(*)         :: line
 
@@ -144,18 +148,18 @@ contains
 900    format('>>>>> ERROR: Too many trajectory atom mask rows (max',i3,').')
        trj_store_mask = .false.
     end if
-  end function trj_store_mask
+end function trj_store_mask
 
 
-!------------------------------------------------------------------------------!
-!>  function: trj_commit_mask
-!>
-!------------------------------------------------------------------------------!
-  integer function trj_commit_mask()
-    !locals
-    integer                           :: row
+integer function trj_commit_mask()
+!!------------------------------------------------------------------------------
+!!  function trj_commit_mask
+!!
+!!------------------------------------------------------------------------------
+  !locals
+  integer                           :: row
 
-    if(lun /= 0) then
+  if(lun /= 0) then
        !file open - can't add now
        write(*,910) 
 910    format('>>>>> ERROR: Trajectory file open, cannot add atoms to mask')
@@ -165,22 +169,23 @@ contains
        end do
     end if
     trj_commit_mask = mask%included
-  end function trj_commit_mask
-
-!------------------------------------------------------------------------------!
-!>  function: trj_count
-!>
-!------------------------------------------------------------------------------!
-  integer function trj_count()
-    trj_count = mask%included
-  end function trj_count
+end function trj_commit_mask
 
 
-!------------------------------------------------------------------------------!
-!>  function: trj_create
-!>
-!------------------------------------------------------------------------------!
-  logical function trj_create(filename, append)
+integer function trj_count()
+!!------------------------------------------------------------------------------
+!!  function trj_count
+!!
+!!------------------------------------------------------------------------------
+  trj_count = mask%included
+end function trj_count
+
+
+logical function trj_create(filename, append)
+!!-------------------------------------------------------------------------------
+!!  function trj_create
+!!
+!!-------------------------------------------------------------------------------
     !arguments
     character(*)                            :: filename
     logical, optional                       :: append
@@ -225,14 +230,14 @@ contains
     trj_create = .false.
     return
 
-  end function trj_create
+end function trj_create
 
 
-!------------------------------------------------------------------------------!
-!>  function: trj_write
-!>  Write real(4) coords to trajectory. Writes only atoms in current mask.
-!------------------------------------------------------------------------------!
-  logical function trj_write(x)
+logical function trj_write(x)
+!!-------------------------------------------------------------------------------
+!!  function trj_write
+!!  Write real(4) coords to trajectory. Writes only atoms in current mask.
+!!-------------------------------------------------------------------------------
     !arguments
     real(8)                           :: x(:)
 
@@ -251,15 +256,15 @@ contains
     !error handling
 900 trj_write = .false.
 
-  end function trj_write
+end function trj_write
 
 
-!------------------------------------------------------------------------------!
-!>  function: trj_read
-!>  Read a frame from trajectory file and return coordinates associated with
-!>  atomnumbers in topology.
-!------------------------------------------------------------------------------!
-  logical function trj_read(x)
+logical function trj_read(x)
+!!-------------------------------------------------------------------------------
+!!  function trj_read
+!!  Read a frame from trajectory file and return coordinates associated with
+!!  atomnumbers in topology.
+!!-------------------------------------------------------------------------------
     !arguments
     real(8)                           :: x(:)
     !read x record to temp variable xmasked
@@ -281,15 +286,15 @@ contains
     !error handling
 900 trj_read = .false.
 
-  end function trj_read
+end function trj_read
 
 
-!------------------------------------------------------------------------------!
-!>  function: trj_read_masked
-!>  Read a frame from trajectory file containing masked atoms, return only
-!>  masked coordinates. !REAL(4)!
-!------------------------------------------------------------------------------!
 logical function trj_read_masked(x)
+!!-------------------------------------------------------------------------------
+!!  function trj_read_masked
+!!  Read a frame from trajectory file containing masked atoms, return only
+!!  masked coordinates. !REAL(4)!
+!!-------------------------------------------------------------------------------
     !arguments
     real(4)                           :: x(:)
 
@@ -311,11 +316,11 @@ logical function trj_read_masked(x)
 end function trj_read_masked
 
 
-!------------------------------------------------------------------------------!
-!>  function: trj_seek
-!>  
-!------------------------------------------------------------------------------!
-  logical function trj_seek(frame)
+logical function trj_seek(frame)
+!!-------------------------------------------------------------------------------
+!!  function trj_seek
+!!  
+!!-------------------------------------------------------------------------------
     !arguments
     integer                           :: frame
     !locals
@@ -358,11 +363,11 @@ end function trj_read_masked
 end function trj_seek
 
 
-!------------------------------------------------------------------------------!
-!>  subroutine: trj_close
-!>  
-!------------------------------------------------------------------------------!
 subroutine trj_close
+!!-------------------------------------------------------------------------------
+!!  subroutine trj_close
+!!  
+!!-------------------------------------------------------------------------------
     !locals
     logical                           :: is_open
     inquire(lun, opened=is_open)
@@ -375,11 +380,11 @@ subroutine trj_close
 end subroutine trj_close
 
 
-!------------------------------------------------------------------------------!
-!>  function: trj_open
-!>  
-!------------------------------------------------------------------------------!
 logical function trj_open(filename)
+!!-------------------------------------------------------------------------------
+!!  function trj_open
+!!  
+!!-------------------------------------------------------------------------------
   !arguments
   character(*)                     :: filename
 
@@ -459,22 +464,23 @@ logical function trj_open(filename)
     return
 end function trj_open
 
-!------------------------------------------------------------------------------!
-!>  function: trj_intersection
-!>  
-!------------------------------------------------------------------------------!
+
 integer function trj_intersection(m)
+!!-------------------------------------------------------------------------------
+!!  function trj_intersection
+!!  
+!!-------------------------------------------------------------------------------
     !arguments
     type(MASK_TYPE) :: m
     trj_intersection = count(m%mask .and. mask%mask)
 end function trj_intersection
 
 
-!------------------------------------------------------------------------------!
-!>  subroutine: trj_clone_mask
-!>  
-!------------------------------------------------------------------------------!
 subroutine trj_clone_mask(m)
+!!-------------------------------------------------------------------------------
+!!  subroutine trj_clone_mask
+!!  
+!!-------------------------------------------------------------------------------
     !arguments
     type(MASK_TYPE) :: m
     if(size(m%mask) == size(mask%mask)) then
@@ -483,11 +489,11 @@ subroutine trj_clone_mask(m)
 end subroutine trj_clone_mask
 
 
-!------------------------------------------------------------------------------!
-!>  function: trj_get_ncoords
-!>  
-!------------------------------------------------------------------------------!
 integer function trj_get_ncoords()
+!!-------------------------------------------------------------------------------
+!!  function trj_get_ncoords
+!!  
+!!-------------------------------------------------------------------------------
   trj_get_ncoords = ncoords
 end function trj_get_ncoords
 

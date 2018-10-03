@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -8,14 +8,15 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module qatom
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!  qatom.f90
-!  by John Marelius, Johan Aqvist & Martin Almlof
-!  Q-atom force field data and FEP file reading
-!------------------------------------------------------------------------------!
-module qatom
+!!  **module qatom**
+!!  by John Marelius, Johan Aqvist & Martin Almlof
+!!  Q-atom force field data and FEP file reading
+!!-------------------------------------------------------------------------------
   use sizes
   use nrgy
   use misc
@@ -27,8 +28,8 @@ module qatom
   implicit none
 
   !constants
-  character(*), private, parameter        :: MODULE_NAME = 'Q-atom'
-  character(*), private, parameter        :: MODULE_VERSION = '5.7'
+  character(*), private, parameter        :: MODULE_NAME = 'qatom'
+  character(*), private, parameter        :: MODULE_VERSION = '6.0.1'
   character(*), private, parameter        :: MODULE_DATE = '2015-02-22'
 
   !       Constants
@@ -37,14 +38,13 @@ module qatom
   !-----------------------------------------------------------------------
   !       fep/evb information
   !-----------------------------------------------------------------------
-
   integer, parameter                      :: max_states = 10
   integer, parameter                      :: max_qat    = 1000
   integer, parameter                      :: max_link   = 10
 
   integer                                 :: nstates, nqat
 
-  !******PWadded this variable
+  !******Petra Wennerstrom added this variable
   !Topology atom number of the switching atom of the Q-atoms
   !Needed if periodic boundaries are used
   integer                                 :: qswitch

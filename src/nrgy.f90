@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -8,19 +8,20 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
-!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
-!  and Paul Bauer
-!>  **nrgy.f90**
+
+module nrgy
+!!-------------------------------------------------------------------------------
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
+!!  **module nrgy**
 !!  by John Marelius
 !!  energy data and energy file I/O
-!------------------------------------------------------------------------------!
-module nrgy
+!!-------------------------------------------------------------------------------
   use sizes
 
   implicit none
 
-  character(*), parameter     :: NRGY_VERSION = '5.7'
+  character(*), parameter     :: NRGY_VERSION = '6.0.1'
   character(*), parameter     :: NRGY_DATE = '2015-02-22'
 
   type bonded_energies

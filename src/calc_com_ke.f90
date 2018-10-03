@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  code authors: johan aqvist, martin almlof, martin ander, jens carlson,      !
 !  isabella feierberg, peter hanspers, anders kaplan, karin kolmodin,          !
 !  petra wennerstrom, kajsa ljunjberg, john marelius, martin nervall,          !

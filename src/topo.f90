@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -23,8 +23,9 @@ module topo
   implicit none
 
   ! constants
-  real, private, parameter         :: MODULE_VERSION = 5.7
-  character(*), private, parameter :: MODULE_DATE = '2015-02-22'
+  !real, private, parameter         :: MODULE_VERSION = '6.0.1'
+  character(*), private, parameter :: module_version = '6.0.1'
+  character(*), private, parameter :: module_date = '2015-02-22'
 
   integer, parameter               :: nljtyp = 3      !TINY
   integer, parameter               :: max_nbr_range   = 25
@@ -94,7 +95,7 @@ module topo
   character(len=256)               :: title = ''
   character(len=256)               :: forcefield = ''
   character(len=256)               :: creation_date
-  character(len=256)               :: pdb_file
+  character(len=256)               :: pdb_file = ''
   character(len=256)               :: lib_files = ''
   character(len=256)               :: prm_file
 
@@ -1108,8 +1109,8 @@ subroutine topo_save(name)
   if(title > '') write(u, 2) 'TITLE', trim(title)
   write(u, 2) 'DATE', trim(creation_date)
   write(u, '(a,t12,f5.2)') 'VERSION', MODULE_VERSION
-!  if(pdb_file > '') write(u, 2) 'PDB_FILE', trim(pdb_file)
-  write(u, 2) 'PDB_FILE', trim(pdb_file)  
+  if(pdb_file > '') write(u, 2) 'PDB_FILE', trim(pdb_file)
+!  write(u, 2) 'PDB_FILE', trim(pdb_file)  
 !  if(lib_files > '') write(u, 2) 'LIB_FILES', trim(lib_files)
   if(lib_files > '') write(u, 2) 'LIB_FILES', trim(lib_files)
 

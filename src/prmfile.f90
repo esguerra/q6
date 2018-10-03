@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q version 5.7                                                               !
+!  Q version 6.0.1                                                             !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
@@ -8,14 +8,15 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
+
+module prmfile
+!!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!  prmfile.f90
-!  by John Marelius
-!  parsing of data files with sections+keywords (input/parameter/library/FEP)
-!------------------------------------------------------------------------------!
-module prmfile
+!!  *module prmfile**
+!!  by John Marelius
+!!  parsing of data files with sections+keywords (input/parameter/library/FEP)
+!!-------------------------------------------------------------------------------
   !!This module reads files with the following format
   !![section_name]
   !!key  value
@@ -70,7 +71,7 @@ module prmfile
   use misc
   implicit none
   !constants
-  character(*), private, parameter  :: MODULE_VERSION = '5.7'
+  character(*), private, parameter  :: MODULE_VERSION = '6.0.1'
   character(*), private, parameter  :: MODULE_DATE = '2015-02-22'
 
   !types, NOTE: maximum length of 500 chars per line
@@ -110,7 +111,6 @@ contains
 !  end subroutine prmfile_startup
 
 
-!-------------------------------------------------------------------------------
 logical function prm_get_integer_by_key(key, value, default)
   !arguments
   character(*)                            :: key
@@ -154,7 +154,6 @@ logical function prm_get_integer_by_key(key, value, default)
 end function prm_get_integer_by_key
 
 
-!-------------------------------------------------------------------------------
 logical function prm_get_real_by_key(key, value, default)
   !arguments
   character(*)                            :: key
@@ -198,7 +197,6 @@ logical function prm_get_real_by_key(key, value, default)
 end function prm_get_real_by_key
 
 
-!-------------------------------------------------------------------------------
 logical function prm_get_real8_by_key(key, value, default)
   !arguments
   character(*)                            :: key
@@ -241,7 +239,6 @@ logical function prm_get_real8_by_key(key, value, default)
 end function prm_get_real8_by_key
 
 
-!-------------------------------------------------------------------------------
 logical function prm_get_string_by_key(key, value, default)
   !arguments
   character(*)                            :: key
@@ -283,7 +280,6 @@ logical function prm_get_string_by_key(key, value, default)
 end function prm_get_string_by_key
 
 
-!-------------------------------------------------------------------------------
 logical function prm_get_line_by_key(key, value, default)
   !arguments
   character(*)                            :: key
@@ -321,7 +317,6 @@ logical function prm_get_line_by_key(key, value, default)
 end function prm_get_line_by_key
 
 
-!-------------------------------------------------------------------------------
 logical function prm_get_logical_by_key(key, value, default)
   !arguments
   character(*)                            :: key
@@ -366,7 +361,6 @@ logical function prm_get_logical_by_key(key, value, default)
 end function prm_get_logical_by_key
 
 
-!-------------------------------------------------------------------------------
   logical function prm_get_line(line)
     !arguments
     character(*), intent(out)       :: line
@@ -385,7 +379,6 @@ end function prm_get_logical_by_key
 
   end function prm_get_line
 
-  !--------------------------------------------------------------------------
 
   logical function prm_get_field(field, skip)
     !arguments
@@ -446,10 +439,11 @@ end function prm_get_logical_by_key
 
   end function prm_get_field
 
-  !---------------------------------------------------------------------------------
-  ! Finds and return the number of input lines in the section 'section'
-  !---------------------------------------------------------------------------------
-  integer function prm_count(section)
+
+integer function prm_count(section)
+!!-------------------------------------------------------------------------------
+!! Finds and return the number of input lines in the section 'section'
+!!-------------------------------------------------------------------------------
     !argument
     character(*),intent(in) :: section
 
@@ -459,13 +453,14 @@ end function prm_get_logical_by_key
        prm_count = 0
     end if
 
-  end function prm_count
+end function prm_count
 
+
+integer function prm_max_enum(section, count_out)
   !-------------------------------------------------------------------------------
   ! Find and return largest number in first column in specified section.
   ! Optional: Return number of lines in section in 'count_out' 
   !-------------------------------------------------------------------------------
-  integer function prm_max_enum(section, count_out)
     !argument
     character(*),intent(in) ::      section
     integer, optional, intent(out):: count_out
@@ -486,13 +481,14 @@ end function prm_get_logical_by_key
     end if
     prm_max_enum = max_enum
     if(present(count_out)) count_out = count
-  end function prm_max_enum
+end function prm_max_enum
 
+
+integer function prm_max_enum2(section, count_out)
   !-------------------------------------------------------------------------------
   ! Find and return largest number in second column in specified section.
   ! Optional: Return number of lines in section in 'count_out' 
   !-------------------------------------------------------------------------------
-  integer function prm_max_enum2(section, count_out)
     !argument
     character(*),intent(in) ::      section
     integer, optional, intent(out):: count_out
@@ -513,19 +509,17 @@ end function prm_get_logical_by_key
     end if
     prm_max_enum2 = max_enum
     if(present(count_out)) count_out = count
-  end function prm_max_enum2
+end function prm_max_enum2
 
-  !-----------------------------------------------------------------------------
 
-  logical function prm_get_string_string(key, value)
+logical function prm_get_string_string(key, value)
     !arguments
     character(*),intent(out)        ::      key
     character(*), intent(out)       ::      value
 
     prm_get_string_string = get_strings(key, value)
-  end function prm_get_string_string
+end function prm_get_string_string
 
-  !-----------------------------------------------------------------------------
 
   logical function prm_get_string_line(key, value)
     !arguments
@@ -546,7 +540,6 @@ end function prm_get_logical_by_key
     prm_get_string_line = .true.
   end function prm_get_string_line
 
-  !-----------------------------------------------------------
 
   logical function prm_get_string_int(key, value)
     !arguments
@@ -567,7 +560,6 @@ end function prm_get_logical_by_key
 
   end function prm_get_string_int
 
-  !-----------------------------------------------------------------------------
 
   logical function prm_get_string_real(key, value)
     !arguments
@@ -586,7 +578,6 @@ end function prm_get_logical_by_key
     end if
   end function prm_get_string_real
 
-  !-----------------------------------------------------------------------------
 
   logical function prm_get_string_real8(key, value)
     !arguments
@@ -607,7 +598,7 @@ end function prm_get_logical_by_key
 
   end function prm_get_string_real8
 
-  !---------------------------------------------------------------------------------
+
   logical function prm_get_int_real(key, value)
     !arguments
     integer,intent(out)                     ::      key
@@ -625,7 +616,7 @@ end function prm_get_logical_by_key
     end if
   end function prm_get_int_real
 
-  !---------------------------------------------------------------------------------
+
   logical function prm_get_int_real8(key, value)
     !arguments
     integer,intent(out)                     ::      key
@@ -643,7 +634,6 @@ end function prm_get_logical_by_key
     end if
   end function prm_get_int_real8
 
-  !----------------------------------------------------------------------------------
 
   logical function prm_get_int_int(key, value)
     !arguments
@@ -662,7 +652,6 @@ end function prm_get_logical_by_key
     end if
   end function prm_get_int_int
 
-  !--------------------------------------------------------------------------
 
   logical function prm_get_int(value)
     !arguments
@@ -680,7 +669,6 @@ end function prm_get_logical_by_key
     end if
   end function prm_get_int
 
-  !----------------------------------------------------------------------------
 
   logical function get_strings(key, value)
     !arguments
@@ -701,7 +689,6 @@ end function prm_get_logical_by_key
     get_strings = .true.
   end function get_strings
 
-  !---------------------------------------------------------------------------------
 
   logical function prm_open_section(section, filename)
     !arguments
@@ -731,7 +718,6 @@ end function prm_get_logical_by_key
     prm_open_section = find_section(section)        
   end function prm_open_section
 
-  !---------------------------------------------------------------------------------
 
   subroutine rewind_section
     if(associated(current_sec)) then
@@ -743,7 +729,6 @@ end function prm_get_logical_by_key
 
   end subroutine rewind_section
 
-  !------------------------------------------------------------------------------
 
   logical function find_section(section)
     !arguments
@@ -783,7 +768,6 @@ end function prm_get_logical_by_key
 
   end function find_section
 
-  !---------------------------------------------------------------------------------------
 
   logical function prm_get_next_title(title)
     !arguments
@@ -802,7 +786,6 @@ end function prm_get_logical_by_key
 
   end function prm_get_next_title
 
-  !----------------------------------------------------------------------------
 
   subroutine rewind_title
     current_sec => first_sec
@@ -813,7 +796,6 @@ end function prm_get_logical_by_key
     end if
   end subroutine rewind_title
 
-  !-------------------------------------------------------------------------------
 
   logical function prm_open(filename)
     !arguments
@@ -837,7 +819,6 @@ end function prm_get_logical_by_key
     end if
   end function prm_open
 
-  !---------------------------------------------------------------------------------
 
   subroutine clear
     !locals
@@ -862,7 +843,6 @@ end function prm_get_logical_by_key
     nullify(first_sec)
   end subroutine clear
 
-  !--------------------------------------------------------------------------------------
 
   subroutine prm_dump
     !locals
@@ -889,7 +869,6 @@ end function prm_get_logical_by_key
 200 format(a)
   end subroutine prm_dump
 
-  !-----------------------------------------------------------------------------------
 
   logical function load()
     !locals
@@ -1019,7 +998,6 @@ end function prm_get_logical_by_key
     call rewind_title !reset pointers       
   end function load
 
-  !------------------------------------------------------------------------------------
 
   subroutine prm_close
     if(PRM_U /= 0) then
@@ -1029,7 +1007,6 @@ end function prm_get_logical_by_key
     call clear
   end subroutine prm_close
 
-  !------------------------------------------------------------------------------------
 
   logical function split(line, key, value)
     !arguments
@@ -1076,7 +1053,6 @@ end function prm_get_logical_by_key
 
   end function split
 
-  !------------------------------------------------------------------------------------
 
   logical function splitone(line, key, value)
     !arguments
@@ -1124,6 +1100,5 @@ end function prm_get_logical_by_key
 
   end function splitone
 
-  !------------------------------------------------------------------------------------
 
 end module prmfile

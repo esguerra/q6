@@ -51,7 +51,7 @@ do
 done
 
 
-for step in {1..5}
+for step in {1..4}
 do
  echo -n "Running production run step ${step} of 5                        "
  if time mpirun --allow-run-as-root -np $CORES $bindir/qdynp dc${step}.inp > dc${step}.log
