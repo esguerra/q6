@@ -43,6 +43,11 @@ in Fedora28 using:
     make all COMP=gcc  
 	make mpi COMP=gcc  
 
+Also, note that the repository is connected to Docker and TravisCI,
+so, you can take a look there to see what's working. Since TravisCI is
+ubuntu based and we like to test in the RedHat family, we need to go
+through our own docker container.
+
 
 Developer Docs
 --------------
@@ -62,6 +67,11 @@ To generate the FORD (version >= 6.0.0) docs:
     cd docs/developers  
     ford -d ../../src -o devdocs forddocs.md  
 
+The compiled developers documentation with the very useful UML-type,
+sort-of, graphs which FORD makes can be found at:  
+
+<http://qdyn.no-ip.org/developers/devdocs/index.html>
+
 
 Coding Standards
 ----------------
@@ -70,21 +80,21 @@ We are following the example of the **GROMACS** developers which have
 identified the following important main points for taking into account
 when organizing a molecular dynamics code.  
 
-1.  **Code formatting** - how to indent code, how to start and end subroutines
-    etc.  
+1.  **Code formatting** - code indentation, start and end of
+    subroutines and functions, module writing.
 2.  **Code constructs** - argument order, return values, encapsulation
     using abstract data types  
-3.  **Interfaces** - the Application Programming Interface should say it
-    all  
-4.  **Comments in code** - comments in code that ford can use  
+3.  **Interfaces** - an Application Programming Interface  
+4.  **Comments in code** - comments in code that FORD can use  
 5.  **Compilation** - using different hardware  
 6.  **Allowed Fortran Features**  
 7.  **Error Handling**  
 8.  **Benchmarking**  
 9.  **Accuracy Testing**   
 
-For fortran maybe slightly different rules will be needed. The fluidity project 
-is a good example to draw from.
+A good example which has advanced quite nicely on the use of modern
+FORTRAN is the fluidity project. A good example to draw inspiration
+from.
 
   
 1. Code formatting
@@ -112,8 +122,15 @@ is a good example to draw from.
 
 4. Comments in code
 -------------------
-*to do*  
 
+We are using FORD. The main rule is to include the documentation after
+the program, module, function, or subroutine is started. It should be
+included by using a double exclamation mark:  
+
+    subroutine riemannhypothesis(s)
+    !! This way **FORD** will find it.
+	!! using double exclamation mark. It will understant markdown.
+	
 
 5. Compilation
 --------------
@@ -139,40 +156,48 @@ for very large programs.
 5.2 compilation in windows 10
 -----------------------------
 
-You will have to install mingw64 in order to compile **Q** in windows.
-Once  mingw64 and  gcc-fortran  are  installed you  can  just use  the
-standard compilation for gcc of  **Q**.  We recommend using msys2, and
-then the mingw64 shell.  You will need git to clone the repository, so
-you  will need  to install  git using  *pacman* which  is the  package
-manager of mingw64. You will also need make and gcc-fortran.
+The easiest way to compile **Q** in Windows 10 without buying the whole
+costly Microsoft Developers Studio is by using GCC.
+To install GCC natively in Windows 10 one can use MinGW. Some easy to
+follow instructions are found here:   
 
+<http://www.codebind.com/cprogramming/install-mingw-windows-10-gcc/>
 
-    pacman -S pacman mingw-w64-x86_64-gcc-fortran
-    pacman -S git make
-   
-Then just clone this fork:
+Once the basic MinGW is installed it's important to install additional
+packages such as **make**. Then you can just download the **Q** code
+from this repository as a .zip file and uncompress it in
+the folder where you want to install **Q**.
 
-    git clone https://github.com/esguerra/q6.git
+With MinGW installed one can then open the Windows Power Shell and
+compile. It's probable that make won't be in your path, so you can 
+invoke it directly if you don't want to add it to your path. If you've
+let the installation of MinGW proceed in the standard way the path to
+make should be as shown in the following example:
 
-And compile with:
+    cd .\q6\src\
+	C:\MinGW\bin\mingw32-make.eke all COMP=gcc
 
-    cd src
-    make all COMP=gcc
+Since the makefile is made to comply with linux commands, it will not
+be able to move the binaries *qprep*, *qcalc*, *qdum*, *qdyn*, *qfep*
+to an independent folder. This you will have to do manually.
 
 We have tested with gcc 6.3.0 and the compilation works well. For
 compilation of the parallel *qdynp* you will need MPI in windows. We
 have not tested Windows MPI yet, nor the openMPI port for cygwin.
 
+You can find our binaries for windows 10 in the release 6.0.1 area of
+the repository.
 
 
 6. Allowed Fortran Features
 ---------------------------
-*to do*  
+Those which comply with Fortran 2008
 
 
 7. Error Handling
 -----------------
-*to do*  
+This is one of the weakest points of the code and it's a much pending
+part.
 
 
 8. Benchmarking
@@ -182,7 +207,10 @@ have not tested Windows MPI yet, nor the openMPI port for cygwin.
 
 9. Accuracy Testing
 -------------------
-*to do*  
+For this we use the tests available in the tests folder.
+
+*to do* The results should be compared with similar cases in gromacs and
+charmm, for example.
 
 
 
