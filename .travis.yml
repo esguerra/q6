@@ -7,9 +7,14 @@ services:
 
 before_install:
   - docker pull esguerra/q6
-  - docker run esguerra/q6 bash -c "cd /root/q6/src; source ~/.bashrc; 
-  export; module load mpi/openmpi-x86_64; make all COMP=gcc; make mpi COMP=gcc; 
-  cd ../tests/test1; pwd"
+  - docker run esguerra/q6 bash -c "cd /root/q6/src;
+  source ~/.bashrc; 
+  export;
+  module load mpi/openmpi-x86_64;
+  make all COMP=gcc;
+  make mpi COMP=gcc; 
+  cd ../tests/test1;
+  pwd"
 
 script:
 #  - docker run esguerra/q6 bash -c "cd /root/q6/tests/test1; source ~/.bashrc; module load mpi/openmpi-x86_64; module list; ls ../../bin"
