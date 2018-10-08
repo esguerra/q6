@@ -29,7 +29,7 @@ module avetr
 contains
 subroutine avetr_calc
 !!------------------------------------------------------------------------------
-!!  **subroutine: avetr_calc**
+!!  **subroutine avetr_calc**
 !!  Main subroutine calls trajectory, add_coordinates, get_string_arg,
 !!  average, write_average
 !!------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ end subroutine avetr_calc
 
 subroutine add_coordinates
 !!------------------------------------------------------------------------------
-!!  **subroutine: add_coordinates**  
+!!  **subroutine add_coordinates**
 !!  Sum the coordinates and the squared coordinates  
 !!------------------------------------------------------------------------------
   x_sum = x_sum + x_in
@@ -83,7 +83,7 @@ end subroutine add_coordinates
 
 subroutine average
 !!------------------------------------------------------------------------------
-!!  **subroutine: average**  
+!!  **subroutine average**
 !!  Make average and rmsd  
 !!------------------------------------------------------------------------------
   x_sum = x_sum / n_sets
@@ -94,7 +94,7 @@ end subroutine average
 
 subroutine write_average
 !!------------------------------------------------------------------------------
-!!  **subroutine: write_average**  
+!!  **subroutine write_average**
 !!  Write average coords to pdb file.  
 !!  Variables used from prep: mask  
 !!  Variables used from topo: xtop  

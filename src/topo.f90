@@ -23,8 +23,7 @@ module topo
   implicit none
 
   ! constants
-  !real, private, parameter         :: MODULE_VERSION = '6.0.1'
-  character(*), private, parameter :: module_version = '6.0.1'
+  real, private, parameter         :: module_version = 6.01
   character(*), private, parameter :: module_date = '2015-02-22'
 
   integer, parameter               :: nljtyp = 3      !TINY
@@ -1108,7 +1107,7 @@ subroutine topo_save(name)
   write(u, '(a)') 'Q topology file'
   if(title > '') write(u, 2) 'TITLE', trim(title)
   write(u, 2) 'DATE', trim(creation_date)
-  write(u, '(a,t12,f5.2)') 'VERSION', MODULE_VERSION
+  write(u, '(a,t12,f5.2)') 'VERSION', module_version
   if(pdb_file > '') write(u, 2) 'PDB_FILE', trim(pdb_file)
 !  write(u, 2) 'PDB_FILE', trim(pdb_file)  
 !  if(lib_files > '') write(u, 2) 'LIB_FILES', trim(lib_files)

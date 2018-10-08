@@ -112,7 +112,7 @@ integer function trj_add(line)
 !!
 !!------------------------------------------------------------------------------
     !arguments
-    character(*)         :: line
+    character(*)                   :: line
 
     if(lun /= 0) then
        !file open - can't add now
