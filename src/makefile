@@ -42,7 +42,7 @@ else ifeq ($(COMP),osx)
 #	                -static-libgfortran -fall-intrinsics -std=legacy \
 #	                -Wall -Wtabs -fstack-protector ${FC_OPT} -DG95=1
 	FFLAGS=         -Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 \
-                   -ffast-math -funroll-loops
+	                -ffast-math -funroll-loops ${FC_OPT}
 
 	FPP_FLG=        -cpp
 

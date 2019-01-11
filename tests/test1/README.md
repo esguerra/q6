@@ -78,13 +78,21 @@ Short Production Run
 Benchmarks
 --------------------------------------------------------------------------------
 
+The system has:
+
+Total TIP3P waters = 1141
+Total ligand atoms = 46
+
 
 |  Machine     | Compiler    | Comp. time (min) | Sim. time (ns) | Num Proc. |    Date    |
 |:-------------|:-----------:|:----------------:|:--------------:|:---------:|:----------:|
-| csb          | no-impi     | xx.xx            |      0.20      |   16      | 2017-12-13 |
+| csb          | no-impi     | xx.xx            |      0.20      |   16      | 2019-01-11 |
+| tetralith    | ifort 18.0.3|  3.57            |      0.20      |   16      | 2019-01-11 |
 | kebnekeise   | ifort 18.0.1|  6.38            |      0.20      |   20      | 2017-12-13 |
 | hebbe        | ifort       | xx.xx            |      0.20      |   20      | 2017-12-13 |
-| csb          | gcc 6.2.0   | 10.38            |      0.20      |   16      | 2017-12-13 |
+| laptop       | gcc 8.1.0   | 11.17            |      0.20      |    8      | 2019-01-11 |
+| csb          | gcc 8.2.0   |  5.86            |      0.20      |   16      | 2019-01-11 |
+| tetralith    | gcc 8.2.0   |  9.11            |      0.20      |   16      | 2019-01-11 |
 | kebnekeise   | gcc 6.4.0   |  7.33            |      0.20      |   20      | 2017-12-12 |
 | hebbe        | gcc 6.3.0   | 10.47            |      0.20      |   20      | 2017-12-13 |
 
