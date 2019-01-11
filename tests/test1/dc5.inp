@@ -10,7 +10,6 @@ shake_solute              off
 shake_hydrogens           on
 lrf                       on
 
-
 [cut_offs]
 solute_solute             10
 solute_solvent            10

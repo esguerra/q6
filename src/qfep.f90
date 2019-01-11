@@ -10,13 +10,13 @@
 
 
 program qfep
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
 !!  program  **qfep**  
 !!  by Johan Aqvist, Karin Kolmodin, John Marelius, Johan Sund  
 !!  qfep free energy analysis program for FEP, BAR, EVB, Umbrella Sampling  
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin  
 !!  and Paul Bauer  
-!!!--------------------------------------------------------------------------------!  
+!!!-------------------------------------------------------------------------------  
   use iso_fortran_env, only : compiler_version, compiler_options
   
   use nrgy
@@ -408,12 +408,15 @@ program qfep
            do istate=1,nstates
               veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)
               veff2=veff2+FEP(ifile+1)%lambda(istate)*FEP(ifile)%v(istate,ipt)
+              !print *, "veff1 terms", veff1, FEP(ifile)%lambda(istate),   FEP(ifile)%v(istate,ipt), ifile, istate, ipt
+              !print *, "veff2 terms", veff2, FEP(ifile+1)%lambda(istate), FEP(ifile)%v(istate,ipt), ifile+1, istate, ipt              
            end do
            !print *, 'veff1, veff2, point counter (ipt) after =', veff1, veff2, ipt
            dv=veff2-veff1
            veff1=0.
            veff2=0.
            sum=sum+exp(-dv/rt)
+           !print *, 'delta potential, ipt', dv, ipt, ifile
         end do
         sum=sum/real(FEP(ifile)%npts-nskip)
         dgf(ifile)=-rt*dlog(sum)
@@ -571,7 +574,7 @@ program qfep
 
         !print *, 'constant for the bennett formula end', dglu(ifile)
         dgbarsum(ifile+1)=dgbarsum(ifile)+dgbar(ifile)
-!        print *, 'The optimization constant is', fel
+        !print *, 'The optimization constant is', fel
         fel=1
 
      end do
@@ -777,10 +780,10 @@ contains
 
 
 subroutine startup
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
 !!  subroutine  **startup**  
 !!  Startup message   
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
   integer :: i
 
   print '(a)',  '--------------------------------------------------------------------------------'
@@ -802,10 +805,10 @@ end subroutine startup
 
 
 subroutine prompt (outtxt)
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
 !!  subroutine  **prompt**  
 !!  When in interctive mode give a proper prompt.  
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
     character( * ) outtxt
 #if defined (__osf__)
     !prompt to STDERR using unit 5=STDIN on OSF/1=DEC UNIX
@@ -830,10 +833,10 @@ end subroutine prompt
 
 
 subroutine commandlineoptions
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
 !!  subroutine  **commandlineoptions**  
 !!  Provide command line options such as help and version.  
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
   do k = 1, command_argument_count()
     call get_command_argument(k, arg)
     select case (arg)
@@ -853,10 +856,10 @@ end subroutine commandlineoptions
 
 
 subroutine print_help()
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
 !!  subroutine  **print_help**  
 !!  Text to accompany the --help argument value.  
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
     print '(a)', 'usage:'
     print '(a)', 'qfep [OPTION]'
     print '(a)', '  or'
@@ -872,14 +875,14 @@ end subroutine print_help
 
 
 subroutine tred2(A,N,NP,D,E)
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
 !! This subroutine reduces a symmetric matrix to tridiagonal  
 !! form. The tridiagonal matrix can further be diagonalized by  
 !! the subroutine tqli.  
 !! These subroutines were copied by Karin Kolmodin 20 Nov. 1997  
 !! from http://rsc.anu.au/HWS/COURSES/MATHMETH/node70.html  
 !! and rewritten in f90.  
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
   real(8),dimension(:)   :: D,E
   real(8),dimension(:,:) :: A
   integer                :: NP,I,J,K,L,N,ERR
@@ -965,13 +968,13 @@ end subroutine tred2
 
 
 subroutine tqli(D,E,N,NP,Z)
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
 !! This subroutine diagonalizes a tridiagonal matrix which has   
 !! been prepared by the subroutine tred2.  
 !! These subroutines were copied by Karin Kolmodin 20 Nov. 1997  
 !! from http://rsc.anu.au/HWS/COURSES/MATHMETH/node70.html  
 !! and rewritten in f90  
-!!!--------------------------------------------------------------------------------!  
+!!!--------------------------------------------------------------------------------  
   implicit none
   real(8),dimension(:)   :: D,E
   real(8),dimension(:,:) :: Z

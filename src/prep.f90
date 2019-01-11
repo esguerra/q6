@@ -240,7 +240,7 @@ end subroutine prep_startup
 
 subroutine allocate_for_pdb(atoms, residues, molecules)
 !!------------------------------------------------------------------------------
-!!  **subroutine allocate_for_pdb**
+!!  subroutine **allocate_for_pdb**
 !!
 !!------------------------------------------------------------------------------
   !arguments
@@ -259,7 +259,7 @@ end subroutine allocate_for_pdb
 
 subroutine prep_shutdown
 !!------------------------------------------------------------------------------  
-!!  **subroutine prep_shutdown**
+!!  subroutine **prep_shutdown**
 !!  
 !!------------------------------------------------------------------------------    
   call topo_deallocate
@@ -271,7 +271,7 @@ end subroutine prep_shutdown
 
 subroutine clearlib
 !!------------------------------------------------------------------------------  
-!!  **subroutine clearlib**
+!!  subroutine **clearlib**
 !!  
 !!------------------------------------------------------------------------------    
   lib_files = ''
@@ -281,7 +281,7 @@ end subroutine clearlib
 
 subroutine check_alloc(message)
 !!------------------------------------------------------------------------------  
-!!  **subroutine check_alloc**
+!!  subroutine **check_alloc**
 !!  
 !!------------------------------------------------------------------------------  
 !arguments
@@ -297,7 +297,7 @@ end subroutine check_alloc
 
 subroutine addbond
 !!------------------------------------------------------------------------------  
-!!  **subroutine addbond**
+!!  subroutine **addbond**
 !!  
 !!------------------------------------------------------------------------------    
   ! *** local variables
@@ -373,7 +373,7 @@ end subroutine addbond
 
 subroutine clearbond
 !!------------------------------------------------------------------------------  
-!!  **subroutine clearbond**
+!!  subroutine **clearbond**
 !!  
 !!------------------------------------------------------------------------------    
   !clear extra bonds
@@ -383,7 +383,7 @@ end subroutine clearbond
 
 subroutine angle_ene(emax, nlarge, av_ene)
 !!------------------------------------------------------------------------------  
-!!  **subroutine angle_ene**
+!!  subroutine **angle_ene**
 !!  
 !!------------------------------------------------------------------------------  
 ! *** local variables
@@ -1243,7 +1243,7 @@ end subroutine listseq
 
 subroutine make14list
 !!-------------------------------------------------------------------------------
-!!  **subroutine make14list**
+!!  subroutine **make14list**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -1304,7 +1304,7 @@ end subroutine make14list
 
 subroutine makeangles
 !!-------------------------------------------------------------------------------
-!!  **subroutine makeangles**
+!!  subroutine **makeangles**
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -1415,7 +1415,7 @@ end subroutine makeangles
 
 subroutine make_solute_bonds
 !!-------------------------------------------------------------------------------
-!!  **subroutine make_solute_bonds**
+!!  subroutine **make_solute_bonds**
 !!  make solute bond list
 !!  used only by xlink routine to make solute bond list to check new
 !!  bonds against
@@ -1441,7 +1441,7 @@ end subroutine make_solute_bonds
 
 subroutine makebonds
 !!-------------------------------------------------------------------------------
-!!  **subroutine makebonds**
+!!  subroutine **makebonds**
 !!
 !!-------------------------------------------------------------------------------
   !locals
@@ -1509,7 +1509,7 @@ end function makeextrabonds
 
 subroutine set_bondcodes
 !!-------------------------------------------------------------------------------
-!!  **subroutine set_bondcodes**
+!!  subroutine **set_bondcodes**
 !!
 !!-------------------------------------------------------------------------------
 !locals
@@ -1604,7 +1604,7 @@ end function makesomebonds
 
 subroutine makeexlist
 !!-------------------------------------------------------------------------------
-!!  **subroutine makeexlist**
+!!  subroutine **makeexlist**
 !!  Make a list of excluded neighbors
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -1677,7 +1677,7 @@ end subroutine makeexlist
 
 subroutine makehyds
 !!-------------------------------------------------------------------------------
-!!  **subroutine makehyds**
+!!  subroutine **makehyds**
 !!  Most likely routine that creates hydrogens not present in input
 !!  structure but present in library definition.
 !!-------------------------------------------------------------------------------
@@ -1724,7 +1724,7 @@ end subroutine makehyds
 
 integer function genh(j, residue)
 !!-------------------------------------------------------------------------------
-!!  **subroutine genh**
+!!  subroutine **genh**
 !!
 !!-------------------------------------------------------------------------------
   !arguments
@@ -1978,7 +1978,7 @@ end function genh
 
 subroutine makeimps
 !!-------------------------------------------------------------------------------
-!!  **subroutine makeimps**
+!!  subroutine **makeimps**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2003,7 +2003,7 @@ end subroutine makeimps
 
 subroutine imp_params
 !!-------------------------------------------------------------------------------
-!!  **subroutine imp_params**
+!!  subroutine **imp_params**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2118,7 +2118,7 @@ end function find_atom
 
 subroutine makeimps_explicit
 !!-------------------------------------------------------------------------------
-!!  **subroutine makeimps_explicit**
+!!  subroutine **makeimps_explicit**
 !!  generate impropers using definitions in library file
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2150,7 +2150,7 @@ end subroutine makeimps_explicit
 
 subroutine maketop
 !!-------------------------------------------------------------------------------
-!!  **subroutine maketop**
+!!  subroutine **maketop**
 !!
 !!-------------------------------------------------------------------------------
   !check if library is loaded
@@ -2299,7 +2299,7 @@ end subroutine maketop
 
 subroutine set_default_mask
 !!-------------------------------------------------------------------------------
-!!  **subroutine set_default_mask**
+!!  subroutine **set_default_mask**
 !!  make atom mask including all atoms
 !!-------------------------------------------------------------------------------
   !first get rid of old mask
@@ -2313,7 +2313,7 @@ end subroutine set_default_mask
 
 subroutine makeconn
 !!-------------------------------------------------------------------------------
-!!  **subroutine makeconn**
+!!  subroutine **makeconn**
 !!  make connections to each atom
 !!-------------------------------------------------------------------------------
   !locals
@@ -2338,7 +2338,7 @@ end subroutine makeconn
 
 subroutine maketors
 !!-------------------------------------------------------------------------------
-!!  **subroutine maketors**
+!!  subroutine **maketors**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2435,7 +2435,7 @@ end subroutine maketors
 
 subroutine prompt(outtxt)
 !!-------------------------------------------------------------------------------
-!!  **subroutine prompt**
+!!  subroutine **prompt**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
@@ -2447,7 +2447,7 @@ end subroutine prompt
 
 real function randm(seed, seed_only)
 !!-------------------------------------------------------------------------------
-!!  **subroutine randm**
+!!  subroutine **randm**
 !!
 !!-------------------------------------------------------------------------------
   !arguments
@@ -2487,7 +2487,7 @@ end function randm
 
 subroutine oldreadlib(filnam)
 !!-------------------------------------------------------------------------------
-!!  **subroutine oldreadlib**
+!!  subroutine **oldreadlib**
 !!
 !!-------------------------------------------------------------------------------
 !arguments
@@ -6396,7 +6396,7 @@ end subroutine writetop
 
 subroutine listprefs
 !!-------------------------------------------------------------------------------
-!!  **subroutine listprefs**
+!!  subroutine **listprefs**
 !!
 !!-------------------------------------------------------------------------------
   call pref_list('Preferences (use set command to change):')
@@ -6405,7 +6405,7 @@ end subroutine listprefs
 
 subroutine set
 !!-------------------------------------------------------------------------------
-!!  **subroutine set**
+!!  subroutine **set**
 !!
 !!-------------------------------------------------------------------------------
   !locals
@@ -6421,7 +6421,7 @@ end subroutine set
 
 subroutine make_shell2
 !!------------------------------------------------------------------------------
-!!  **subroutine make_shell2**
+!!  subroutine **make_shell2**
 !!
 !!  Sort out atoms in restrained shell. Use protein center to calculate distance.
 !!  Use coordinates from topology unless 'implicit_rstr_from_file' is specified

@@ -109,11 +109,12 @@ program qcalc
 
 contains
 
-  !----------------------------------------------------------------------------!
-  !!  subroutine: startup  
-  !!  Startup  
-  !----------------------------------------------------------------------------!
+
 subroutine startup
+!!------------------------------------------------------------------------------
+!!  subroutine: startup
+!!  Startup
+!!------------------------------------------------------------------------------
   integer :: i
 
 !  write(*,'(79a)')('#',i=1,79)
@@ -141,21 +142,21 @@ subroutine startup
 end subroutine startup
 
 
-  !----------------------------------------------------------------------------!
-  !!  subroutine: shutdown
-  !!  Shutdown call
-  !!  TODO: Implement fully.
-  !----------------------------------------------------------------------------!
 subroutine shutdown
+!!----------------------------------------------------------------------------!
+!!  subroutine: shutdown
+!!  Shutdown call
+!!  TODO: Implement fully.
+!!----------------------------------------------------------------------------!
   call trj_shutdown
 end subroutine shutdown
 
 
-  !----------------------------------------------------------------------------!
-  !!  function: get_topology
-  !!
-  !----------------------------------------------------------------------------!
 logical function get_topology()
+!!------------------------------------------------------------------------------
+!!  function: get_topology
+!!
+!!------------------------------------------------------------------------------
   !locals
   character(len=200)                      :: topfile
   call getlin(topfile, '--> Topology file: ')
@@ -260,7 +261,6 @@ subroutine process_help
         WRITE( * , '(a)') &
         'Enter names of coordinate files (restart or trajectory) on separate lines', &
         'Terminate with EOF or period (.).'
-
 end subroutine process_help
 
 

@@ -8,10 +8,12 @@
 !  latest update: August 29, 2017
 !------------------------------------------------------------------------------
 
-!------------------------------------------------------------------------------
-!>  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+
+module calc_xscore
+!!!------------------------------------------------------------------------------
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
-!!  calc_xscore.f90
+!!  **calc_xscore.f90**
 !!  by Peter Hanspers & Martin Nervall
 !!  Qcalc trajectory analysis main program
 !! v.2003.11, Structure-Based Drug Design Toolkits, developed by Dr. Renxiao
@@ -19,8 +21,7 @@
 !! structure from the original xscore source code is ported to f90.
 !! Before scoring, protein and ligand data structures are translated to
 !! xscore format.
-!------------------------------------------------------------------------------
-module calc_xscore
+!!!------------------------------------------------------------------------------
 
   use calc_base
   use maskmanip
@@ -1948,7 +1949,7 @@ subroutine xscore_calc(iCalc, iFrame)   ! calc topmost routine
 
   call xlog_frame(iFrame,ligand)
 
-  if(input%show_abs.eq.'YES')             call Ligand_Scoring_Stats(ligand)
+  if(input%show_abs.eq.'YES')   call Ligand_Scoring_Stats(ligand)
   if(input%show_abs.eq.'QATOM') call Ligand_Scoring_Stats(ligand,input%qatom-1)
 
   if(input%show_total.eq.'YES') then
@@ -1956,7 +1957,10 @@ subroutine xscore_calc(iCalc, iFrame)   ! calc topmost routine
       ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt, &
       ligand%bind_score
   endif
-  if(input%show_abs.eq.'YES')             write(*,'(a)') '------------------------------------------------------------------------------'
+  if(input%show_abs.eq.'YES') then
+    write(*,'(a)') '------------------------------------------------------------------------------'
+    end if
+
 end subroutine xscore_calc
 
 subroutine xlog_frame(iFrame,ligand)                            ! logs scoring results for frame
@@ -1966,8 +1970,8 @@ subroutine xlog_frame(iFrame,ligand)                            ! logs scoring r
         
   nXScores = nXScores +1
   if(nXScores>maxXScores) then
-    maxXScores = maxXScores + 16                                                                            ! allocate 16 elements a time
-    allocate(new_aXScore(maxXScores))                                                               ! allocate new mem
+    maxXScores = maxXScores + 16                            ! allocate 16 elements a time
+    allocate(new_aXScore(maxXScores))                       ! allocate new mem
     new_aXScore(1:nXScores-1) = xscores(1:nXScores-1)       ! copy old
                 
     deallocate(xscores)                             ! return old mem to OS
@@ -2023,13 +2027,13 @@ subroutine xscore_heading(i)
 1       format(      t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2, t67,a2,   t74,a5)
 end subroutine xscore_heading
 
-! ==========================================================================================================================================
-! ==========================================================================================================================================
+! ======================================================================================================================
+! ======================================================================================================================
 
 ! XMOLECULE MODULE
 
-! ==========================================================================================================================================
-! ==========================================================================================================================================
+! ======================================================================================================================
+! ======================================================================================================================
 
 integer function Molecule_Get_Num_Heavy_Atom(molecule)
         type(tXMolecule)        :: molecule
@@ -2237,41 +2241,41 @@ subroutine Molecule_Show_Atoms(mol)
 end subroutine Molecule_Show_Atoms
 
 subroutine Molecule_Show_Bonds(mol)
-        type(tXMolecule) :: mol
-        integer ::  i 
+  type(tXMolecule) :: mol
+  integer ::  i
 
-        write(*,'(a,i6)') 'Total number of bonds in this molecule = ',mol%num_bond
-        write(*,'(a)') '  ID valid atom_1 atom_2 topo_1 topo_2 type ring part  num_neib  neib[0:5]'
+  write(*,'(a,i6)') 'Total number of bonds in this molecule = ',mol%num_bond
+  write(*,'(a)') '  ID valid atom_1 atom_2 topo_1 topo_2 type ring part  num_neib  neib[0:5]'
 
-        do i = 0,mol%num_bond -1 
-                write(*,'(i4, 1x, i3, 2x,i4, 3x, i4, 4x, i5, 2x i5, t42 ,a, t46, i2, 1x, i3, 4x, i4, 2x, 6(i5,1x))')  &
-                                        mol%bond(i)%id, mol%bond(i)%valid, mol%bond(i)%atom_1, mol%bond(i)%atom_2, &
-                                        mol%atom(mol%bond(i)%atom_1-1)%topindex, mol%atom(mol%bond(i)%atom_2-1)%topindex, &
-                                        mol%bond(i)%ttype, mol%bond(i)%ring, mol%bond(i)%part, mol%bond(i)%num_neib, mol%bond(i)%neib(0), mol%bond(i)%neib(1), &
-                                        mol%bond(i)%neib(2), mol%bond(i)%neib(3), mol%bond(i)%neib(4), mol%bond(i)%neib(5)
-        end do
+  do i = 0,mol%num_bond -1
+    write(*,'(i4, 1x, i3, 2x,i4, 3x, i4, 4x, i5, 2x i5, t42 ,a, t46, i2, 1x, i3, 4x, i4, 2x, 6(i5,1x))')  &
+      mol%bond(i)%id, mol%bond(i)%valid, mol%bond(i)%atom_1, mol%bond(i)%atom_2, &
+      mol%atom(mol%bond(i)%atom_1-1)%topindex, mol%atom(mol%bond(i)%atom_2-1)%topindex, &
+      mol%bond(i)%ttype, mol%bond(i)%ring, mol%bond(i)%part, mol%bond(i)%num_neib, mol%bond(i)%neib(0), mol%bond(i)%neib(1), &
+      mol%bond(i)%neib(2), mol%bond(i)%neib(3), mol%bond(i)%neib(4), mol%bond(i)%neib(5)
+  end do
 end subroutine Molecule_Show_Bonds
 
 subroutine Molecule_Show_Rings(mol)
-        type(tXMolecule) :: mol
-        integer ::  i 
+  type(tXMolecule) :: mol
+  integer ::  i
 
-        write(*,'(a,i4)') 'Total number of aromatic rings in this molecule = ', size(mol%ring)
+  write(*,'(a,i4)') 'Total number of aromatic rings in this molecule = ', size(mol%ring)
 
-        if(size(mol%ring)>0 .and. associated(mol%ring)) then
-                write(*,'(t1,a)') 'id  vld. type size    atoms (first-last)  centroid'
-                do i = 0,size(mol%ring) -1 
-!                       write(*,*) i, associated(mol%ring), size(mol%ring)
-                        if(mol%ring(i)%valid.ne.0) then
-                                write(*,'(t1,i3, t6,i1, t10,i1, t15,i2, t23,i5,t29,i5, t43,f5.1,t49,f5.1,t56,f5.1)') &
-                                                i+1, mol%ring(i)%valid,mol%ring(i)%ttype,mol%ring(i)%num_member, &
-                                                mol%ring(i)%atom_id(0),mol%ring(i)%atom_id(mol%ring(i)%num_member-1), &
-                                                mol%ring(i)%centroid(0),mol%ring(i)%centroid(1),mol%ring(i)%centroid(2)
-                        else
-                                write(*,'(t1,i3, t6,a)') i+1, 'invalid'
-                        end if
-                end do
-        end if
+  if(size(mol%ring)>0 .and. associated(mol%ring)) then
+    write(*,'(t1,a)') 'id  vld. type size    atoms (first-last)  centroid'
+    do i = 0,size(mol%ring) -1
+      !                       write(*,*) i, associated(mol%ring), size(mol%ring)
+      if(mol%ring(i)%valid.ne.0) then
+        write(*,'(t1,i3, t6,i1, t10,i1, t15,i2, t23,i5,t29,i5, t43,f5.1,t49,f5.1,t56,f5.1)') &
+          i+1, mol%ring(i)%valid,mol%ring(i)%ttype,mol%ring(i)%num_member, &
+          mol%ring(i)%atom_id(0),mol%ring(i)%atom_id(mol%ring(i)%num_member-1), &
+          mol%ring(i)%centroid(0),mol%ring(i)%centroid(1),mol%ring(i)%centroid(2)
+      else
+        write(*,'(t1,i3, t6,a)') i+1, 'invalid'
+      end if
+    end do
+  end if
 end subroutine Molecule_Show_Rings
 
 subroutine Molecule_DetectConnections(molecule)
@@ -3292,99 +3296,99 @@ subroutine Molecule_Detect_Rings(molecule)
 end subroutine Molecule_Detect_Rings
 
 integer function Molecule_Look_For_A_Ring(molecule, bond_id, atom_path, bond_path, required_size)
-! this is a bond-based algorithm to detect rings in a molecule%
-! it returns the size of the ring (if zero, the given bond is not in a ring)
-! also the corresponding atom path and bond path
-        type(tXMolecule),intent(inout)  :: molecule
-        integer :: bond_id
-        integer,pointer :: atom_path(:)
-        integer,pointer :: bond_path(:)
-        integer :: required_size
+  ! this is a bond-based algorithm to detect rings in a molecule%
+  ! it returns the size of the ring (if zero, the given bond is not in a ring)
+  ! also the corresponding atom path and bond path
+  type(tXMolecule),intent(inout)  :: molecule
+  integer :: bond_id
+  integer,pointer :: atom_path(:)
+  integer,pointer :: bond_path(:)
+  integer :: required_size
 
-        integer ::  i,ring_size=0 
-        integer ::  p,next 
-        integer,allocatable ::  choice(:,:)
+  integer ::  i,ring_size=0
+  integer ::  p,next
+  integer,allocatable ::  choice(:,:)
 
-        ! initialize the variables first
-        allocate(choice(0:molecule%num_bond-1,0:MAX_BOND_NEIB-1),stat=err)
-        if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
-        choice(:,:) = 0
+  ! initialize the variables first
+  allocate(choice(0:molecule%num_bond-1,0:MAX_BOND_NEIB-1),stat=err)
+  if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
+  choice(:,:) = 0
 
-        ! note that atom_path() and bond_path() is not cleaned here
-        ! they are supposed to be cleaned at the upper level 
-        do i = 0,molecule%num_bond -1  
-                 if(molecule%bond(i)%valid<=0) goto 1 
-                 call Molecule_Reset_Choices(molecule,molecule%bond(i)%id,choice(i,:)) 
-1       end do
+  ! note that atom_path() and bond_path() is not cleaned here
+  ! they are supposed to be cleaned at the upper level
+  do i = 0,molecule%num_bond -1
+    if(molecule%bond(i)%valid<=0) goto 1
+    call Molecule_Reset_Choices(molecule,molecule%bond(i)%id,choice(i,:))
+    1       end do
 
-        ! put the given bond at the beginning of the searching chain 
-        p=0  
-        bond_path(0)=bond_id
-        atom_path(0)=molecule%bond(bond_id-1)%atom_1            ! bond_id -1
+    ! put the given bond at the beginning of the searching chain
+    p=0
+    bond_path(0)=bond_id
+    atom_path(0)=molecule%bond(bond_id-1)%atom_1            ! bond_id -1
 
-        do
-                ! search the next possible step 
-                do
-                        next = Molecule_Get_Choices(molecule, choice(bond_path(p)-1,:),atom_path(p),p+1,bond_path) 
-                        if(next.eq.0) then      ! next step is not available 
-                                if(p.eq.0) then ! the given bond is not in a ring%
-                                        ring_size=0 
-                                        goto 10
-                                end if
+    do
+      ! search the next possible step
+      do
+        next = Molecule_Get_Choices(molecule, choice(bond_path(p)-1,:),atom_path(p),p+1,bond_path)
+        if(next.eq.0) then      ! next step is not available
+          if(p.eq.0) then ! the given bond is not in a ring%
+            ring_size=0
+            goto 10
+          end if
 
-                                ! trace back to the previous step 
-                                call Molecule_Reset_Choices(molecule,bond_path(p),choice(bond_path(p)-1,:)) 
-                                bond_path(p)=0 
-                                atom_path(p)=0 
-                                p = p -1 
-                                goto 2 
-                        else
-                                exit
-                        end if
-2               end do
+          ! trace back to the previous step
+          call Molecule_Reset_Choices(molecule,bond_path(p),choice(bond_path(p)-1,:))
+          bond_path(p)=0
+          atom_path(p)=0
+          p = p -1
+          goto 2
+        else
+          exit
+        end if
+        2               end do
 
-                ! define the next step 
+        ! define the next step
 
-                p = p +1 
-                bond_path(p)=next 
-                atom_path(p)=Molecule_Two_Bonds_Connection_Check(molecule%bond(bond_path(p-1)-1), molecule%bond(bond_path(p)-1))
+        p = p +1
+        bond_path(p)=next
+        atom_path(p)=Molecule_Two_Bonds_Connection_Check(molecule%bond(bond_path(p-1)-1), molecule%bond(bond_path(p)-1))
 
-                ! record the searching history, prevent repeating  
-                call Molecule_Clean_Choices(molecule,bond_path(p),choice(bond_path(p-1)-1,:)) 
+        ! record the searching history, prevent repeating
+        call Molecule_Clean_Choices(molecule,bond_path(p),choice(bond_path(p-1)-1,:))
 
-                ! now check if a ring has formed
-                if(Molecule_Two_Bonds_Connection_Check(molecule%bond(bond_path(0)-1),molecule%bond(bond_path(p)-1)).eq.atom_path(0)) then
-                        if(required_size<=0) then ! a ring is found
-                                ring_size=p+1
-                                goto 10
-      elseif((p+1).eq.required_size) then  ! a ring with required size
-                                ring_size=p+1
-                                goto 10  
-                        else   ! pre-mature ring, trace back
-                                call Molecule_Reset_Choices(molecule,bond_path(p), choice(bond_path(p)-1,:)) 
-                                bond_path(p)=0 
-                                atom_path(p)=0 
-                                p = p -1 
-                                goto 3 
-                        end if
-                else   ! no ring is formed at this step
-                        if(required_size<=0) then
-                                goto 3 
-                        elseif((p+1).eq.required_size) then ! no ring on this path, trace back
-                                call Molecule_Reset_Choices(molecule,bond_path(p), choice(bond_path(p)-1,:)) 
-                                bond_path(p)=0 
-                                atom_path(p)=0 
-                                p = p -1 
-                                goto 3 
-                        else
-                                goto 3
-                        end if
-                end if
-3       end do
+        ! now check if a ring has formed
+        if(Molecule_Two_Bonds_Connection_Check(molecule%bond(bond_path(0)-1),molecule%bond(bond_path(p)-1)).eq.atom_path(0)) then
+          if(required_size<=0) then ! a ring is found
+            ring_size=p+1
+            goto 10
+          elseif((p+1).eq.required_size) then  ! a ring with required size
+            ring_size=p+1
+            goto 10
+          else   ! pre-mature ring, trace back
+            call Molecule_Reset_Choices(molecule,bond_path(p), choice(bond_path(p)-1,:))
+            bond_path(p)=0
+            atom_path(p)=0
+            p = p -1
+            goto 3
+          end if
+        else   ! no ring is formed at this step
+          if(required_size<=0) then
+            goto 3
+          elseif((p+1).eq.required_size) then ! no ring on this path, trace back
+            call Molecule_Reset_Choices(molecule,bond_path(p), choice(bond_path(p)-1,:))
+            bond_path(p)=0
+            atom_path(p)=0
+            p = p -1
+            goto 3
+          else
+            goto 3
+          end if
+        end if
+        3       end do
 
 10      deallocate(choice) 
         Molecule_Look_For_A_Ring = ring_size 
-end function Molecule_Look_For_A_Ring
+      end function Molecule_Look_For_A_Ring
 
 subroutine Molecule_Reset_Choices(molecule, bond_id,choice)
 ! find all the neighboring bonds for the given bond 
@@ -4002,129 +4006,130 @@ real function Molecule_Count_O3_1_4_Pair(molecule,flag)
 end function Molecule_Count_O3_1_4_Pair
 
 integer function Molecule_Adjacent_Aromatic_Check(molecule,id_in)
-        type(tXMolecule)        :: molecule
-        integer                                         ::id, id_in
+  type(tXMolecule)        :: molecule
+  integer                                         ::id, id_in
   integer ::  i,num,tmp,mark 
 
-        id = id_in
-        id = id -1 
+  id = id_in
+  id = id -1
 
-        mark=0
-        num=molecule%atom(id)%num_neib
+  mark=0
+  num=molecule%atom(id)%num_neib
 
-        do i = 0,num -1 
-                tmp=molecule%atom(id)%neib(i) 
-                if((molecule%atom(tmp-1)%ttype.eq.'C.ar')) then
-                        mark=tmp
-                        exit
-                end if
-        end do
+  do i = 0,num -1
+    tmp=molecule%atom(id)%neib(i)
+    if((molecule%atom(tmp-1)%ttype.eq.'C.ar')) then
+      mark=tmp
+      exit
+    end if
+  end do
   
-        Molecule_Adjacent_Aromatic_Check = mark 
+  Molecule_Adjacent_Aromatic_Check = mark
 end function Molecule_Adjacent_Aromatic_Check
 
 real function Molecule_Count_Nar_1_4_Pair(molecule,flag)
-        type(tXMolecule) :: molecule
-        integer                                  :: flag
-        integer ::  i,j,num,tmp1,tmp2,tmp3,tmp4 
+  type(tXMolecule) :: molecule
+  integer                                  :: flag
+  integer ::  i,j,num,tmp1,tmp2,tmp3,tmp4
 
-        num=0 
+  num=0
 
-        do i = 0,molecule%num_atom-1 -1 
-                if((molecule%atom(i)%ttype.ne.'N.ar')) goto 1 
+  do i = 0,molecule%num_atom-1 -1
+    if((molecule%atom(i)%ttype.ne.'N.ar')) goto 1
 
-                tmp1=molecule%atom(i)%neib(0)
-                tmp2=molecule%atom(i)%neib(1)
+    tmp1=molecule%atom(i)%neib(0)
+    tmp2=molecule%atom(i)%neib(1)
 
-                do j = i,molecule%num_atom -1 
-                        if((molecule%atom(j)%ttype.ne.'N.ar')) then
-                                goto 2 
-                        elseif(Molecule_Connection_1_4_Check(molecule,(molecule%atom(i)%id), (molecule%atom(j)%id)).eq.0) then
-                                goto 2 
-                        else
-                                tmp3=molecule%atom(j)%neib(0)
-                                tmp4=molecule%atom(j)%neib(1)
+    do j = i,molecule%num_atom -1
+      if((molecule%atom(j)%ttype.ne.'N.ar')) then
+        goto 2
+      elseif(Molecule_Connection_1_4_Check(molecule,(molecule%atom(i)%id), (molecule%atom(j)%id)).eq.0) then
+        goto 2
+      else
+        tmp3=molecule%atom(j)%neib(0)
+        tmp4=molecule%atom(j)%neib(1)
 
-                                if(Molecule_Connection_1_2_Check(molecule,(tmp1),(tmp3)).eq.1) then
-                                        if(Molecule_Connection_1_2_Check(molecule,(tmp2),(tmp4)).eq.1) then
-                                                num = num +1 
-                                                if(flag.ne.0) then
-                                                        molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_NAR_PAIR)/2.0) 
-                                                        molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_NAR_PAIR)/2.0) 
-                                                end if
-                                        else 
-                                                goto 2  
-                                        end if
-                                elseif(Molecule_Connection_1_2_Check(molecule,tmp1,tmp4).eq.1) then
-                                        if(Molecule_Connection_1_2_Check(molecule,tmp2,tmp3).eq.1) then
-                                                num = num +1 
-                                                if(flag.ne.0) then
-                                                        molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_NAR_PAIR)/2.0) 
-                                                        molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_NAR_PAIR)/2.0) 
-                                                end if
-                                        end if
-                                else 
-                                        goto 2  
-                                end if
-                        end if
+        if(Molecule_Connection_1_2_Check(molecule,(tmp1),(tmp3)).eq.1) then
+          if(Molecule_Connection_1_2_Check(molecule,(tmp2),(tmp4)).eq.1) then
+            num = num +1
+            if(flag.ne.0) then
+              molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_NAR_PAIR)/2.0)
+              molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_NAR_PAIR)/2.0)
+            end if
+          else
+            goto 2
+          end if
+        elseif(Molecule_Connection_1_2_Check(molecule,tmp1,tmp4).eq.1) then
+          if(Molecule_Connection_1_2_Check(molecule,tmp2,tmp3).eq.1) then
+            num = num +1
+            if(flag.ne.0) then
+              molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_NAR_PAIR)/2.0)
+              molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_NAR_PAIR)/2.0)
+            end if
+          end if
+        else
+          goto 2
+        end if
+      end if
 2               end do
 1       end do
 
-        Molecule_Count_Nar_1_4_Pair = num 
+Molecule_Count_Nar_1_4_Pair = num
 end function Molecule_Count_Nar_1_4_Pair
 
 real function Molecule_Count_Halogen_1_3_Pair(molecule,flag)
-        type(tXMolecule)        :: molecule
-        integer                                         :: flag
-        integer ::  i,j 
-        integer ::  num1,num2 
+  type(tXMolecule)        :: molecule
+  integer                                         :: flag
+  integer ::  i,j
+  integer ::  num1,num2
 
-        num1=0
-        num2=0 
+  num1=0
+  num2=0
 
-        do i = 0,molecule%num_atom-1 -1 
-                if((molecule%atom(i)%ttype.ne.'F')) goto 1 
+  do i = 0,molecule%num_atom-1 -1
+    if((molecule%atom(i)%ttype.ne.'F')) goto 1
 
-                do j = i,molecule%num_atom -1 
-                        if((molecule%atom(j)%ttype.ne.'F')) then
-                                goto 2 
-                        elseif(Molecule_Connection_1_3_Check(molecule,molecule%atom(i)%id,molecule%atom(j)%id).eq.0) then
-                                goto 2 
-                        end if
+    do j = i,molecule%num_atom -1
+      if((molecule%atom(j)%ttype.ne.'F')) then
+        goto 2
+      elseif(Molecule_Connection_1_3_Check(molecule,molecule%atom(i)%id,molecule%atom(j)%id).eq.0) then
+        goto 2
+      end if
 
-                        num1 = num1 +1 
+      num1 = num1 +1
 
-                        if(flag.ne.0) then
-                                molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_HALOGEN_PAIR)/2.0) 
-                                molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_HALOGEN_PAIR)/2.0) 
-                        else 
-                                goto 2 
-                        end if
+      if(flag.ne.0) then
+        molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_HALOGEN_PAIR)/2.0)
+        molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_HALOGEN_PAIR)/2.0)
+      else
+        goto 2
+      end if
 2               end do
 1       end do
 
-        do i = 0,molecule%num_atom-1 -1 
-                if((molecule%atom(i)%ttype.ne.'Cl').and.(molecule%atom(i)%ttype.ne.'Br').and.(molecule%atom(i)%ttype.ne.'I')) goto 3 
+      do i = 0,molecule%num_atom-1 -1
+        if((molecule%atom(i)%ttype.ne.'Cl').and.(molecule%atom(i)%ttype.ne.'Br').and.(molecule%atom(i)%ttype.ne.'I')) goto 3
 
-                do j = i,molecule%num_atom -1 
-                        if((molecule%atom(j)%ttype.ne.'Cl').and.(molecule%atom(j)%ttype.ne.'Br').and.(molecule%atom(j)%ttype.ne.'I')) then
-                                goto 4 
-                        elseif(Molecule_Connection_1_3_Check(molecule,molecule%atom(i)%id,molecule%atom(j)%id).eq.0) then
-                                goto 4 
-                        end if
+        do j = i,molecule%num_atom -1
+          if((molecule%atom(j)%ttype.ne.'Cl').and.(molecule%atom(j)%ttype.ne.'Br').and.(molecule%atom(j)%ttype.ne.'I')) then
+            goto 4
+          elseif(Molecule_Connection_1_3_Check(molecule,molecule%atom(i)%id,molecule%atom(j)%id).eq.0) then
+            goto 4
+          end if
 
-                        num2 = num2 +1 
+          num2 = num2 +1
 
-                        if(flag.ne.0) then
-                                molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_HALOGEN_PAIR)/2.0) 
-                                molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_HALOGEN_PAIR)/2.0) 
-                        else 
-                                goto 4
-                        end if
+          if(flag.ne.0) then
+            molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_HALOGEN_PAIR)/2.0)
+            molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_HALOGEN_PAIR)/2.0)
+          else
+            goto 4
+          end if
+
 4               end do
 3       end do
 
-        Molecule_Count_Halogen_1_3_Pair = num1+num2
+Molecule_Count_Halogen_1_3_Pair = num1+num2
 end function Molecule_Count_Halogen_1_3_Pair
 
 integer function Molecule_Adjacent_Ring_Check(molecule,id_in)
@@ -4965,242 +4970,242 @@ subroutine Molecule_Get_XLOGP_Type(molecule,atom_id, ttype)
 end subroutine Molecule_Get_XLOGP_Type 
 
 
-! ==========================================================================================================================================
-! ==========================================================================================================================================
+! ==============================================================================
+! ==============================================================================
 
 ! XLIGAND MODULE
 
-! ==========================================================================================================================================
-! ==========================================================================================================================================
-        
+! ==============================================================================
+! ==============================================================================
 subroutine Ligand_Scoring_Stats(ligand,iAtom)
-        type(tXLigand)  :: ligand
-        integer,optional:: iAtom
-        integer                                 :: i
-        real                                            :: vdw, hb, hp, hm, hs, rt, score
+  type(tXLigand)  :: ligand
+  integer,optional:: iAtom
+  integer                                 :: i
+  real                                            :: vdw, hb, hp, hm, hs, rt, score
 
-        vdw = 0
-        hb = 0
-        hp = 0
-        hm = 0
-        hs = 0
-        rt = 0
-        score = 0
+  vdw = 0
+  hb = 0
+  hp = 0
+  hm = 0
+  hs = 0
+  rt = 0
+  score = 0
 
 
-        if(present(iAtom)) then
-                i = iAtom
-                write(*,'(t81,i3, t85,a,   t28,f6.1,  t36,f5.2, t43,f5.2, t51,f5.2, t57,f5.2, t65,f4.1, t73,f6.3)') &
-                                                        ligand%mol%atom(i)%id, ligand%mol%atom(i)%ttype,  ligand%abs_inf(i)%vdw,        ligand%abs_inf(i)%hb,           ligand%abs_inf(i)%hp, &
-                                                        ligand%abs_inf(i)%hm,  ligand%abs_inf(i)%hs,              ligand%abs_inf(i)%rt,         ligand%abs_inf(i)%score
-        else
-                write(*,'(t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2,&
-                    t67,a2,   t74,a5)')  'VDW',   'HB',    'HP',    'HM', &
-                    'HS',       'RT',                   'SCORE'
-                do i = 0,ligand%mol%num_atom -1
-                !       write(*,'(t28,f6.1,  t36,f4.1, t43,f5.1, t51,f3.1, t57,f5.1, t65,f4.1, t74,f5.2)')
-                        write(*,'(t1,i3, t6,a,   t28,f6.1,  t36,f5.2, t43,f5.2, t51,f5.2, t57,f5.2, t65,f4.1, t73,f6.3)') &
-                            ligand%mol%atom(i)%id, ligand%mol%atom(i)%ttype, &
-                            ligand%abs_inf(i)%vdw, ligand%abs_inf(i)%hb, &
-                            ligand%abs_inf(i)%hp, &
-                            ligand%abs_inf(i)%hm, ligand%abs_inf(i)%hs, &
-                            ligand%abs_inf(i)%rt, ligand%abs_inf(i)%score
+  if(present(iAtom)) then
+    i = iAtom
+    write(*,'(t81,i3, t85,a,   t28,f6.1,  t36,f5.2, t43,f5.2, t51,f5.2, t57,f5.2, t65,f4.1, t73,f6.3)') &
+      ligand%mol%atom(i)%id, ligand%mol%atom(i)%ttype, ligand%abs_inf(i)%vdw, ligand%abs_inf(i)%hb, ligand%abs_inf(i)%hp, &
+      ligand%abs_inf(i)%hm, ligand%abs_inf(i)%hs, ligand%abs_inf(i)%rt, ligand%abs_inf(i)%score
+  else
+    write(*,'(t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2,&
+                    t67,a2,   t74,a5)'    )  'VDW',   'HB',    'HP',    'HM', &
+      'HS',       'RT',                   'SCORE'
+    do i = 0,ligand%mol%num_atom -1
+      !       write(*,'(t28,f6.1,  t36,f4.1, t43,f5.1, t51,f3.1, t57,f5.1, t65,f4.1, t74,f5.2)')
+      write(*,'(t1,i3, t6,a,   t28,f6.1,  t36,f5.2, t43,f5.2, t51,f5.2, t57,f5.2, t65,f4.1, t73,f6.3)') &
+        ligand%mol%atom(i)%id, ligand%mol%atom(i)%ttype, &
+        ligand%abs_inf(i)%vdw, ligand%abs_inf(i)%hb, &
+        ligand%abs_inf(i)%hp, &
+        ligand%abs_inf(i)%hm, ligand%abs_inf(i)%hs, &
+        ligand%abs_inf(i)%rt, ligand%abs_inf(i)%score
                         
-                        vdw             = vdw           + ligand%abs_inf(i)%vdw
-                        hb              = hb            + ligand%abs_inf(i)%hb
-                        hp              = hp            + ligand%abs_inf(i)%hp
-                        hm              = hm            + ligand%abs_inf(i)%hm
-                        hs              = hs            +       ligand%abs_inf(i)%hs
-                        rt              = rt            + ligand%abs_inf(i)%rt
-                        score = score + ligand%mol%atom(i)%score
+      vdw             = vdw           + ligand%abs_inf(i)%vdw
+      hb              = hb            + ligand%abs_inf(i)%hb
+      hp              = hp            + ligand%abs_inf(i)%hp
+      hm              = hm            + ligand%abs_inf(i)%hm
+      hs              = hs            +       ligand%abs_inf(i)%hs
+      rt              = rt            + ligand%abs_inf(i)%rt
+      score = score + ligand%mol%atom(i)%score
 
-                end do
+    end do
 
-                write(*,'(a)') '                            --------------------------------------------------'
-        end if
+    write(*,'(a)') '                            --------------------------------------------------'
+  end if
 
 end subroutine Ligand_Scoring_Stats
 
 real function Ligand_Calculate_Binding_Score(ligand,input,protein)
-        type(tXLigand)          :: ligand
-        type(tXInput)                   :: input
-        type(tXProtein)         :: protein
-        integer                                         :: i 
-        type(tXLigand)          :: bak 
-        integer                                         :: num_nonh=0
-        real                                                    :: sum=0.000 
+  type(tXLigand)          :: ligand
+  type(tXInput)                   :: input
+  type(tXProtein)         :: protein
+  integer                                         :: i
+  type(tXLigand)          :: bak
+  integer                                         :: num_nonh=0
+  real                                                    :: sum=0.000
 
-        bak = ligand   ! backup the atomic charge information
+  bak = ligand   ! backup the atomic charge information
 
-        ! these scoring functions may need formal charges
-        call Molecule_Assign_Apparent_Charge(ligand%mol) 
+  ! these scoring functions may need formal charges
+  call Molecule_Assign_Apparent_Charge(ligand%mol)
 
 
-        ! prepare for atomic binding score
-        if(.not. associated(ligand%abs_inf)) then
-                allocate(ligand%abs_inf(0:ligand%mol%num_atom -1),stat=err)     ! create array of atomic binding score, one element for each atom in ligand
-                if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
-        end if
+  ! prepare for atomic binding score
+  if(.not. associated(ligand%abs_inf)) then
+    allocate(ligand%abs_inf(0:ligand%mol%num_atom -1),stat=err)     ! create array of atomic binding score, one element for each atom in ligand
+    if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
+  end if
 
-        ! initialize binding scores to 0%0
-        ligand%abs_inf(:)%pkd1  = 0.000 
-        ligand%abs_inf(:)%pkd2  = 0.000 
-        ligand%abs_inf(:)%pkd3  = 0.000 
-        ligand%abs_inf(:)%vdw           = 0.000 
-        ligand%abs_inf(:)%hb            = 0.000 
-        ligand%abs_inf(:)%hm            = 0.000 
-        ligand%abs_inf(:)%hp            = 0.000 
-        ligand%abs_inf(:)%hs            = 0.000 
-        ligand%abs_inf(:)%rt            = 0.000 
-        ligand%abs_inf(:)%score = 0.000 
+  ! initialize binding scores to 0%0
+  ligand%abs_inf(:)%pkd1  = 0.000
+  ligand%abs_inf(:)%pkd2  = 0.000
+  ligand%abs_inf(:)%pkd3  = 0.000
+  ligand%abs_inf(:)%vdw           = 0.000
+  ligand%abs_inf(:)%hb            = 0.000
+  ligand%abs_inf(:)%hm            = 0.000
+  ligand%abs_inf(:)%hp            = 0.000
+  ligand%abs_inf(:)%hs            = 0.000
+  ligand%abs_inf(:)%rt            = 0.000
+  ligand%abs_inf(:)%score = 0.000
 
-        ! clean other variables
-        ligand%pkd1     = 0 
-        ligand%pkd2     = 0
-        ligand%pkd3     = 0
-        ligand%vdw      = 0
-        ligand%hb               = 0
-        ligand%hm               = 0
-        ligand%hp               = 0
-        ligand%hs               = 0
-        ligand%rt               = 0 
+  ! clean other variables
+  ligand%pkd1     = 0
+  ligand%pkd2     = 0
+  ligand%pkd3     = 0
+  ligand%vdw      = 0
+  ligand%hb               = 0
+  ligand%hm               = 0
+  ligand%hp               = 0
+  ligand%hs               = 0
+  ligand%rt               = 0
 
-        ! first, generate dot surface
-        call Molecule_Generate_Surface_Dots(ligand%mol, WATER_R) 
+  ! first, generate dot surface
+  call Molecule_Generate_Surface_Dots(ligand%mol, WATER_R)
 
-        ! now calculate the van der Waals term
-        ligand%vdw = Ligand_Calculate_VDW(ligand,protein) 
-        ligand%abs_inf(:)%vdw = ligand%mol%atom(:)%score
+  ! now calculate the van der Waals term
+  ligand%vdw = Ligand_Calculate_VDW(ligand,protein)
+  ligand%abs_inf(:)%vdw = ligand%mol%atom(:)%score
 
-        ! now calculate the H-bond term
-        ligand%hb=Ligand_Calculate_HB(ligand,protein) 
+  ! now calculate the H-bond term
+  ligand%hb=Ligand_Calculate_HB(ligand,protein)
   ligand%abs_inf(:)%hb=ligand%mol%atom(:)%score 
 
-        ! now calculate the rotor term
-        ligand%rt=Ligand_Calculate_RT(ligand,protein) 
-        ligand%abs_inf(:)%rt=ligand%mol%atom(:)%score 
+  ! now calculate the rotor term
+  ligand%rt=Ligand_Calculate_RT(ligand,protein)
+  ligand%abs_inf(:)%rt=ligand%mol%atom(:)%score
 
-        ! now calculate the hydrophobic term
-        if(input%apply_hpscore.eq.'YES') then
-                ligand%hp=Ligand_Calculate_HP(ligand,protein) 
-                ligand%abs_inf(:)%hp=ligand%Mol%atom(:)%score 
-          ligand%pkd1=input%hpscore_c0 +                                &
-                input%hpscore_cvdw*ligand%vdw   + &
-                input%hpscore_chb*ligand%hb     +               &
-                input%hpscore_chp*ligand%hp     +               &
-                input%hpscore_crt*ligand%rt 
-        end if
+  ! now calculate the hydrophobic term
+  if(input%apply_hpscore.eq.'YES') then
+    ligand%hp=Ligand_Calculate_HP(ligand,protein)
+    ligand%abs_inf(:)%hp=ligand%Mol%atom(:)%score
+    ligand%pkd1=input%hpscore_c0 +                                &
+      input%hpscore_cvdw*ligand%vdw   + &
+      input%hpscore_chb*ligand%hb     +               &
+      input%hpscore_chp*ligand%hp     +               &
+      input%hpscore_crt*ligand%rt
+  end if
         
-        if(input%apply_hmscore.eq.'YES') then
-          ligand%hm=Ligand_Calculate_HM(ligand,protein) 
+  if(input%apply_hmscore.eq.'YES') then
+    ligand%hm=Ligand_Calculate_HM(ligand,protein)
     ligand%abs_inf(:)%hm=ligand%mol%atom(:)%score 
-                ligand%pkd2=input%hmscore_c0+   &
-                    input%hmscore_cvdw*ligand%vdw+      &
-                    input%hmscore_chb*ligand%hb+                &
-                    input%hmscore_chm*ligand%hm+                &
-                    input%hmscore_crt*ligand%rt 
+    ligand%pkd2=input%hmscore_c0+   &
+      input%hmscore_cvdw*ligand%vdw+      &
+      input%hmscore_chb*ligand%hb+                &
+      input%hmscore_chm*ligand%hm+                &
+      input%hmscore_crt*ligand%rt
 
-        end if
+  end if
 
-        if(input%apply_hsscore.eq.'YES') then
-          ligand%hs=Ligand_Calculate_HS(ligand,protein) 
-                ligand%abs_inf(:)%hs=ligand%mol%atom(:)%score 
-          ligand%pkd3=input%hsscore_c0+ &
-                input%hsscore_cvdw* ligand%vdw+ &
-                input%hsscore_chb * ligand%hb+          &
-                input%hsscore_chs * ligand%hs+          &
-                input%hsscore_crt * ligand%rt 
-        end if
+  if(input%apply_hsscore.eq.'YES') then
+    ligand%hs=Ligand_Calculate_HS(ligand,protein)
+    ligand%abs_inf(:)%hs=ligand%mol%atom(:)%score
+    ligand%pkd3=input%hsscore_c0+ &
+      input%hsscore_cvdw* ligand%vdw+ &
+      input%hsscore_chb * ligand%hb+          &
+      input%hsscore_chs * ligand%hs+          &
+      input%hsscore_crt * ligand%rt
+  end if
 
-        ligand%bind_score=(ligand%pkd1+ligand%pkd2+ligand%pkd3)/(input%num_method) 
+  ligand%bind_score=(ligand%pkd1+ligand%pkd2+ligand%pkd3)/(input%num_method)
 
-        ! now compute atomic binding scores
-        num_nonh = Molecule_Get_Num_Heavy_Atom(ligand%mol)
+  ! now compute atomic binding scores
+  num_nonh = Molecule_Get_Num_Heavy_Atom(ligand%mol)
 
-        if(input%apply_hpscore.eq.'YES') then
-                do i = 0,ligand%mol%num_atom -1 
-                         if(ligand%mol%atom(i)%valid<=0) goto 1
-                         if(ligand%mol%atom(i)%ttype.eq.'H') goto 1
+  if(input%apply_hpscore.eq.'YES') then
+    do i = 0,ligand%mol%num_atom -1
+      if(ligand%mol%atom(i)%valid<=0) goto 1
+      if(ligand%mol%atom(i)%ttype.eq.'H') goto 1
 
-                         ligand%abs_inf(i)%pkd1 =  input%hpscore_c0/num_nonh + &
-                                                                                                                                 input%hpscore_cvdw * ligand%abs_inf(i)%vdw + &
-                                                                                                                                 input%hpscore_chb  * ligand%abs_inf(i)%hb +    &
-                                                                                                                                 input%hpscore_chp  * ligand%abs_inf(i)%hp +    &
-                                                                                                                                 input%hpscore_crt  * ligand%abs_inf(i)%rt 
-1               end do
-        end if
+      ligand%abs_inf(i)%pkd1 =  input%hpscore_c0/num_nonh + &
+        input%hpscore_cvdw * ligand%abs_inf(i)%vdw + &
+        input%hpscore_chb  * ligand%abs_inf(i)%hb +    &
+        input%hpscore_chp  * ligand%abs_inf(i)%hp +    &
+        input%hpscore_crt  * ligand%abs_inf(i)%rt
+      1               end do
+    end if
 
-        if(input%apply_hmscore.eq.'YES') then
-                do i = 0,ligand%mol%num_atom -1 
-                        if(ligand%mol%atom(i)%valid<=0) goto 2
-                        if(ligand%mol%atom(i)%ttype.eq.'H') goto 2
+    if(input%apply_hmscore.eq.'YES') then
+      do i = 0,ligand%mol%num_atom -1
+        if(ligand%mol%atom(i)%valid<=0) goto 2
+        if(ligand%mol%atom(i)%ttype.eq.'H') goto 2
 
-                        ligand%abs_inf(i)%pkd2 = input%hmscore_c0/num_nonh + &
-                                                                                                                         input%hmscore_cvdw * ligand%abs_inf(i)%vdw + &
-                                                                                                                         input%hmscore_chb  * ligand%abs_inf(i)%hb + &
-                                                                                                                         input%hmscore_chm      * ligand%abs_inf(i)%hm + &
-                                                                                                                         input%hmscore_crt      * ligand%abs_inf(i)%rt 
-2               end do
-        end if
+        ligand%abs_inf(i)%pkd2 = input%hmscore_c0/num_nonh + &
+          input%hmscore_cvdw * ligand%abs_inf(i)%vdw + &
+          input%hmscore_chb  * ligand%abs_inf(i)%hb + &
+          input%hmscore_chm      * ligand%abs_inf(i)%hm + &
+          input%hmscore_crt      * ligand%abs_inf(i)%rt
+        2               end do
+      end if
 
-        if(input%apply_hsscore.eq.'YES') then
-                do i = 0,ligand%mol%num_atom -1 
-                        if(ligand%mol%atom(i)%valid<=0) goto 3
-                        if(ligand%mol%atom(i)%ttype.eq.'H') goto 3
+      if(input%apply_hsscore.eq.'YES') then
+        do i = 0,ligand%mol%num_atom -1
+          if(ligand%mol%atom(i)%valid<=0) goto 3
+          if(ligand%mol%atom(i)%ttype.eq.'H') goto 3
 
-                        ligand%abs_inf(i)%pkd3 = input%hsscore_c0/num_nonh + &
-                                                                                                                         input%hsscore_cvdw * ligand%abs_inf(i)%vdw + &
-                                                                                                                         input%hsscore_chb      * ligand%abs_inf(i)%hb + &
-                                                                                                                         input%hsscore_chs      * ligand%abs_inf(i)%hs + &
-                                                                                                                         input%hsscore_crt      * ligand%abs_inf(i)%rt 
-3               end do
+          ligand%abs_inf(i)%pkd3 = input%hsscore_c0/num_nonh + &
+            input%hsscore_cvdw * ligand%abs_inf(i)%vdw + &
+            input%hsscore_chb      * ligand%abs_inf(i)%hb + &
+            input%hsscore_chs      * ligand%abs_inf(i)%hs + &
+            input%hsscore_crt      * ligand%abs_inf(i)%rt
+          3               end do
         end if
 
         sum = 0
         do i = 0,ligand%mol%num_atom -1 
-                 ligand%abs_inf(i)%score=0
-                 ligand%abs_inf(i)%score=ligand%abs_inf(i)%score+ligand%abs_inf(i)%pkd1 
-                 ligand%abs_inf(i)%score=ligand%abs_inf(i)%score+ligand%abs_inf(i)%pkd2 
-                 ligand%abs_inf(i)%score=ligand%abs_inf(i)%score+ligand%abs_inf(i)%pkd3 
-                 ligand%abs_inf(i)%score=ligand%abs_inf(i)%score/input%num_method 
-                 ligand%mol%atom(i)%score=ligand%abs_inf(i)%score 
-                 sum= sum + ligand%mol%atom(i)%score 
+          ligand%abs_inf(i)%score=0
+          ligand%abs_inf(i)%score=ligand%abs_inf(i)%score+ligand%abs_inf(i)%pkd1
+          ligand%abs_inf(i)%score=ligand%abs_inf(i)%score+ligand%abs_inf(i)%pkd2
+          ligand%abs_inf(i)%score=ligand%abs_inf(i)%score+ligand%abs_inf(i)%pkd3
+          ligand%abs_inf(i)%score=ligand%abs_inf(i)%score/input%num_method
+          ligand%mol%atom(i)%score=ligand%abs_inf(i)%score
+          sum= sum + ligand%mol%atom(i)%score
         end do
 
         if(input%show_abs.eq.'YES') then ! use abs as charges
-                ligand%mol%charge_type = 'USER_CHARGES'
-                ligand%mol%atom(:)%q = ligand%abs_inf(:)%score
+          ligand%mol%charge_type = 'USER_CHARGES'
+          ligand%mol%atom(:)%q = ligand%abs_inf(:)%score
         else            ! restore original charges
-                ligand%mol%charge_type = bak%mol%charge_type 
-                ligand%mol%atom(:)%q=bak%mol%atom(:)%q 
+          ligand%mol%charge_type = bak%mol%charge_type
+          ligand%mol%atom(:)%q=bak%mol%atom(:)%q
         end if
 
 
-        Ligand_Calculate_Binding_Score =  ligand%bind_score 
+Ligand_Calculate_Binding_Score =  ligand%bind_score
 end function Ligand_Calculate_Binding_Score
 
 subroutine Ligand_Sum_HBonds(ligand, protein, num_candidate, candidate)
-        type(tXLigand)  :: ligand
-        type(tXProtein) :: protein
-        integer                                 :: num_candidate
-        type(tXHBond)           :: candidate(0:999)
-        type(tXHBond)           :: tmp_hbond            ! used in swap
-        integer                                 :: i,j,k,count,limit,latom,patom 
-        real                                            :: angle,v1(0:2),v2(0:2) 
-        type(tXGroup)           :: tmp_group 
 
-        ! Step 1: rank candidates according their strength in decreasing order
-        ! note 'fabs' is applied because SB strength could be negative
-        do i = 0,num_candidate-1 -1 
-                do j = i+1,num_candidate -1 
-                        if(abs(candidate(i)%score)>=abs(candidate(j)%score)) goto 1
-!                       write(*,*) 'swapping ', i, j
-                        !call SWAP(candidate(i),candidate(j))
-                        call HBond_operator_copy(tmp_hbond,candidate(i))
-                        call HBond_operator_copy(candidate(i),candidate(j))
-                        call HBond_operator_copy(candidate(j),tmp_hbond)
-1   end do
-        end do
+  type(tXLigand)  :: ligand
+  type(tXProtein) :: protein
+  integer                                 :: num_candidate
+  type(tXHBond)           :: candidate(0:999)
+  type(tXHBond)           :: tmp_hbond            ! used in swap
+  integer                                 :: i,j,k,count,limit,latom,patom
+  real                                            :: angle,v1(0:2),v2(0:2)
+  type(tXGroup)           :: tmp_group
+
+  ! Step 1: rank candidates according their strength in decreasing order
+  ! note 'fabs' is applied because SB strength could be negative
+  do i = 0,num_candidate-1 -1
+    do j = i+1,num_candidate -1
+      if(abs(candidate(i)%score)>=abs(candidate(j)%score)) goto 1
+      !                       write(*,*) 'swapping ', i, j
+      !call SWAP(candidate(i),candidate(j))
+      call HBond_operator_copy(tmp_hbond,candidate(i))
+      call HBond_operator_copy(candidate(i),candidate(j))
+      call HBond_operator_copy(candidate(j),tmp_hbond)
+      1   end do
+    end do
 
         ! Step 2: check the angular limit: the angle between any two H-bonds
         ! on the same atom must be larger than 45 degrees
@@ -5793,173 +5798,176 @@ integer function Ligand_Get_HBond_Pair_PL(ligand,protein,candidate)
 end function Ligand_Get_HBond_Pair_PL
 
 subroutine Ligand_Value_Atom(ligand,lite_run)
-        type(tXLigand),intent(inout)                    :: ligand
-        integer,optional                                                                        :: lite_run
-        integer                                                                                                         :: mark
+  type(tXLigand),intent(inout)                    :: ligand
+  integer,optional                                :: lite_run
+  integer                                         :: mark
 
-        if(.not. present(lite_run)) mark = Molecule_ValueAtom(ligand%mol)
+  if(.not. present(lite_run)) mark = Molecule_ValueAtom(ligand%mol)
 
-        ! now compute the H-bond root for each HB atom
-        call Ligand_Calculate_HB_Root(ligand)
+  ! now compute the H-bond root for each HB atom
+  call Ligand_Calculate_HB_Root(ligand)
 
-        ! assign atomic logp values, which is needed by binding score
-        ! atomic logp is not read from ATOM_DEF_XTOOL!
-        if(.not. present(lite_run)) ligand%mol%logp = Molecule_Calculate_LogP(ligand%mol)
+  ! assign atomic logp values, which is needed by binding score
+  ! atomic logp is not read from ATOM_DEF_XTOOL!
+  if(.not. present(lite_run)) ligand%mol%logp = Molecule_Calculate_LogP(ligand%mol)
 
-        ! some other molecular properties
-        if(.not. present(lite_run)) ligand%mol%num_hb_atom  = Molecule_Get_Num_HB_Atom(ligand%mol)
-        if(.not. present(lite_run)) ligand%mol%num_rotor                = Molecule_Count_Rotor(ligand%mol)
+  ! some other molecular properties
+  if(.not. present(lite_run)) ligand%mol%num_hb_atom  = Molecule_Get_Num_HB_Atom(ligand%mol)
+  if(.not. present(lite_run)) ligand%mol%num_rotor    = Molecule_Count_Rotor(ligand%mol)
+
 end subroutine Ligand_Value_Atom
 
 subroutine Ligand_Calculate_HB_Root(lig)
-        type(tXLigand) :: lig
-        integer :: i,j,tmp,num_nonh
-        real :: tmpx,tmpy,tmpz
+  type(tXLigand) :: lig
+  integer :: i,j,tmp,num_nonh
+  real :: tmpx,tmpy,tmpz
 
-        do i = 0,lig%mol%num_atom -1
-                if(lig%mol%atom(i)%valid==0) then
-                        goto 1
-                else if(lig%mol%atom(i)%hb.eq.'N') then
-                        goto 1
-                else if(lig%mol%atom(i)%hb.eq.'H') then
-                        goto 1
-                else if(lig%mol%atom(i)%hb.eq.'P') then
-                        goto 1
-                end if
+  do i = 0,lig%mol%num_atom -1
+    if(lig%mol%atom(i)%valid==0) then
+      goto 1
+    else if(lig%mol%atom(i)%hb.eq.'N') then
+      goto 1
+    else if(lig%mol%atom(i)%hb.eq.'H') then
+      goto 1
+    else if(lig%mol%atom(i)%hb.eq.'P') then
+      goto 1
+    end if
 
-                tmpx=0
-                tmpy=0
-                tmpz=0.000
-                num_nonh=0
+    tmpx=0
+    tmpy=0
+    tmpz=0.000
+    num_nonh=0
                 
-                do j = 0,lig%mol%atom(i)%num_neib -1
-                        tmp=lig%mol%atom(i)%neib(j)-1
-                        if(lig%mol%atom(tmp)%ttype(1:1)=='H') then
-                                goto 2
-                        else
-                                tmpx=tmpx+lig%mol%atom(tmp)%coor(0)
-                                tmpy=tmpy+lig%mol%atom(tmp)%coor(1)
-                                tmpz=tmpz+lig%mol%atom(tmp)%coor(2)
-                                num_nonh = num_nonh + 1
-                        end if
+    do j = 0,lig%mol%atom(i)%num_neib -1
+      tmp=lig%mol%atom(i)%neib(j)-1
+      if(lig%mol%atom(tmp)%ttype(1:1)=='H') then
+        goto 2
+      else
+        tmpx=tmpx+lig%mol%atom(tmp)%coor(0)
+        tmpy=tmpy+lig%mol%atom(tmp)%coor(1)
+        tmpz=tmpz+lig%mol%atom(tmp)%coor(2)
+        num_nonh = num_nonh + 1
+      end if
 2               end do
 
-                if(num_nonh==0) then
-                        lig%mol%atom(i)%hb = 'P'
-                else
-                         tmpx=tmpx/num_nonh
-                         tmpy=tmpy/num_nonh
-                         tmpz=tmpz/num_nonh
-                         lig%mol%atom(i)%root(0)=tmpx
-                         lig%mol%atom(i)%root(1)=tmpy
-                         lig%mol%atom(i)%root(2)=tmpz
-                end if
-1       end do
+      if(num_nonh==0) then
+        lig%mol%atom(i)%hb = 'P'
+      else
+        tmpx=tmpx/num_nonh
+        tmpy=tmpy/num_nonh
+        tmpz=tmpz/num_nonh
+        lig%mol%atom(i)%root(0)=tmpx
+        lig%mol%atom(i)%root(1)=tmpy
+        lig%mol%atom(i)%root(2)=tmpz
+      end if
+1   end do
+
 end subroutine Ligand_Calculate_HB_Root
 
 
-!################################################################
-!# Translate list of q-atoms and bonds to xscore-type ligand.
-!# If offset input eq 0 then 
-!################################################################
 subroutine xligand_translate(ligand,nAtoms,nBonds,aQ,aB)
-        type(tXLigand),intent(out)                              :: ligand
-        integer,intent(in)                                              :: nAtoms, nBonds
-        type(q_atom),dimension(:),intent(in)    :: aQ
-        type(q_bond),dimension(:),intent(in)    :: aB
-!       integer                                                                                                                         :: offset
-        integer                                                                                                                         :: i, mark,iRes,atom_res_id
-        type(tXBond)                                                                                                    :: tmp
+!!------------------------------------------------------------------------------
+!!  subroutine: **xligand_translate**
+!!  Translate list of q-atoms and bonds to xscore-type ligand.
+!!  If offset input eq 0 then
+!!------------------------------------------------------------------------------
+  type(tXLigand),intent(out)                       :: ligand
+  integer,intent(in)                               :: nAtoms, nBonds
+  type(q_atom),dimension(:),intent(in)    :: aQ
+  type(q_bond),dimension(:),intent(in)    :: aB
+  !       integer                         :: offset
+  integer                                          :: i, mark,iRes,atom_res_id
+  type(tXBond)                                     :: tmp
 
-        ! set number of qatoms
-        ligand%mol%num_atom = nAtoms
-        allocate(ligand%mol%atom(0:nAtoms -1),stat=err)         ! old c++ code req. 0:...
-        if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
-        ligand%mol%num_bond = nBonds
-        allocate(ligand%mol%bond(0:nBonds -1),stat=err)         ! old c++ code req. 0:...
-        if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
+  ! set number of qatoms
+  ligand%mol%num_atom = nAtoms
+  allocate(ligand%mol%atom(0:nAtoms -1),stat=err)         ! old c++ code req. 0:...
+  if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
+  ligand%mol%num_bond = nBonds
+  allocate(ligand%mol%bond(0:nBonds -1),stat=err)         ! old c++ code req. 0:...
+  if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
 
-        !Set residue offset, provided that ligand is after protein 
-        if (offset .eq. 0) then
-                do i=1,nres_solute
-                        if (iqseq(1) <= res(i)%start) then
-                                iRes = i
-                                exit
-                        end if
-                end do
-!               offset=res(iRes)%start-1
-        end if
+  !Set residue offset, provided that ligand is after protein
+  if (offset .eq. 0) then
+    do i=1,nres_solute
+      if (iqseq(1) <= res(i)%start) then
+        iRes = i
+        exit
+      end if
+    end do
+  !               offset=res(iRes)%start-1
+  end if
 
-atom_res_id=0
-        do i = 0,nAtoms-1
-                ligand%mol%atom(i)%id                            = i +1
-                ligand%mol%atom(i)%topindex             = iqseq(i+1)
-                ligand%mol%atom(i)%name                  = ''
-                ligand%mol%atom(i)%coor(0)       = xtop(3*(iqseq(i+1)-1) +1)
-                ligand%mol%atom(i)%coor(1)       = xtop(3*(iqseq(i+1)-1) +2)
-                ligand%mol%atom(i)%coor(2)       = xtop(3*(iqseq(i+1)-1) +3)
-                ligand%mol%atom(i)%origin                = 1    ! This is a ligand atom
-                ligand%mol%atom(i)%ttype                 = tac(iac(iqseq(i+1)))
-                ligand%mol%atom(i)%weight                = iaclib(iac(iqseq(i+1)))%mass
-                ligand%mol%atom(i)%solv                  = 0
-                ligand%mol%atom(i)%bfactor       = 0
-                ligand%mol%atom(i)%logp                  = 0
-                ligand%mol%atom(i)%valid                 = 1
-!               if(masks(1)%mask(i+1)) ligand%mol%atom(i)%mask = 1 !masks(1)%mask(i+1)
-                ligand%mol%atom(i)%occupancy = 1.0                      ! default
-                ligand%mol%atom(i)%neib(:)       = 0
-                ligand%mol%atom(i)%bond(:)       = 0
-                ligand%mol%atom(i)%root(:)       = 0
+  atom_res_id=0
+  do i = 0,nAtoms-1
+    ligand%mol%atom(i)%id                            = i +1
+    ligand%mol%atom(i)%topindex             = iqseq(i+1)
+    ligand%mol%atom(i)%name                  = ''
+    ligand%mol%atom(i)%coor(0)       = xtop(3*(iqseq(i+1)-1) +1)
+    ligand%mol%atom(i)%coor(1)       = xtop(3*(iqseq(i+1)-1) +2)
+    ligand%mol%atom(i)%coor(2)       = xtop(3*(iqseq(i+1)-1) +3)
+    ligand%mol%atom(i)%origin                = 1    ! This is a ligand atom
+    ligand%mol%atom(i)%ttype                 = tac(iac(iqseq(i+1)))
+    ligand%mol%atom(i)%weight                = iaclib(iac(iqseq(i+1)))%mass
+    ligand%mol%atom(i)%solv                  = 0
+    ligand%mol%atom(i)%bfactor       = 0
+    ligand%mol%atom(i)%logp                  = 0
+    ligand%mol%atom(i)%valid                 = 1
+    !               if(masks(1)%mask(i+1)) ligand%mol%atom(i)%mask = 1 !masks(1)%mask(i+1)
+    ligand%mol%atom(i)%occupancy = 1.0                      ! default
+    ligand%mol%atom(i)%neib(:)       = 0
+    ligand%mol%atom(i)%bond(:)       = 0
+    ligand%mol%atom(i)%root(:)       = 0
 
-                        if(iRes<nres) then
-                                if(atom_res_id + res(iRes)%start >= res(iRes+1)%start) then
-                                        iRes = iRes +1
-                                        atom_res_id = 0
-                                end if
-                        end if
+    if(iRes<nres) then
+      if(atom_res_id + res(iRes)%start >= res(iRes+1)%start) then
+        iRes = iRes +1
+        atom_res_id = 0
+      end if
+    end if
                         
-                        atom_res_id = atom_res_id +1
-                        ligand%mol%atom(i)%atom_res_id = atom_res_id
-                        ligand%mol%atom(i)%residue = res(iRes)%name      !What is function of this?
-                        write(ligand%mol%atom(i)%res_id, '(I8)') iRes           ! use internal read to convert integer -> character
-        end do  
+    atom_res_id = atom_res_id +1
+    ligand%mol%atom(i)%atom_res_id = atom_res_id
+    ligand%mol%atom(i)%residue = res(iRes)%name      !What is function of this?
+    write(ligand%mol%atom(i)%res_id, '(I8)') iRes           ! use internal read to convert integer -> character
+  end do
 
-        do i = 0,nBonds-1
-                ligand%mol%bond(i)%id = i +1                    ! meanwhile
-                ligand%mol%bond(i)%valid  = 1
-                ligand%mol%bond(i)%atom_1 = aB(i +1)%a%top_nr - aQ(1)%top_nr +1         ! Remove offset so that first q-atom has index 1
-                ligand%mol%bond(i)%atom_2 = aB(i +1)%b%top_nr   - aQ(1)%top_nr +1
-                ligand%mol%bond(i)%ttype = SYBYL_bond_type(aB(i +1)%cod)
+  do i = 0,nBonds-1
+    ligand%mol%bond(i)%id = i +1                    ! meanwhile
+    ligand%mol%bond(i)%valid  = 1
+    ligand%mol%bond(i)%atom_1 = aB(i +1)%a%top_nr - aQ(1)%top_nr +1         ! Remove offset so that first q-atom has index 1
+    ligand%mol%bond(i)%atom_2 = aB(i +1)%b%top_nr   - aQ(1)%top_nr +1
+    ligand%mol%bond(i)%ttype = SYBYL_bond_type(aB(i +1)%cod)
                 
-                if(adjustl(trim(ligand%mol%bond(i)%ttype)).eq.'') then
-                        write(*,'(a,i4,a)') '>>> WARNING: Ligand bond ', i+1, ' is of unknown type. Rings may not be correctly identified.'
-                        warn = warn +1
-                end if
-        end do
+    if(adjustl(trim(ligand%mol%bond(i)%ttype)).eq.'') then
+      write(*,'(a,i4,a)') '>>> WARNING: Ligand bond ', i+1, ' is of unknown type. Rings may not be correctly identified.'
+      warn = warn +1
+    end if
+  end do
 
-        ! Bubble sort bonds in increasing atom order
-        do
-                mark = 0
-                do i = 0, nBonds -2
-                        if((ligand%mol%bond(i)%atom_1.eq.ligand%mol%bond(i+1)%atom_1).and. &
-                                (ligand%mol%bond(i)%atom_2.eq.ligand%mol%bond(i+1)%atom_2)) goto 2
-                        if(ligand%mol%bond(i)%atom_1 <  ligand%mol%bond(i+1)%atom_1) goto 2
-                        if((ligand%mol%bond(i)%atom_1.eq.ligand%mol%bond(i+1)%atom_1) .and. &
-                                (ligand%mol%bond(i)%atom_2<=ligand%mol%bond(i+1)%atom_2)) goto 2
+  ! Bubble sort bonds in increasing atom order
+  do
+    mark = 0
+    do i = 0, nBonds -2
+      if((ligand%mol%bond(i)%atom_1.eq.ligand%mol%bond(i+1)%atom_1).and. &
+        (ligand%mol%bond(i)%atom_2.eq.ligand%mol%bond(i+1)%atom_2)) goto 2
+      if(ligand%mol%bond(i)%atom_1 <  ligand%mol%bond(i+1)%atom_1) goto 2
+      if((ligand%mol%bond(i)%atom_1.eq.ligand%mol%bond(i+1)%atom_1) .and. &
+        (ligand%mol%bond(i)%atom_2<=ligand%mol%bond(i+1)%atom_2)) goto 2
 
-                        ! If no rule triggered, the bonds are in the wrong order
-                        mark = 1
-                        tmp = ligand%mol%bond(i)
-                        ligand%mol%bond(i) = ligand%mol%bond(i+1)
-                        ligand%mol%bond(i+1) = tmp
-2               end do
-                if(mark.eq.0) exit
-        end do
+      ! If no rule triggered, the bonds are in the wrong order
+      mark = 1
+      tmp = ligand%mol%bond(i)
+      ligand%mol%bond(i) = ligand%mol%bond(i+1)
+      ligand%mol%bond(i+1) = tmp
+      2               end do
+      if(mark.eq.0) exit
+    end do
 
-        ! Reset bond id
-        do i = 0,nBonds -1
-                ligand%mol%bond(i)%id = i +1
-        end do
+    ! Reset bond id
+    do i = 0,nBonds -1
+      ligand%mol%bond(i)%id = i +1
+    end do
 
 end subroutine xligand_translate
 
@@ -6002,7 +6010,7 @@ real function Ligand_Atom_Buried_Surface(ligand,protein,id_in, total, buried)
 1       end do
 
         num=ligand%mol%num_sur_dot
-        do j = 1,num                                                                            ! === NOTE: CHANGED BOUNDARIES FROM 0,num-1 TO 1,num
+        do j = 1,num                  ! === NOTE: CHANGED BOUNDARIES FROM 0,num-1 TO 1,num
                 if(ligand%mol%sur_dot(j)%valid.ne.id) goto 2
 
                 ! check if this dot is buried 
@@ -6040,34 +6048,34 @@ real function Ligand_Atom_Buried_Surface(ligand,protein,id_in, total, buried)
  Ligand_Atom_Buried_Surface = ratio 
 end function Ligand_Atom_Buried_Surface
 
-! ==========================================================================================================================================
-! ==========================================================================================================================================
+! ==============================================================================
+! ==============================================================================
 
 ! XFORECFIELD MODULE
 
-! ==========================================================================================================================================
-! ==========================================================================================================================================
+! ==============================================================================
+! ==============================================================================
 
 subroutine ForceField_Read_SURFACE_DEF(filename)
-        character(len=80)       :: filename
-        integer                                         :: fp
-        integer                                         :: i,count, filestat
-        character(len=256):: buf,head 
+  character(len=80)       :: filename
+  integer                                         :: fp
+  integer                                         :: i,count, filestat
+  character(len=256):: buf,head
 
-        fp = freefile()
-        open(unit=fp,file=filename,err=999,action='READ')
-                ! first, determine num_sdot_type 
-    count=0 
-                do
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                if(buf(1:1).eq.'#') goto 1              ! skip REM
-                                if(trim(buf).eq.'') goto 1              ! skip blank line
+  fp = freefile()
+  open(unit=fp,file=filename,err=999,action='READ')
+              ! first, determine num_sdot_type
+  count=0
+  do
+    read(fp,'(a256)',iostat=filestat) buf
+    if(filestat.eq.0) then
+      if(buf(1:1).eq.'#') goto 1              ! skip REM
+      if(trim(buf).eq.'') goto 1              ! skip blank line
 
-                                if(buf(1:6).eq.'DOTSET') count = count +1 
-                        else
-                                exit
-                        end if
+      if(buf(1:6).eq.'DOTSET') count = count +1
+    else
+      exit
+    end if
 1               end do
 
     rewind(fp) 
@@ -6075,51 +6083,51 @@ subroutine ForceField_Read_SURFACE_DEF(filename)
     ff%num_sdot_type=count 
 
     allocate(ff%sdot(0:ff%num_sdot_type),stat=err)
-                if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
-                ff%sdot(:)%max_dot = 0
-                ff%sdot(:)%num_dot = 0
+    if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
+    ff%sdot(:)%max_dot = 0
+    ff%sdot(:)%num_dot = 0
 
-                ! now read pre-calculated volume dots 
-                count=0 
-                do
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                if(buf(1:1).eq.'#') goto 2              ! skip REM
-                                if(trim(buf).eq.'') goto 2              ! skip blank line
+    ! now read pre-calculated volume dots
+    count=0
+    do
+      read(fp,'(a256)',iostat=filestat) buf
+      if(filestat.eq.0) then
+        if(buf(1:1).eq.'#') goto 2              ! skip REM
+        if(trim(buf).eq.'') goto 2              ! skip blank line
 
-                                if(buf(1:3).eq.'END') exit 
+        if(buf(1:3).eq.'END') exit
                                 
-                                head = buf(1:6)
-                                if(head.eq.'DOTSET') then
-                                        read(buf(7:256),*,iostat=filestat) ff%sdot(count)%r,ff%sdot(count)%num_dot,ff%sdot(count)%unit,ff%sdot(count)%total
-                                        ff%sdot(count)%ttype = 'Un'
+        head = buf(1:6)
+        if(head.eq.'DOTSET') then
+          read(buf(7:256),*,iostat=filestat) ff%sdot(count)%r,ff%sdot(count)%num_dot,ff%sdot(count)%unit,ff%sdot(count)%total
+          ff%sdot(count)%ttype = 'Un'
 
-!                                       write(*,'(t1,a,t35,f3.1,t40,i4,t46,f5.2,t54,f6.2)') 'count, r, num_dot, unit, total = ', ff%sdot(count)%r,ff%sdot(count)%num_dot,ff%sdot(count)%unit,ff%sdot(count)%total
-                                        allocate(ff%sdot(count)%dot(0:ff%sdot(count)%num_dot -1),stat=err)
-                                        if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
+          ! write(*,'(t1,a,t35,f3.1,t40,i4,t46,f5.2,t54,f6.2)') 'count, r, num_dot, unit, total = ', ff%sdot(count)%r,ff%sdot(count)%num_dot,ff%sdot(count)%unit,ff%sdot(count)%total
+          allocate(ff%sdot(count)%dot(0:ff%sdot(count)%num_dot -1),stat=err)
+          if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
 
-                                        do i = 0,ff%sdot(count)%num_dot -1 
-                                                read(fp,'(a256)',iostat=filestat) buf
-                                                read(buf(1:256),*,iostat=filestat) &
-                                                        ff%sdot(count)%dot(i)%coor(0), &
-                                                        ff%sdot(count)%dot(i)%coor(1), &
-                                                        ff%sdot(count)%dot(i)%coor(2)
+          do i = 0,ff%sdot(count)%num_dot -1
+            read(fp,'(a256)',iostat=filestat) buf
+            read(buf(1:256),*,iostat=filestat) &
+              ff%sdot(count)%dot(i)%coor(0), &
+              ff%sdot(count)%dot(i)%coor(1), &
+              ff%sdot(count)%dot(i)%coor(2)
 
-                                                        ff%sdot(count)%dot%valid=1 
-                                                        ff%sdot(count)%dot%unit=ff%sdot(count)%unit 
-                                                        ff%sdot(count)%dot%ttype = 'Un'
-                                        end do
+            ff%sdot(count)%dot%valid=1
+            ff%sdot(count)%dot%unit=ff%sdot(count)%unit
+            ff%sdot(count)%dot%ttype = 'Un'
+          end do
 
-                                        count = count +1 
-                                end if
-                        end if
+          count = count +1
+        end if
+      end if
 2               end do
 
-        close(fp) 
-        return
+      close(fp)
+      return
 
-999 write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
-                stop
+999   write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
+      stop
 end subroutine ForceField_Read_SURFACE_DEF
 
 type(tXDotSet) function ForceField_Get_Surface_Dot(atom, r)
@@ -6229,99 +6237,101 @@ type(tXDotSet) function ForceField_Get_Surface_Dot_Rxyz(bigR, x, y, z)
 end function ForceField_Get_Surface_Dot_Rxyz
 
 subroutine ForceField_Read_RESIDUE_DEF(filename)
-        character(len=256)              :: filename
-
-        integer ::      fp                                              ! file number
-        integer ::  i,num,count 
-        character(len=256) :: buf,head
-        integer :: filestat
+  character(len=256)              :: filename
+  integer                         :: fp          ! file number
+  integer                         :: i,num,count
+  character(len=256)              :: buf,head
+  integer                         :: filestat
         
-        fp = freefile()
-        open(unit=fp,file=filename,err=999,action='READ')
+  fp = freefile()
+  open(unit=fp,file=filename,err=999,action='READ')
 
-    ! first, determine num_restype
-    count=0 
-    do
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                if(buf(1:1).eq.'#') goto 1              ! skip REM
-                                if(trim(buf).eq.'') goto 1              ! skip blank line
+  ! first, determine num_restype
+  count=0
+  do
+    read(fp,'(a256)',iostat=filestat) buf
+    if(filestat.eq.0) then
+      if(buf(1:1).eq.'#') goto 1              ! skip REM
+      if(trim(buf).eq.'') goto 1              ! skip blank line
 
-                                if(buf(1:4).eq.'RESI') count = count +1 
-                        else
-                                exit
-                        end if
-1               end do      
+      if(buf(1:4).eq.'RESI') count = count +1
+    else
+      exit
+    end if
+1               end do
 
     rewind(fp) 
 
-                ff%num_restype=count 
+    ff%num_restype=count
 
-                allocate(ff%residue(0:ff%num_restype -1),stat=err)
-                if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
+    allocate(ff%residue(0:ff%num_restype -1),stat=err)
+    if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
 
-                ! second, read the residue templates
-                count=0 
+    ! second, read the residue templates
+    count=0
 
-                do
-                        read(fp,'(a256)',iostat=filestat) buf
-                        if(filestat.eq.0) then
-                                if(buf(1:1).eq.'#') goto 2              ! skip REM
-                                if(trim(buf).eq.'') goto 2              ! skip blank line
+    do
+      read(fp,'(a256)',iostat=filestat) buf
+      if(filestat.eq.0) then
+        if(buf(1:1).eq.'#') goto 2              ! skip REM
+        if(trim(buf).eq.'') goto 2              ! skip blank line
 
-                                if(buf(1:3).eq.'END') exit 
+        if(buf(1:3).eq.'END') exit
                                 
-                                head = buf(1:4)
-                                if(head.eq.'RESI') then
-                                        num=0 
-                                        read(buf(5:256),*,iostat=filestat) ff%residue(count)%name,ff%residue(count)%num_atom,ff%residue(count)%num_bond
+        head = buf(1:4)
+        if(head.eq.'RESI') then
+          num=0
+          read(buf(5:256),*,iostat=filestat) ff%residue(count)%name,ff%residue(count)%num_atom,ff%residue(count)%num_bond
 
-                                        ! read the ATOM information first
-                                        num = ff%residue(count)%num_atom 
+          ! read the ATOM information first
+          num = ff%residue(count)%num_atom
 
-                                        do i = 0,num -1 
-                                                read(fp,'(a256)',iostat=filestat) buf
-                                                read(buf(5:256),*,iostat=filestat) &
-                                                        ff%residue(count)%atom(i)%name,         &
-                                                        ff%residue(count)%atom(i)%ttype,        &
-                                                        ff%residue(count)%atom(i)%xtype,        &
-                                                        ff%residue(count)%atom(i)%r,                    &
-                                                        ff%residue(count)%atom(i)%eps,          &
-                                                        ff%residue(count)%atom(i)%q,                    &
-                                                        ff%residue(count)%atom(i)%hb,                   &
-                                                        ff%residue(count)%atom(i)%logp,         &
-                                                        ff%residue(count)%atom(i)%solv,         &
-                                                        ff%residue(count)%atom(i)%ring,         &
-                                                        ff%residue(count)%atom(i)%pmftype 
-                                                end do
+          do i = 0,num -1
+            read(fp,'(a256)',iostat=filestat) buf
+            read(buf(5:256),*,iostat=filestat) &
+              ff%residue(count)%atom(i)%name,         &
+              ff%residue(count)%atom(i)%ttype,        &
+              ff%residue(count)%atom(i)%xtype,        &
+              ff%residue(count)%atom(i)%r,                    &
+              ff%residue(count)%atom(i)%eps,          &
+              ff%residue(count)%atom(i)%q,                    &
+              ff%residue(count)%atom(i)%hb,                   &
+              ff%residue(count)%atom(i)%logp,         &
+              ff%residue(count)%atom(i)%solv,         &
+              ff%residue(count)%atom(i)%ring,         &
+              ff%residue(count)%atom(i)%pmftype
+          end do
 
-                                        ! then read the BOND information
-                                        num=ff%residue(count)%num_bond 
+          ! then read the BOND information
+          num=ff%residue(count)%num_bond
 
-                                        if(num>0) then
-                                                do i = 0,num -1 
-                                                        read(fp,'(a256)',iostat=filestat) buf
-                                                        read(buf(5:256),*,iostat=filestat) &
-                                                        ff%residue(count)%bond(i)%atom1, &
-                                                        ff%residue(count)%bond(i)%atom2, &
-                                                        ff%residue(count)%bond(i)%ttype 
+          if(num>0) then
+            do i = 0,num -1
+              read(fp,'(a256)',iostat=filestat) buf
+              read(buf(5:256),*,iostat=filestat) &
+                ff%residue(count)%bond(i)%atom1, &
+                ff%residue(count)%bond(i)%atom2, &
+                ff%residue(count)%bond(i)%ttype
             end do
-                                        end if
+          end if
                 
-                                        count = count +1 
-                                end if
-                        end if
+          count = count +1
+        end if
+      end if
 2               end do
 
-        close(fp) 
+      close(fp)
 
-        write(*,'(a,i4,a,a)') 'Read ', ff%num_restype, ' residue types from ', trim(filename)
-  if(count.ne.ff%num_restype) write(*,*) 'Error occured when reading ', filename
-        return
+      write(*,'(a,i4,a,a)') 'Read ', ff%num_restype, ' residue types from ', trim(filename)
+      if(count.ne.ff%num_restype) write(*,*) 'Error occured when reading ', filename
+      return
 
-999 write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
-                stop
+
+
+999     write(*,'(a,a,a)') '>>>>> ERROR: Unable to read ', adjustl(trim(filename)), '. Exiting.'
+        stop
 end subroutine ForceField_Read_RESIDUE_DEF
+
 
 subroutine ForceField_Read_ATOM_DEF(filename)
         character(len=256)      :: filename

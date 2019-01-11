@@ -8,7 +8,6 @@
 !  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
-
 module md
 !!-------------------------------------------------------------------------------
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
@@ -46,7 +45,7 @@ module md
   integer                   :: stat
 
   ! print temperature if it changed more than 2% in one time step
-  real, parameter           :: TEMP_PRINT_THRESHOLD=0.02
+  real, parameter           :: TEMP_PRINT_THRESHOLD = 0.02
 
   ! Memory management
   integer                   :: alloc_status
@@ -56,7 +55,7 @@ module md
   integer                   :: natom
   integer                   :: nat3
   ! --- q-atom number or 0 for non-q
-  integer(TINY), allocatable :: iqatom(:)
+  integer(tiny), allocatable :: iqatom(:)
   ! --- water topology
   ! atoms of water, total water molecules, excluded water molecules
   integer                   :: nwat
@@ -119,7 +118,7 @@ module md
   real(8)                   :: fkwpol
   logical                   :: wpol_restr, wpol_Born
   real(8)                   :: fk_wsphere, crgtot, crgQtot
-  integer(AI), allocatable  :: list_sh(:,:), nsort(:,:)
+  integer(ai), allocatable  :: list_sh(:,:), nsort(:,:)
   real(8),  allocatable     :: theta(:), theta0(:), tdum(:)
   integer                   :: nwpolr_shell, n_max_insh
 
@@ -174,47 +173,47 @@ module md
   integer                   :: implicit_rstr_from_file
   integer                   :: nrstr_seq, nrstr_pos, nrstr_dist, nrstr_angl, nrstr_wall
 
-  type RSTRSEQ_TYPE
+  type rstrseq_type
     integer(AI)            :: i,j
     real(8)                :: fk
     integer(TINY)          :: ih
     integer                :: to_center !flag for restraining to geom. or mass center
-  end type RSTRSEQ_TYPE
+  end type rstrseq_type
 
-  type RSTRPOS_TYPE
+  type rstrpos_type
     integer(AI)            :: i
     integer(TINY)          :: ipsi
     real(8)                :: fk(3)
     real(8)                :: x(3)
-  end type RSTRPOS_TYPE
+  end type rstrpos_type
 
-  type RSTRDIS_TYPE
+  type rstrdis_type
     integer(AI)            :: i,j
     integer(TINY)          :: ipsi
     real(8)                :: fk
     real(8)                :: d1, d2
     character(len=20)      :: itext,jtext
-  end type RSTRDIS_TYPE
+  end type rstrdis_type
 
-  type RSTRANG_TYPE
+  type rstrang_type
     integer(AI)    :: i,j,k
     integer(TINY)  :: ipsi
     real(8)        :: fk
     real(8)        :: ang
   !       character(len=20)       ::  itext,jtext,ktext
-  end type RSTRANG_TYPE
+  end type rstrang_type
 
-  type RSTRWAL_TYPE
+  type rstrwal_type
     integer(AI)            :: i,j
     real(8)                :: d, fk, aMorse, dMorse
     integer(TINY)          :: ih
-  end type RSTRWAL_TYPE
+  end type rstrwal_type
 
-  type(RSTRSEQ_TYPE), allocatable:: rstseq(:)
-  type(RSTRPOS_TYPE), allocatable:: rstpos(:)
-  type(RSTRDIS_TYPE), allocatable:: rstdis(:)
-  type(RSTRANG_TYPE), allocatable:: rstang(:)
-  type(RSTRWAL_TYPE), allocatable:: rstwal(:)
+  type(rstrseq_type), allocatable:: rstseq(:)
+  type(rstrpos_type), allocatable:: rstpos(:)
+  type(rstrdis_type), allocatable:: rstdis(:)
+  type(rstrang_type), allocatable:: rstang(:)
+  type(rstrwal_type), allocatable:: rstwal(:)
 
 
   !-----------------------------------------------------------------------
@@ -231,7 +230,7 @@ module md
   !-----------------------------------------------------------------------
   !       Energies , EQ is defined in qatom.f90
   !-----------------------------------------------------------------------
-  type(ENERGIES)            :: E
+  type(energies)            :: E
   real(8)                   :: Tfree, Tfree_solvent, Tfree_solute
   real(8)                   :: Temp_solvent, Temp_solute, Texcl_solute, Texcl_solvent
 
@@ -239,105 +238,98 @@ module md
   !-----------------------------------------------------------------------
   !       Nonbonded pair information
   !-----------------------------------------------------------------------
-  type NB_TYPE
+  type nb_type
     integer(AI)             :: i, j
     integer(TINY)           :: LJcod
     integer                 :: cgp_pair ! cgp_pair only used with periodic conditions
-  end type NB_TYPE
+  end type nb_type
 
-  type CGP_PAIR_TYPE
+  type cgp_pair_type
     integer(AI)             :: i, j !switching atoms (or equal in case of no switching atoms) of the chargegroups
     real(8)                 :: x, y, z !periodical shifts
-  end type CGP_PAIR_TYPE
+  end type cgp_pair_type
 
-  type NBQP_TYPE
+  type nbqp_type
     integer(AI)             :: i, j
     integer(TINY)           :: LJcod, qLJcod
     integer                 :: cgp_pair !this variable only used with periodic conditions
-  end type NBQP_TYPE
+  end type nbqp_type
 
-  type NBQ_TYPE
+  type nbq_type
     integer(AI)             :: j !atom number
     integer(AI)             :: iq, jq !q-atom numbers
     integer(TINY)           :: LJcod
     real(8)                 :: el_scale !scale factor for electostatic interactions in qq-pairs
-  end type NBQ_TYPE
+  end type nbq_type
 
   integer                    :: nbpp_pair !current no solute-solute pairs
-  type(NB_TYPE), allocatable, target::nbpp(:)
+  type(nb_type), allocatable, target::nbpp(:)
 
   integer                    :: nbww_pair,nbww_true_pair !current no solvent-solvent pairs, implicit and explicit
-  integer(AI), allocatable, target::nbww(:)
+  integer(ai), allocatable, target::nbww(:)
 
   integer                    :: nbpw_pair !current no solute-solvent pairs
-  type(NB_TYPE), allocatable, target::nbpw(:)
+  type(nb_type), allocatable, target::nbpw(:)
 
   integer                    :: nbqq_max !max number of q-q pairs in any state
-  integer(TINY), allocatable :: qconn(:,:,:) !Q-atom connectivity list
+  integer(tiny), allocatable :: qconn(:,:,:) !Q-atom connectivity list
 
   integer                     :: nbqq_pair(max_states)
-  type(NBQ_TYPE), allocatable :: nbqq(:,:)
+  type(nbq_type), allocatable :: nbqq(:,:)
 
   integer                     :: nbqp_pair !current no of qatom-solute pairs
-  type(NBQP_TYPE), allocatable, target :: nbqp(:)
+  type(nbqp_type), allocatable, target :: nbqp(:)
 
   integer                          :: nbqw_pair !current no of q-atom-water mol. pairs
-  integer(AI), allocatable         :: nbqw(:)
-
+  integer(ai), allocatable         :: nbqw(:)
 
   !these three used only under periodic conditions
   integer                          :: nbpp_cgp_pair !number of solute-solute chargegroups interacting
-  type(CGP_PAIR_TYPE), allocatable :: nbpp_cgp(:)
+  type(cgp_pair_type), allocatable :: nbpp_cgp(:)
 
   integer                          :: nbpw_cgp_pair
-  type(CGP_PAIR_TYPE), allocatable :: nbpw_cgp(:)
+  type(cgp_pair_type), allocatable :: nbpw_cgp(:)
 
   integer                          :: nbqp_cgp_pair
-  type(CGP_PAIR_TYPE), allocatable :: nbqp_cgp(:)
+  type(cgp_pair_type), allocatable :: nbqp_cgp(:)
 
   !special monitoring of pairs
-  integer (TINY),allocatable       :: special_LJcod(:,:,:,:)
+  integer (tiny),allocatable       :: special_LJcod(:,:,:,:)
 
   ! LRF related variables
-  integer(AI), allocatable         :: iwhich_cgp(:)
+  integer(ai), allocatable         :: iwhich_cgp(:)
 
-
-  type LRF_TYPE
+  type lrf_type
     real(8)                       :: cgp_cent(3)
     real(8)                       :: phi0
     real(8)                       :: phi1(3)
     real(8)                       :: phi2(9)
     real(8)                       :: phi3(27)
-  end type LRF_TYPE
+  end type lrf_type
 
-  type(LRF_TYPE), allocatable      :: lrf(:)
-  type(LRF_TYPE), allocatable      :: old_lrf(:)  !for constant pressure: MC_volume routine
-
+  type(lrf_type), allocatable      :: lrf(:)
+  type(lrf_type), allocatable      :: old_lrf(:)  !for constant pressure: MC_volume routine
 
   type(node_assignment_type)       :: calculation_assignment
-
 
   !shake types & variables
   !convergence criterion (fraction of distance)
   real(8), parameter               :: SHAKE_TOL = 0.0001
   integer, parameter               :: SHAKE_MAX_ITER = 1000
 
-
-  type SHAKE_BOND_TYPE
+  type shake_bond_type
     integer(AI)                   :: i,j
     real(8)                       :: dist2
     logical                       :: ready
-  end type SHAKE_BOND_TYPE
+  end type shake_bond_type
 
-
-  type SHAKE_MOL_TYPE
+  type shake_mol_type
     integer                       :: nconstraints
-    type(SHAKE_BOND_TYPE), pointer :: bond(:)
-  end type SHAKE_MOL_TYPE
+    type(shake_bond_type), pointer :: bond(:)
+  end type shake_mol_type
 
-
-  integer                          :: shake_constraints, shake_molecules
-  type(SHAKE_MOL_TYPE), allocatable :: shake_mol(:)
+  integer                           :: shake_constraints, shake_molecules
+  type(shake_mol_type), allocatable :: shake_mol(:)
 
   !-----------------------------------------------------------------------
   !       profiling vars
@@ -367,667 +359,667 @@ module md
   integer                   :: Ndegf_solute,Ndegfree_solute
   integer                   :: Ndegf_solvent,Ndegfree_solvent
   logical                   :: detail_temps  !controls whether or not solute and solvent temps are printed separately (true if solute and solvent degrees of freedom are both not zero)
-  !-------------------------------------------------------------------------------
-  !       END OF SHARED VARIABLES
-  !-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!       END OF SHARED VARIABLES
+!-------------------------------------------------------------------------------
 
 
 
-  !-------------------------------------------------------------------------------
-  !       START OF PUBLIC SUBROUTINES
-  !-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!       START OF PUBLIC SUBROUTINES
+!-------------------------------------------------------------------------------
 contains
 
-  !-------------------------------------------------------------------------------
-  ! md_startup
-  !-------------------------------------------------------------------------------
-  subroutine md_startup
-    ! initialize used modules
-    call qatom_startup
-    call trj_startup
-    ! initialize constants
-    pi = 4.0*atan(1.0)
-    deg2rad = pi/180.0
-  end subroutine md_startup
 
-  !-------------------------------------------------------------------------------
-  ! md_shutdown
-  !-------------------------------------------------------------------------------
-  subroutine md_shutdown
-    ! call used modules' shutdown subroutines
-    call md_deallocate
-    call topo_deallocate
-    call qatom_shutdown
-  end subroutine md_shutdown
+subroutine md_startup
+!!--------------------------------------------------------------------------------
+!! subroutine **md_startup**
+!!
+!!--------------------------------------------------------------------------------
+  ! initialize used modules
+  call qatom_startup
+  call trj_startup
+  ! initialize constants
+  pi = 4.0*atan(1.0)
+  deg2rad = pi/180.0
+end subroutine md_startup
 
-  !-------------------------------------------------------------------------------
-  ! die
-  !-------------------------------------------------------------------------------
-  subroutine die(cause)
-    ! args
-    character(*), optional    :: cause
 
-    !
-    ! exit with an error message
-    !
+subroutine md_shutdown
+!!--------------------------------------------------------------------------------
+!! subroutine **md_shutdown**
+!!
+!!--------------------------------------------------------------------------------
+  ! call used modules' shutdown subroutines
+  call md_deallocate
+  call topo_deallocate
+  call qatom_shutdown
+end subroutine md_shutdown
 
-    ! local vars
-    integer                   :: i
-    ! flush stuff
-    integer(4), parameter     :: stdout_unit = 6
 
-    if (nodeid .eq. 0) then
-      write(*,*)
-      call centered_heading('ABNORMAL TERMINATION', '!')
-      ! write final energies if run has started
-      if (istep > 0) then
-        if ( mod(istep,iout_cycle) .ne. 1 ) call write_out
-      end if
-      if(allocated(v)) then
-        !save restart file for diagnosing coordinate problems
-        write(*,*) 'restart file written at step', istep
-        call write_xfin
-      endif
-      write (*,'(79a)') ('!',i=1,79)
-      call close_output_files
+subroutine die(cause)
+!!--------------------------------------------------------------------------------
+!! subroutine **die**
+!! exit with an error message
+!!--------------------------------------------------------------------------------
+  ! args
+  character(*), optional    :: cause
 
-      ! apologize
-      write(*,'(a)') 'ABNORMAL TERMINATION of qdyn'
-      if (present(cause)) then
-        write(*,'(79a)') 'Terminating due to ', cause
-      endif
-      write (*,'(79a)') ('!',i=1,79)
-#if defined(CRAY)
-      !Cray can't flush stdout...
-#elif defined(NO_FLUSH)
-      !When you can't flush
-#else
-      ! flush stdout
-      call flush(stdout_unit)
-#endif
+  ! local vars
+  integer                   :: i
+  ! flush stuff
+  integer(4), parameter     :: stdout_unit = 6
+
+  if (nodeid .eq. 0) then
+    write(*,*)
+    call centered_heading('ABNORMAL TERMINATION', '!')
+    ! write final energies if run has started
+    if (istep > 0) then
+      if ( mod(istep,iout_cycle) .ne. 1 ) call write_out
     end if
-    ! clean up
-    call md_deallocate
+    if(allocated(v)) then
+      !save restart file for diagnosing coordinate problems
+      write(*,*) 'restart file written at step', istep
+      call write_xfin
+    endif
+    write (*,'(79a)') ('!',i=1,79)
+    call close_output_files
+
+    ! apologize
+    write(*,'(a)') 'ABNORMAL TERMINATION of qdyn'
+    if (present(cause)) then
+      write(*,'(79a)') 'Terminating due to ', cause
+    endif
+    write (*,'(79a)') ('!',i=1,79)
+#if defined(CRAY)
+    !Cray can't flush stdout...
+#elif defined(NO_FLUSH)
+    !When you can't flush
+#else
+    ! flush stdout
+    call flush(stdout_unit)
+#endif
+  end if
+  ! clean up
+  call md_deallocate
 
 
 #if defined (USE_MPI)
-    ! abort all processes with exit code 255
-    call MPI_Abort(MPI_COMM_WORLD, 255, ierr)
+  ! abort all processes with exit code 255
+  call MPI_Abort(MPI_COMM_WORLD, 255, ierr)
 #else
-    ! stop with a message to stderr
-    stop 'qdyn terminated abnormally'
+  ! stop with a message to stderr
+  stop 'qdyn terminated abnormally'
 #endif
 
-  end subroutine die
+end subroutine die
 
 
 
-  !-------------------------------------------------------------------------------
-  ! --- Memory management routines
-  !-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! --- Memory management routines
+!-------------------------------------------------------------------------------
 
-  !-------------------------------------------------------------------------------
-  ! allocate_natom_arrays
-  !-------------------------------------------------------------------------------
-  subroutine allocate_natom_arrays
+subroutine allocate_natom_arrays
+!!--------------------------------------------------------------------------------
+!! subroutine **allocate_natom_arrays**
+!!
+!!--------------------------------------------------------------------------------
+  allocate(x(natom*3), &
+    xx(natom*3), &
+    v(natom*3), &
+    d(natom*3), &
+    winv(natom), &
+    iqatom(natom), &
+    stat=alloc_status)
+  call check_alloc('atom data arrays')
+end subroutine allocate_natom_arrays
 
-    allocate(x(natom*3), &
-      xx(natom*3), &
-      v(natom*3), &
-      d(natom*3), &
-      winv(natom), &
-      iqatom(natom), &
-      stat=alloc_status)
-    call check_alloc('atom data arrays')
-  end subroutine allocate_natom_arrays
 
-  !-------------------------------------------------------------------------------
-  !Allocate arrays that hold no. pairs per chargegroup.
-  !-------------------------------------------------------------------------------
-  subroutine allocate_nbxx_per_cgp
+subroutine allocate_nbxx_per_cgp
+!!--------------------------------------------------------------------------------
+!! subroutine **allocate_nbxx_per_cgp**
+!! Allocate arrays that hold no. pairs per chargegroup.
+!!--------------------------------------------------------------------------------
+  allocate(nbpp_per_cgp(ncgp_solute), &
+    nbww_per_cgp(nwat), &
+    nbqp_per_cgp(ncgp_solute), &
+    nbqw_per_cgp(nwat), &
+    nbpw_per_cgp(ncgp_solute), &
+    stat=alloc_status)
+  call check_alloc('MPI data arrays')
+end subroutine allocate_nbxx_per_cgp
 
-    allocate(nbpp_per_cgp(ncgp_solute), & 
-      nbww_per_cgp(nwat), &
-      nbqp_per_cgp(ncgp_solute), &
-      nbqw_per_cgp(nwat), &
-      nbpw_per_cgp(ncgp_solute), &
+
+subroutine allocate_lrf_arrays
+!!--------------------------------------------------------------------------------
+!! subroutine **allocate_lrf_arrays**
+!!
+!!--------------------------------------------------------------------------------
+  if (use_PBC .and. constant_pressure) then
+    allocate(iwhich_cgp(natom), lrf(ncgp), old_lrf(ncgp), stat=alloc_status)
+  else
+    allocate(iwhich_cgp(natom), lrf(ncgp), stat=alloc_status)
+  end if
+
+  call check_alloc('LRF arrays')
+end subroutine allocate_lrf_arrays
+
+
+#if defined(USE_MPI)
+subroutine allocate_mpi
+!!--------------------------------------------------------------------------------
+!! subroutine **allocate_mpi**
+!!
+!!--------------------------------------------------------------------------------
+  if(nodeid .eq. 0) then
+    allocate(mpi_status(MPI_STATUS_SIZE,numnodes-1), &
+      request_recv(numnodes-1,3), &
+      d_recv(natom*3,numnodes-1), &
+      E_recv(numnodes-1), &
+      EQ_recv(nstates,numnodes-1), &
       stat=alloc_status)
     call check_alloc('MPI data arrays')
-
-  end subroutine allocate_nbxx_per_cgp
-
-
-  !----------------------------------------------------------------------
-  subroutine allocate_lrf_arrays
-
-    if (use_PBC .and. constant_pressure) then
-      allocate(iwhich_cgp(natom), lrf(ncgp), old_lrf(ncgp), stat=alloc_status)
-    else
-      allocate(iwhich_cgp(natom), lrf(ncgp), stat=alloc_status)
-    end if
-
-    call check_alloc('LRF arrays')
-  end subroutine allocate_lrf_arrays
-
-  !----------------------------------------------------------------------
-#if defined(USE_MPI)
-  subroutine allocate_mpi
-
-    if(nodeid .eq. 0) then
-      allocate(mpi_status(MPI_STATUS_SIZE,numnodes-1), &
-        request_recv(numnodes-1,3), &
-        d_recv(natom*3,numnodes-1), &
-        E_recv(numnodes-1), &
-        EQ_recv(nstates,numnodes-1), &
-        stat=alloc_status)
-      call check_alloc('MPI data arrays')
-    else
-      allocate(E_send(1), &
-        EQ_send(nstates), &
-        stat=alloc_status)
-      call check_alloc('MPI data arrays')
-    end if
-  end subroutine allocate_mpi
-#endif
-  !----------------------------------------------------------------------
-
-  subroutine allocate_watpol_arrays
-
-    allocate(list_sh(n_max_insh, nwpolr_shell), &
-      nsort(n_max_insh,nwpolr_shell), &
-      theta(nwat), &
-      theta0(nwat), &
-      tdum(nwat), &
+  else
+    allocate(E_send(1), &
+      EQ_send(nstates), &
       stat=alloc_status)
-    call check_alloc('water polarization shell arrays')
+    call check_alloc('MPI data arrays')
+  end if
+end subroutine allocate_mpi
+#endif
 
-  end subroutine allocate_watpol_arrays
 
-  !----------------------------------------------------------------------
+subroutine allocate_watpol_arrays
 
-  subroutine check_alloc(message)
+  allocate(list_sh(n_max_insh, nwpolr_shell), &
+    nsort(n_max_insh,nwpolr_shell), &
+    theta(nwat), &
+    theta0(nwat), &
+    tdum(nwat), &
+    stat=alloc_status)
+  call check_alloc('water polarization shell arrays')
 
-    ! argument
-    character(*) message
+end subroutine allocate_watpol_arrays
 
-    ! local var
-    character(120) allocmsg
 
-    if (alloc_status .ne. 0) then
-      allocmsg = '>>> Out of memory trying to allocate '//message
-      call die(allocmsg)
-    end if
-  end subroutine check_alloc
+subroutine check_alloc(message)
 
-  !----------------------------------------------------------------------
+  ! argument
+  character(*) message
 
-  subroutine md_deallocate
-    ! deallocate this module's own arrays. Called by shutdown
-    ! use status to avoid errors if not allocated
-    ! atom arrays
-    deallocate (x, stat=alloc_status)
-    deallocate (xx, stat=alloc_status)
-    deallocate (v, stat=alloc_status)
-    deallocate (d, stat=alloc_status)
-    deallocate (winv, stat=alloc_status)
-    deallocate (iqatom, stat=alloc_status)
+  ! local var
+  character(120) allocmsg
 
-    ! nonbond lists
-    deallocate(nbpp, nbpw, nbww, nbqq, nbqp, nbqw, qconn, stat=alloc_status)
+  if (alloc_status .ne. 0) then
+    allocmsg = '>>> Out of memory trying to allocate '//message
+    call die(allocmsg)
+  end if
+end subroutine check_alloc
 
-    ! watpol arrays
-    deallocate(wshell, stat=alloc_status)
-    deallocate(list_sh, stat=alloc_status)
-    deallocate(nsort, stat=alloc_status)
-    deallocate(theta, stat=alloc_status)
-    deallocate(theta0, stat=alloc_status)
-    deallocate(tdum, stat=alloc_status)
 
-    ! LRF arrays
-    deallocate(iwhich_cgp, lrf, stat=alloc_status)
+subroutine md_deallocate
+  ! deallocate this module's own arrays. Called by shutdown
+  ! use status to avoid errors if not allocated
+  ! atom arrays
+  deallocate (x, stat=alloc_status)
+  deallocate (xx, stat=alloc_status)
+  deallocate (v, stat=alloc_status)
+  deallocate (d, stat=alloc_status)
+  deallocate (winv, stat=alloc_status)
+  deallocate (iqatom, stat=alloc_status)
 
-    ! restraints
-    deallocate(rstseq, stat=alloc_status)
-    deallocate(rstpos, stat=alloc_status)
-    deallocate(rstdis, stat=alloc_status)
-    deallocate(rstang, stat=alloc_status)
-    deallocate(rstwal, stat=alloc_status)
+  ! nonbond lists
+  deallocate(nbpp, nbpw, nbww, nbqq, nbqp, nbqw, qconn, stat=alloc_status)
+
+  ! watpol arrays
+  deallocate(wshell, stat=alloc_status)
+  deallocate(list_sh, stat=alloc_status)
+  deallocate(nsort, stat=alloc_status)
+  deallocate(theta, stat=alloc_status)
+  deallocate(theta0, stat=alloc_status)
+  deallocate(tdum, stat=alloc_status)
+
+  ! LRF arrays
+  deallocate(iwhich_cgp, lrf, stat=alloc_status)
+
+  ! restraints
+  deallocate(rstseq, stat=alloc_status)
+  deallocate(rstpos, stat=alloc_status)
+  deallocate(rstdis, stat=alloc_status)
+  deallocate(rstang, stat=alloc_status)
+  deallocate(rstwal, stat=alloc_status)
 
 #if defined (USE_MPI)
-    !MPI arrays
-    deallocate(nbpp_per_cgp ,stat=alloc_status)
-    deallocate(nbww_per_cgp ,stat=alloc_status)
-    deallocate(nbqp_per_cgp ,stat=alloc_status)
-    deallocate(nbqw_per_cgp ,stat=alloc_status)
-    deallocate(nbpw_per_cgp ,stat=alloc_status)
+  !MPI arrays
+  deallocate(nbpp_per_cgp ,stat=alloc_status)
+  deallocate(nbww_per_cgp ,stat=alloc_status)
+  deallocate(nbqp_per_cgp ,stat=alloc_status)
+  deallocate(nbqw_per_cgp ,stat=alloc_status)
+  deallocate(nbpw_per_cgp ,stat=alloc_status)
 
 
-    if(nodeid .eq. 0) then
-      deallocate(d_recv, stat=alloc_status)
-      deallocate(E_recv, stat=alloc_status)
-      deallocate(EQ_recv, stat=alloc_status)
-    else
-      deallocate(E_send, stat=alloc_status)
-      deallocate(EQ_send, stat=alloc_status)
-    end if
+  if(nodeid .eq. 0) then
+    deallocate(d_recv, stat=alloc_status)
+    deallocate(E_recv, stat=alloc_status)
+    deallocate(EQ_recv, stat=alloc_status)
+  else
+    deallocate(E_send, stat=alloc_status)
+    deallocate(EQ_send, stat=alloc_status)
+  end if
 #endif
 
-  end subroutine md_deallocate
+end subroutine md_deallocate
 
-  !-----------------------------------------------------------------------
 
-  subroutine reallocate_nonbondlist_pp
+subroutine reallocate_nonbondlist_pp
+  ! variables
+  type(NB_TYPE), allocatable      :: old_nbxx(:)
+  integer                                         :: old_max
 
-    ! variables
-    type(NB_TYPE), allocatable      :: old_nbxx(:)
-    integer                                         :: old_max
+  ! copy
+  old_max = calculation_assignment%pp%max
+  allocate(old_nbxx(old_max), stat=alloc_status)
+  call check_alloc('reallocating non-bonded interaction list')
+  old_nbxx(1:old_max) = nbpp(1:old_max)
 
-    ! copy
-    old_max = calculation_assignment%pp%max
-    allocate(old_nbxx(old_max), stat=alloc_status)
-    call check_alloc('reallocating non-bonded interaction list')
-    old_nbxx(1:old_max) = nbpp(1:old_max)
+  ! deallocate and copy back
+  deallocate(nbpp)
+  calculation_assignment%pp%max = int(calculation_assignment%pp%max * 1.05) + 200
+  allocate(nbpp(calculation_assignment%pp%max), stat = alloc_status)
+  call check_alloc('reallocating non-bonded interaction list')
+  nbpp(1:old_max) = old_nbxx(1:old_max)
 
-    ! deallocate and copy back
-    deallocate(nbpp)
-    calculation_assignment%pp%max = int(calculation_assignment%pp%max * 1.05) + 200
-    allocate(nbpp(calculation_assignment%pp%max), stat = alloc_status)
-    call check_alloc('reallocating non-bonded interaction list')
-    nbpp(1:old_max) = old_nbxx(1:old_max)
+  ! deallocate copy
+  deallocate(old_nbxx)
 
-    ! deallocate copy
-    deallocate(old_nbxx)
-
-    ! tell the world
-    write (*,100) calculation_assignment%pp%max
+  ! tell the world
+  write (*,100) calculation_assignment%pp%max
 100 format('>>> reallocating p-p pair list, new max is ', i8)
 
-  end subroutine reallocate_nonbondlist_pp
-  !----------------------------------------------------------------------
-  subroutine reallocate_nbpp_cgp
+end subroutine reallocate_nonbondlist_pp
 
-    ! variables
-    type(CGP_PAIR_TYPE), allocatable        :: old_nbxx(:)
-    integer                                         :: old_max, new_max
 
-    ! copy
-    old_max = size(nbpp_cgp, 1)
-    allocate(old_nbxx(old_max), stat=alloc_status)
-    call check_alloc('reallocating non-bonded charge group list')
-    old_nbxx(1:old_max) = nbpp_cgp(1:old_max)
+subroutine reallocate_nbpp_cgp
+  ! variables
+  type(CGP_PAIR_TYPE), allocatable        :: old_nbxx(:)
+  integer                                         :: old_max, new_max
 
-    ! deallocate and copy back
-    deallocate(nbpp_cgp)
-    new_max = int( old_max*1.05) + 200
-    allocate(nbpp_cgp(new_max), stat = alloc_status)
-    call check_alloc('reallocating non-bonded charge group list')
-    nbpp_cgp(1:old_max) = old_nbxx(1:old_max)
+  ! copy
+  old_max = size(nbpp_cgp, 1)
+  allocate(old_nbxx(old_max), stat=alloc_status)
+  call check_alloc('reallocating non-bonded charge group list')
+  old_nbxx(1:old_max) = nbpp_cgp(1:old_max)
 
-    ! deallocate copy
-    deallocate(old_nbxx)
+  ! deallocate and copy back
+  deallocate(nbpp_cgp)
+  new_max = int( old_max*1.05) + 200
+  allocate(nbpp_cgp(new_max), stat = alloc_status)
+  call check_alloc('reallocating non-bonded charge group list')
+  nbpp_cgp(1:old_max) = old_nbxx(1:old_max)
 
-    ! tell the world
-    write (*,100) new_max
+  ! deallocate copy
+  deallocate(old_nbxx)
+
+  ! tell the world
+  write (*,100) new_max
 100 format('>>> reallocating p-p charge group pair list, new max is ', i8)
 
-  end subroutine reallocate_nbpp_cgp
-  !----------------------------------------------------------------------
-  subroutine reallocate_nbpw_cgp
+end subroutine reallocate_nbpp_cgp
 
-    ! variables
-    type(CGP_PAIR_TYPE), allocatable        :: old_nbxx(:)
-    integer                                         :: old_max, new_max
 
-    ! copy
-    old_max = size(nbpw_cgp, 1)
-    allocate(old_nbxx(old_max), stat=alloc_status)
-    call check_alloc('reallocating non-bonded charge group list')
-    old_nbxx(1:old_max) = nbpw_cgp(1:old_max)
+subroutine reallocate_nbpw_cgp
+  ! variables
+  type(CGP_PAIR_TYPE), allocatable        :: old_nbxx(:)
+  integer                                         :: old_max, new_max
 
-    ! deallocate and copy back
-    deallocate(nbpw_cgp)
-    new_max = int( old_max*1.05) + 200
-    allocate(nbpw_cgp(new_max), stat = alloc_status)
-    call check_alloc('reallocating non-bonded charge group list')
-    nbpw_cgp(1:old_max) = old_nbxx(1:old_max)
+  ! copy
+  old_max = size(nbpw_cgp, 1)
+  allocate(old_nbxx(old_max), stat=alloc_status)
+  call check_alloc('reallocating non-bonded charge group list')
+  old_nbxx(1:old_max) = nbpw_cgp(1:old_max)
 
-    ! deallocate copy
-    deallocate(old_nbxx)
+  ! deallocate and copy back
+  deallocate(nbpw_cgp)
+  new_max = int( old_max*1.05) + 200
+  allocate(nbpw_cgp(new_max), stat = alloc_status)
+  call check_alloc('reallocating non-bonded charge group list')
+  nbpw_cgp(1:old_max) = old_nbxx(1:old_max)
 
-    ! tell the world
-    write (*,100) new_max
+  ! deallocate copy
+  deallocate(old_nbxx)
+
+  ! tell the world
+  write (*,100) new_max
 100 format('>>> reallocating p-w charge group pair list, new max is ', i8)
 
-  end subroutine reallocate_nbpw_cgp
-  !----------------------------------------------------------------------
-  subroutine reallocate_nbqp_cgp
+end subroutine reallocate_nbpw_cgp
 
-    ! variables
-    type(CGP_PAIR_TYPE), allocatable        :: old_nbxx(:)
-    integer                                         :: old_max, new_max
 
-    ! copy
-    old_max = size(nbqp_cgp, 1)
-    allocate(old_nbxx(old_max), stat=alloc_status)
-    call check_alloc('reallocating non-bonded charge group list')
-    old_nbxx(1:old_max) = nbqp_cgp(1:old_max)
+subroutine reallocate_nbqp_cgp
+  ! variables
+  type(CGP_PAIR_TYPE), allocatable        :: old_nbxx(:)
+  integer                                         :: old_max, new_max
 
-    ! deallocate and copy back
-    deallocate(nbqp_cgp)
-    new_max = int( old_max*1.05) + 200
-    allocate(nbqp_cgp(new_max), stat = alloc_status)
-    call check_alloc('reallocating non-bonded charge group list')
-    nbqp_cgp(1:old_max) = old_nbxx(1:old_max)
+  ! copy
+  old_max = size(nbqp_cgp, 1)
+  allocate(old_nbxx(old_max), stat=alloc_status)
+  call check_alloc('reallocating non-bonded charge group list')
+  old_nbxx(1:old_max) = nbqp_cgp(1:old_max)
 
-    ! deallocate copy
-    deallocate(old_nbxx)
+  ! deallocate and copy back
+  deallocate(nbqp_cgp)
+  new_max = int( old_max*1.05) + 200
+  allocate(nbqp_cgp(new_max), stat = alloc_status)
+  call check_alloc('reallocating non-bonded charge group list')
+  nbqp_cgp(1:old_max) = old_nbxx(1:old_max)
 
-    ! tell the world
-    write (*,100) new_max
+  ! deallocate copy
+  deallocate(old_nbxx)
+
+  ! tell the world
+  write (*,100) new_max
 100 format('>>> reallocating q-p charge group pair list, new max is ', i8)
 
-  end subroutine reallocate_nbqp_cgp
+end subroutine reallocate_nbqp_cgp
 
-  !----------------------------------------------------------------------
 
-  subroutine reallocate_nonbondlist_pw
-    ! variables
-    type(NB_TYPE), allocatable      :: old_nbxx(:)
-    integer                                         :: old_max
+subroutine reallocate_nonbondlist_pw
+  ! variables
+  type(NB_TYPE), allocatable      :: old_nbxx(:)
+  integer                                         :: old_max
 
-    ! copy
-    old_max = calculation_assignment%pw%max
-    allocate(old_nbxx(old_max), stat=alloc_status)
-    call check_alloc('reallocating non-bonded interaction list')
-    old_nbxx(1:old_max) = nbpw(1:old_max)
+  ! copy
+  old_max = calculation_assignment%pw%max
+  allocate(old_nbxx(old_max), stat=alloc_status)
+  call check_alloc('reallocating non-bonded interaction list')
+  old_nbxx(1:old_max) = nbpw(1:old_max)
 
-    ! deallocate and copy back
-    deallocate(nbpw)
-    calculation_assignment%pw%max = int(calculation_assignment%pw%max * 1.05) + 200
-    allocate(nbpw(calculation_assignment%pw%max), stat = alloc_status)
-    call check_alloc('reallocating non-bonded interaction list')
-    nbpw(1:old_max) = old_nbxx(1:old_max)
+  ! deallocate and copy back
+  deallocate(nbpw)
+  calculation_assignment%pw%max = int(calculation_assignment%pw%max * 1.05) + 200
+  allocate(nbpw(calculation_assignment%pw%max), stat = alloc_status)
+  call check_alloc('reallocating non-bonded interaction list')
+  nbpw(1:old_max) = old_nbxx(1:old_max)
 
-    ! deallocate copy
-    deallocate(old_nbxx)
+  ! deallocate copy
+  deallocate(old_nbxx)
 
-    ! tell the world
-    write (*,100) calculation_assignment%pw%max
+  ! tell the world
+  write (*,100) calculation_assignment%pw%max
 100 format('>>> reallocating p-w pair list, new max is ', i8)
 
-  end subroutine reallocate_nonbondlist_pw
+end subroutine reallocate_nonbondlist_pw
 
-  !----------------------------------------------------------------------
 
-  subroutine reallocate_nonbondlist_qp
-    ! variables
-    type(NBQP_TYPE), allocatable    :: old_nbxx(:)
-    integer                                         :: old_max
+subroutine reallocate_nonbondlist_qp
+  ! variables
+  type(NBQP_TYPE), allocatable    :: old_nbxx(:)
+  integer                                         :: old_max
 
-    ! copy
-    old_max = calculation_assignment%qp%max
-    allocate(old_nbxx(old_max), stat=alloc_status)
-    call check_alloc('reallocating non-bonded interaction list')
-    old_nbxx(1:old_max) = nbqp(1:old_max)
+  ! copy
+  old_max = calculation_assignment%qp%max
+  allocate(old_nbxx(old_max), stat=alloc_status)
+  call check_alloc('reallocating non-bonded interaction list')
+  old_nbxx(1:old_max) = nbqp(1:old_max)
 
-    ! deallocate and copy back
-    deallocate(nbqp)
-    calculation_assignment%qp%max = int(calculation_assignment%qp%max * 1.05) + 200
-    allocate(nbqp(calculation_assignment%qp%max), stat = alloc_status)
-    call check_alloc('reallocating non-bonded interaction list')
-    nbqp(1:old_max) = old_nbxx(1:old_max)
+  ! deallocate and copy back
+  deallocate(nbqp)
+  calculation_assignment%qp%max = int(calculation_assignment%qp%max * 1.05) + 200
+  allocate(nbqp(calculation_assignment%qp%max), stat = alloc_status)
+  call check_alloc('reallocating non-bonded interaction list')
+  nbqp(1:old_max) = old_nbxx(1:old_max)
 
-    ! deallocate copy
-    deallocate(old_nbxx)
+  ! deallocate copy
+  deallocate(old_nbxx)
 
-    ! tell the world
-    write (*,100) calculation_assignment%qp%max
+  ! tell the world
+  write (*,100) calculation_assignment%qp%max
 100 format('>>> reallocating q-s pair list, new max is ', i8)
 
-  end subroutine reallocate_nonbondlist_qp
+end subroutine reallocate_nonbondlist_qp
 
-  !----------------------------------------------------------------------
 
-  subroutine reallocate_nonbondlist_ww
-    ! variables
-    integer(AI), allocatable                :: old_nbxx(:)
-    integer                                         :: old_max
+subroutine reallocate_nonbondlist_ww
+  ! variables
+  integer(AI), allocatable                :: old_nbxx(:)
+  integer                                         :: old_max
 
-    ! copy
-    allocate(old_nbxx(calculation_assignment%ww%max), stat=alloc_status)
-    call check_alloc('reallocating non-bonded interaction list')
-    old_nbxx(1:calculation_assignment%ww%max) = nbww(1:calculation_assignment%ww%max)
-    old_max = calculation_assignment%ww%max
+  ! copy
+  allocate(old_nbxx(calculation_assignment%ww%max), stat=alloc_status)
+  call check_alloc('reallocating non-bonded interaction list')
+  old_nbxx(1:calculation_assignment%ww%max) = nbww(1:calculation_assignment%ww%max)
+  old_max = calculation_assignment%ww%max
 
-    ! deallocate and copy back
-    deallocate(nbww)
-    calculation_assignment%ww%max = int(calculation_assignment%ww%max * 1.05) + 200 + nwat
-    allocate(nbww(calculation_assignment%ww%max), stat = alloc_status)
-    call check_alloc('reallocating non-bonded interaction list')
-    nbww(1:old_max) = old_nbxx(1:old_max)
+  ! deallocate and copy back
+  deallocate(nbww)
+  calculation_assignment%ww%max = int(calculation_assignment%ww%max * 1.05) + 200 + nwat
+  allocate(nbww(calculation_assignment%ww%max), stat = alloc_status)
+  call check_alloc('reallocating non-bonded interaction list')
+  nbww(1:old_max) = old_nbxx(1:old_max)
 
-    ! deallocate copy
-    deallocate(old_nbxx)
+  ! deallocate copy
+  deallocate(old_nbxx)
 
-    ! tell the world
-    write (*,100) calculation_assignment%ww%max
+  ! tell the world
+  write (*,100) calculation_assignment%ww%max
 100 format('>>> reallocating w-w pair list, new max is ', i8)
 
-  end subroutine reallocate_nonbondlist_ww
+end subroutine reallocate_nonbondlist_ww
 
 
-  !----------------------------------------------------------------------
-  ! --- Dynamics subroutines, alphabetically
-  real(8) function angle(istart, iend)
-    ! *** arguments
-    integer                                         :: istart, iend
+!-------------------------------------------------------------------------------
+! --- Dynamics subroutines, alphabetically
+!-------------------------------------------------------------------------------
+real(8) function angle(istart, iend)
+  ! *** arguments
+  integer                                         :: istart, iend
 
-    ! *** local variables
-    integer                                         :: i,j,k,ia,ic,i3,j3,k3
-    real(8)                                         :: bjiinv, bjkinv, bji2inv, bjk2inv
-    real(8)                                         :: scp,angv,da,dv,f1
-    real(8)                                         :: rji(3),rjk(3),di(3),dk(3)
+  ! *** local variables
+  integer                                         :: i,j,k,ia,ic,i3,j3,k3
+  real(8)                                         :: bjiinv, bjkinv, bji2inv, bjk2inv
+  real(8)                                         :: scp,angv,da,dv,f1
+  real(8)                                         :: rji(3),rjk(3),di(3),dk(3)
 
-    ! global variables used:
-    ! ang, x, anglib, d
+  ! global variables used:
+  ! ang, x, anglib, d
 
-    ! calculate the total energy of all protein or water angles, depending
-    ! updates d
+  ! calculate the total energy of all protein or water angles, depending
+  ! updates d
 
-    ! reset Eangle
-    angle = 0.
+  ! reset Eangle
+  angle = 0.
 
-    do ia=istart,iend
-      ! for each angle in range:
+  do ia=istart,iend
+    ! for each angle in range:
 
-      i  = ang(ia)%i
-      j  = ang(ia)%j
-      k  = ang(ia)%k
-      ic = ang(ia)%cod
-      ! calculate rji and rjk
-      i3=i*3-3
-      j3=j*3-3
-      k3=k*3-3
-      rji(1) = x(i3+1) - x(j3+1)
-      rji(2) = x(i3+2) - x(j3+2)
-      rji(3) = x(i3+3) - x(j3+3)
-      rjk(1) = x(k3+1) - x(j3+1)
-      rjk(2) = x(k3+2) - x(j3+2)
-      rjk(3) = x(k3+3) - x(j3+3)
+    i  = ang(ia)%i
+    j  = ang(ia)%j
+    k  = ang(ia)%k
+    ic = ang(ia)%cod
+    ! calculate rji and rjk
+    i3=i*3-3
+    j3=j*3-3
+    k3=k*3-3
+    rji(1) = x(i3+1) - x(j3+1)
+    rji(2) = x(i3+2) - x(j3+2)
+    rji(3) = x(i3+3) - x(j3+3)
+    rjk(1) = x(k3+1) - x(j3+1)
+    rjk(2) = x(k3+2) - x(j3+2)
+    rjk(3) = x(k3+3) - x(j3+3)
 
-      ! calculate bjiinv and bjkinv and their squares
-      bji2inv = 1./(rji(1)**2 + rji(2)**2 + rji(3)**2 )
-      bjk2inv = 1./(rjk(1)**2 + rjk(2)**2 + rjk(3)**2 )
-      bjiinv = sqrt(bji2inv)
-      bjkinv = sqrt(bjk2inv)
+    ! calculate bjiinv and bjkinv and their squares
+    bji2inv = 1./(rji(1)**2 + rji(2)**2 + rji(3)**2 )
+    bjk2inv = 1./(rjk(1)**2 + rjk(2)**2 + rjk(3)**2 )
+    bjiinv = sqrt(bji2inv)
+    bjkinv = sqrt(bjk2inv)
 
-      ! calculate scp and angv
-      scp = ( rji(1)*rjk(1) + rji(2)*rjk(2) + rji(3)*rjk(3) )
-      scp = scp * bjiinv*bjkinv
-      if ( scp .gt.  1.0 ) then
-        scp =  1.0
-      else if ( scp .lt. -1.0 ) then
-        scp = -1.0
-      end if
-      angv = acos(scp)
+    ! calculate scp and angv
+    scp = ( rji(1)*rjk(1) + rji(2)*rjk(2) + rji(3)*rjk(3) )
+    scp = scp * bjiinv*bjkinv
+    if ( scp .gt.  1.0 ) then
+      scp =  1.0
+    else if ( scp .lt. -1.0 ) then
+      scp = -1.0
+    end if
+    angv = acos(scp)
 
-      ! calculate da and dv
-      da = angv - anglib(ic)%ang0
-      angle = angle + 0.5*anglib(ic)%fk*da**2
-      dv = anglib(ic)%fk*da
+    ! calculate da and dv
+    da = angv - anglib(ic)%ang0
+    angle = angle + 0.5*anglib(ic)%fk*da**2
+    dv = anglib(ic)%fk*da
 
-      ! calculate f1
-      f1 = sin ( angv )
-      if ( abs(f1) .lt. 1.e-12 ) then
-        ! avoid division by zero
-        f1 = -1.e12
-      else
-        f1 =  -1.0 / f1
-      end if
+    ! calculate f1
+    f1 = sin ( angv )
+    if ( abs(f1) .lt. 1.e-12 ) then
+      ! avoid division by zero
+      f1 = -1.e12
+    else
+      f1 =  -1.0 / f1
+    end if
 
-      ! calculate di and dk
-      di(1) = f1 * ( rjk(1)*bjiinv*bjkinv - scp*rji(1)*bji2inv )
-      di(2) = f1 * ( rjk(2)*bjiinv*bjkinv - scp*rji(2)*bji2inv )
-      di(3) = f1 * ( rjk(3)*bjiinv*bjkinv - scp*rji(3)*bji2inv )
-      dk(1) = f1 * ( rji(1)*bjiinv*bjkinv - scp*rjk(1)*bjk2inv )
-      dk(2) = f1 * ( rji(2)*bjiinv*bjkinv - scp*rjk(2)*bjk2inv )
-      dk(3) = f1 * ( rji(3)*bjiinv*bjkinv - scp*rjk(3)*bjk2inv )
+    ! calculate di and dk
+    di(1) = f1 * ( rjk(1)*bjiinv*bjkinv - scp*rji(1)*bji2inv )
+    di(2) = f1 * ( rjk(2)*bjiinv*bjkinv - scp*rji(2)*bji2inv )
+    di(3) = f1 * ( rjk(3)*bjiinv*bjkinv - scp*rji(3)*bji2inv )
+    dk(1) = f1 * ( rji(1)*bjiinv*bjkinv - scp*rjk(1)*bjk2inv )
+    dk(2) = f1 * ( rji(2)*bjiinv*bjkinv - scp*rjk(2)*bjk2inv )
+    dk(3) = f1 * ( rji(3)*bjiinv*bjkinv - scp*rjk(3)*bjk2inv )
 
-      ! update d
-      d(i3+1) = d(i3+1) + dv*di(1)
-      d(i3+2) = d(i3+2) + dv*di(2)
-      d(i3+3) = d(i3+3) + dv*di(3)
-      d(k3+1) = d(k3+1) + dv*dk(1)
-      d(k3+2) = d(k3+2) + dv*dk(2)
-      d(k3+3) = d(k3+3) + dv*dk(3)
-      d(j3+1) = d(j3+1) - dv*( di(1) + dk(1) )
-      d(j3+2) = d(j3+2) - dv*( di(2) + dk(2) )
-      d(j3+3) = d(j3+3) - dv*( di(3) + dk(3) )
+    ! update d
+    d(i3+1) = d(i3+1) + dv*di(1)
+    d(i3+2) = d(i3+2) + dv*di(2)
+    d(i3+3) = d(i3+3) + dv*di(3)
+    d(k3+1) = d(k3+1) + dv*dk(1)
+    d(k3+2) = d(k3+2) + dv*dk(2)
+    d(k3+3) = d(k3+3) + dv*dk(3)
+    d(j3+1) = d(j3+1) - dv*( di(1) + dk(1) )
+    d(j3+2) = d(j3+2) - dv*( di(2) + dk(2) )
+    d(j3+3) = d(j3+3) - dv*( di(3) + dk(3) )
+  end do
+
+end function angle
+
+
+real(8) function urey_bradley(istart, iend)
+  ! *** arguments
+  integer                        :: istart, iend
+
+  ! *** local variables
+  integer                        :: i,j,k,ia,ic,i3,j3,k3
+  real(8)                        :: bjiinv, bjkinv, bji2inv, bjk2inv
+  real(8)                        :: scp,angv,da,dv,f1
+  real(8)                        :: rji(3),rjk(3),di(3),dk(3)
+  real(8)                        :: rik(3), dik, ru, du
+  real(8)                        :: Eurey
+
+  ! global variables used:
+  ! ang, x, anglib, d
+
+  ! reset energy
+  urey_bradley = 0.
+
+  do ia=istart,iend
+    ! for each angle in range:
+
+    i  = ang(ia)%i
+    j  = ang(ia)%j
+    k  = ang(ia)%k
+    ic = ang(ia)%cod
+    ! calculate rji and rjk
+    i3=i*3-3
+    j3=j*3-3
+    k3=k*3-3
+    ! 1-3 distance for Urey-Bradley potential:
+    if(anglib(ic)%ureyfk > 0.) then
+      rik(1) = x(k3+1) - x(i3+1)
+      rik(2) = x(k3+2) - x(i3+2)
+      rik(3) = x(k3+3) - x(i3+3)
+      dik = sqrt(rik(1)*rik(1) + rik(2)*rik(2) + rik(3)*rik(3))
+      ru = dik - anglib(ic)%ureyr0
+      urey_bradley = urey_bradley + anglib(ic)%ureyfk*ru**2
+      du = 2*anglib(ic)%ureyfk*ru/dik
+      d(k3+1) = d(k3+1) + du*rik(1)
+      d(k3+2) = d(k3+2) + du*rik(2)
+      d(k3+3) = d(k3+3) + du*rik(3)
+      d(i3+1) = d(i3+1) - du*rik(1)
+      d(i3+2) = d(i3+2) - du*rik(2)
+      d(i3+3) = d(i3+3) - du*rik(3)
+    end if
+  end do
+
+end function urey_bradley
+
+
+real(8) function bond(istart, iend)
+  ! *** arguments
+  integer                                         ::      istart, iend
+
+  ! *** local variables
+  integer                                         ::      i,j,ib,ic,i3,j3
+  real(8)                                         ::      b,db,dv
+  real(8)                                         ::      rij(3)
+
+  ! global variables used:
+  ! bnd, x, bondlib, d
+
+  ! reset Ebond
+  bond = 0
+
+  do ib=istart,iend
+    ! for each bond in range:
+
+    i  = bnd(ib)%i
+    j  = bnd(ib)%j
+    ic = bnd(ib)%cod
+    ! calculate rij
+    i3=i*3-3
+    j3=j*3-3
+    rij(1) = x(j3+1) - x(i3+1)
+    rij(2) = x(j3+2) - x(i3+2)
+    rij(3) = x(j3+3) - x(i3+3)
+
+    ! calculate b and db, update Ebond
+    b = sqrt ( rij(1)**2 + rij(2)**2 + rij(3)**2 )
+    db = b - bondlib(ic)%bnd0
+    bond = bond + 0.5*bondlib(ic)%fk*db**2
+
+    ! calculate dv and update d
+    dv = bondlib(ic)%fk*db/b
+    d(j3+1) = d(j3+1) + rij(1)*dv
+    d(j3+2) = d(j3+2) + rij(2)*dv
+    d(j3+3) = d(j3+3) + rij(3)*dv
+    d(i3+1) = d(i3+1) - rij(1)*dv
+    d(i3+2) = d(i3+2) - rij(2)*dv
+    d(i3+3) = d(i3+3) - rij(3)*dv
+  end do
+
+end function bond
+
+
+subroutine cgp_centers
+  ! *** local variables
+  integer                                         ::      ig,i,i3
+
+  do ig = 1, ncgp
+    lrf(ig)%cgp_cent(:) = 0.
+    lrf(ig)%phi0 = 0.
+    lrf(ig)%phi1(:) = 0.
+    lrf(ig)%phi2(:) = 0.
+    lrf(ig)%phi3(:) = 0.
+
+    do i  = cgp(ig)%first, cgp(ig)%last
+      lrf(ig)%cgp_cent(:) = lrf(ig)%cgp_cent(:) + x(cgpatom(i)*3-2:cgpatom(i)*3)
     end do
 
-  end function angle
+    lrf(ig)%cgp_cent(:) = lrf(ig)%cgp_cent(:)/real(cgp(ig)%last - cgp(ig)%first +1)
 
-  !-----------------------------------------------------------------------
-  real(8) function urey_bradley(istart, iend)
-    ! *** arguments
-    integer                        :: istart, iend
+  end do
 
-    ! *** local variables
-    integer                        :: i,j,k,ia,ic,i3,j3,k3
-    real(8)                        :: bjiinv, bjkinv, bji2inv, bjk2inv
-    real(8)                        :: scp,angv,da,dv,f1
-    real(8)                        :: rji(3),rjk(3),di(3),dk(3) 
-    real(8)                        :: rik(3), dik, ru, du 
-    real(8)                        :: Eurey
-
-    ! global variables used:
-    ! ang, x, anglib, d
-
-    ! reset energy
-    urey_bradley = 0.
-
-    do ia=istart,iend
-      ! for each angle in range:
-
-      i  = ang(ia)%i
-      j  = ang(ia)%j
-      k  = ang(ia)%k
-      ic = ang(ia)%cod
-      ! calculate rji and rjk
-      i3=i*3-3
-      j3=j*3-3
-      k3=k*3-3
-      ! 1-3 distance for Urey-Bradley potential:
-      if(anglib(ic)%ureyfk > 0.) then
-        rik(1) = x(k3+1) - x(i3+1)
-        rik(2) = x(k3+2) - x(i3+2)
-        rik(3) = x(k3+3) - x(i3+3)
-        dik = sqrt(rik(1)*rik(1) + rik(2)*rik(2) + rik(3)*rik(3))
-        ru = dik - anglib(ic)%ureyr0
-        urey_bradley = urey_bradley + anglib(ic)%ureyfk*ru**2
-        du = 2*anglib(ic)%ureyfk*ru/dik
-        d(k3+1) = d(k3+1) + du*rik(1)
-        d(k3+2) = d(k3+2) + du*rik(2)
-        d(k3+3) = d(k3+3) + du*rik(3)
-        d(i3+1) = d(i3+1) - du*rik(1)
-        d(i3+2) = d(i3+2) - du*rik(2)
-        d(i3+3) = d(i3+3) - du*rik(3)
-      end if
-    end do
-
-  end function urey_bradley
+end subroutine cgp_centers
 
 
-  !-----------------------------------------------------------------------
-  real(8) function bond(istart, iend)
-    ! *** arguments
-    integer                                         ::      istart, iend
-
-    ! *** local variables
-    integer                                         ::      i,j,ib,ic,i3,j3
-    real(8)                                         ::      b,db,dv
-    real(8)                                         ::      rij(3)
-
-    ! global variables used:
-    ! bnd, x, bondlib, d
-
-    ! reset Ebond
-    bond = 0
-
-    do ib=istart,iend
-      ! for each bond in range:
-
-      i  = bnd(ib)%i
-      j  = bnd(ib)%j
-      ic = bnd(ib)%cod
-      ! calculate rij
-      i3=i*3-3
-      j3=j*3-3
-      rij(1) = x(j3+1) - x(i3+1)
-      rij(2) = x(j3+2) - x(i3+2)
-      rij(3) = x(j3+3) - x(i3+3)
-
-      ! calculate b and db, update Ebond
-      b = sqrt ( rij(1)**2 + rij(2)**2 + rij(3)**2 )
-      db = b - bondlib(ic)%bnd0
-      bond = bond + 0.5*bondlib(ic)%fk*db**2
-
-      ! calculate dv and update d
-      dv = bondlib(ic)%fk*db/b
-      d(j3+1) = d(j3+1) + rij(1)*dv
-      d(j3+2) = d(j3+2) + rij(2)*dv
-      d(j3+3) = d(j3+3) + rij(3)*dv
-      d(i3+1) = d(i3+1) - rij(1)*dv
-      d(i3+2) = d(i3+2) - rij(2)*dv
-      d(i3+3) = d(i3+3) - rij(3)*dv
-    end do
-
-  end function bond
-  !-----------------------------------------------------------------------
-  subroutine cgp_centers
-    ! *** local variables
-    integer                                         ::      ig,i,i3
-
-    do ig = 1, ncgp
-      lrf(ig)%cgp_cent(:) = 0.
-      lrf(ig)%phi0 = 0.
-      lrf(ig)%phi1(:) = 0.
-      lrf(ig)%phi2(:) = 0.
-      lrf(ig)%phi3(:) = 0.
-
-      do i  = cgp(ig)%first, cgp(ig)%last
-        lrf(ig)%cgp_cent(:) = lrf(ig)%cgp_cent(:) + x(cgpatom(i)*3-2:cgpatom(i)*3)
-      end do
-
-      lrf(ig)%cgp_cent(:) = lrf(ig)%cgp_cent(:)/real(cgp(ig)%last - cgp(ig)%first +1)
-
-    end do
-
-  end subroutine cgp_centers
-
-
-!-----------------------------------------------------------------------
-  subroutine make_nbqqlist
+subroutine make_nbqqlist
     !locals
     integer                                         ::      is
 
@@ -1045,11 +1037,11 @@ contains
 
 200 format ('No. of Rcq indep. nb pairs involving q-atoms = ',i5, &
       ' in state :',i3)
-  end subroutine make_nbqqlist
+end subroutine make_nbqqlist
 
 
-  !-----------------------------------------------------------------------
-  subroutine distribute_nonbonds
+!-------------------------------------------------------------------------------
+subroutine distribute_nonbonds
     !locals
     integer                                 :: npp, npw, nqp, nww, nqw
     type(NODE_ASSIGNMENT_TYPE),allocatable  :: node_assignment(:)
@@ -1366,28 +1358,28 @@ contains
 
     if (nodeid .eq. 0)  call centered_heading('End of distribution', '-')
 
-  end subroutine distribute_nonbonds
+end subroutine distribute_nonbonds
 
 
-  !-----------------------------------------------------------------------
-  subroutine close_input_files
+!-------------------------------------------------------------------------------
+subroutine close_input_files
     close (1)
     if(restart) close (2)
     if ( implicit_rstr_from_file .eq. 1 ) close (12)
     close (13)
-  end subroutine close_input_files
+end subroutine close_input_files
 
 
-  !-----------------------------------------------------------------------
-  subroutine close_output_files
+!-------------------------------------------------------------------------------
+subroutine close_output_files
     close (3)
     if ( itrj_cycle .gt. 0 ) close (10)
     if ( iene_cycle .gt. 0 ) close (11)
-  end subroutine close_output_files
+end subroutine close_output_files
 
 
-  !-----------------------------------------------------------------------------
-  subroutine open_files
+!-------------------------------------------------------------------------------
+subroutine open_files
     ! --> restart file (2)
     if(restart) then
       open (unit=2, file=restart_file, status='old', form='unformatted', action='read', err=2)
@@ -1414,12 +1406,12 @@ contains
 11  call die('error opening energy output file.')
 12  call die('error opening position restraints file.')
 
-  end subroutine open_files
+end subroutine open_files
 
 
-  !-----------------------------------------------------------------------
-  !Restrain all excluded atoms plus heavy solute atoms in the inner shell.
-  subroutine fix_shell
+!-------------------------------------------------------------------------------
+!Restrain all excluded atoms plus heavy solute atoms in the inner shell.
+subroutine fix_shell
     ! local variables
     integer                                         ::      i,i3
     real(8)                                         ::      fk,r2,erst
@@ -1455,10 +1447,10 @@ contains
         d(i3+3) = d(i3+3) + fk*dr(3)
       end if
     end do
-  end subroutine fix_shell
+end subroutine fix_shell
 
-  !-----------------------------------------------------------------------
-  subroutine gauss (am,sd,v,ig)
+!-------------------------------------------------------------------------------
+subroutine gauss (am,sd,v,ig)
     ! arguments
     real(8)                                 :: am,sd,v
     integer                                 :: ig
@@ -1473,11 +1465,11 @@ contains
       a=a+y
     end do
     v=(a-6.0)*sd+am
-  end subroutine gauss
+end subroutine gauss
 
 
-  !-----------------------------------------------------------------------
-  subroutine get_fep
+!-------------------------------------------------------------------------------
+subroutine get_fep
     ! local variables
     character                      :: libtext*80,qaname*2
     integer                        :: i,j,k,iat
@@ -1657,11 +1649,11 @@ contains
     end do
 592 format('>>>>> ERROR: Special exclusion pair ',i2,' (',i5,1x,i5,') is invalid')
 594 format('>>>>> ERROR: Non-Q-atom special excl. pair ',i2,' must be on in all or no states')
-  end subroutine get_fep
+end subroutine get_fep
 
 
-  !-----------------------------------------------------------------------
-  subroutine get_fname (text,length,filnam)
+!-------------------------------------------------------------------------------
+subroutine get_fname (text,length,filnam)
     ! arguments
     character                      :: text*80,filnam*80
     integer                        :: length
@@ -1678,11 +1670,11 @@ contains
     end do
 10  filnam(1:length)=text(1:length)
 
-  end subroutine get_fname
+end subroutine get_fname
 
 
-  !-----------------------------------------------------------------------
-  real(8) function improper(istart, iend)
+!-------------------------------------------------------------------------------
+real(8) function improper(istart, iend)
     !arguments
     integer                                         ::      istart, iend
 
@@ -1791,11 +1783,10 @@ contains
       d(t%l*3-1) = d(t%l*3-1) + dv*dp(11)
       d(t%l*3-0) = d(t%l*3-0) + dv*dp(12)
     end do
-  end function improper
+end function improper
 
-  !-----------------------------------------------------------------------
-
-  real(8) function improper2(istart, iend)
+!-------------------------------------------------------------------------------
+real(8) function improper2(istart, iend)
     !evaluate periodic impropers
     !arguments
     integer                                         ::      istart, iend
@@ -1903,14 +1894,13 @@ contains
 
       d(t%l*3-0) = d(t%l*3-0) + dv*dp(12)
     end do
-  end function improper2
+end function improper2
 
-  !-----------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 #if defined (USE_MPI)
 subroutine init_nodes
 !!-------------------------------------------------------------------------------
-!!  subroutine  **init_nodes**
+!!subroutine  **init_nodes**
 !!  Defines and allocates variables needed in the md-calculations
 !!  The node initiation is written for AI = 4. If changes are made to any size in
 !!   sizes.f90 the MPI-code must be changed accordingly. It is not dynamically
@@ -2328,7 +2318,7 @@ end subroutine init_nodes
 #endif
 
 
-  subroutine init_shake
+subroutine init_shake
     !
     ! initialize shake constraints
     !
@@ -2502,10 +2492,10 @@ end subroutine init_nodes
         end do
       end do
     end do
-  end subroutine init_shake
+end subroutine init_shake
 
 
-  subroutine initial_shaking
+subroutine initial_shaking
     !
     ! initial shaking
     !
@@ -2523,10 +2513,10 @@ end subroutine init_nodes
 
     v(:)=(x(:)-xx(:))/dt
 
-  end subroutine initial_shaking
+end subroutine initial_shaking
 
-  !-----------------------------------------------------------------------
-  logical function initialize()                  
+
+logical function initialize()                  
     ! local variables
     character                                       :: text*80
     integer                                         :: i,j,length
@@ -3260,13 +3250,11 @@ end subroutine init_nodes
     end if
 
     call prm_close
-  end function initialize
+end function initialize
 
 
-  !-----------------------------------------------------------------------------------
-
-
-  logical function old_initialize(fu)
+!-------------------------------------------------------------------------------
+logical function old_initialize(fu)
     !arguments
     integer                                         :: fu
     ! local variables
@@ -3642,11 +3630,11 @@ end subroutine init_nodes
     write (*,160) 
 160 format ('Ignoring water model.')
 
-  end function old_initialize
+end function old_initialize
 
   
   !-----------------------------------------------------------------------
-  subroutine lrf_taylor
+subroutine lrf_taylor
     ! *** local variables
     integer                                         ::      i,i3,ic
     real(8)                                         ::      Vij, q
@@ -3712,11 +3700,11 @@ end subroutine init_nodes
         d(i3+3)=d(i3+3)-crg(i)*df(3)
       end if
     end do
-  end subroutine lrf_taylor
+end subroutine lrf_taylor
 
 
   !-----------------------------------------------------------------------
-  subroutine make_pair_lists
+subroutine make_pair_lists
 #if defined (PROFILING)
     real(8)                                         :: start_loop_time
     start_loop_time = rtime()
@@ -3784,15 +3772,15 @@ end subroutine init_nodes
     profile(1)%time = profile(1)%time + rtime() - start_loop_time
 #endif
 
-  end subroutine make_pair_lists
+end subroutine make_pair_lists
 
 
-!------------------------------------------------------------------------------!
-!>  subroutine: **maxwell**
+subroutine maxwell
+!!------------------------------------------------------------------------------
+!!  subroutine: **maxwell**
 !!  Generates Maxwell velocities using a gaussian randomizer.
 !!  uses randm
-!------------------------------------------------------------------------------!
-  subroutine maxwell
+!!------------------------------------------------------------------------------
     ! *** local variables
     integer                                         :: i,j,k
     real(8)                                         :: zero,sd,vg,kT
@@ -3810,17 +3798,17 @@ end subroutine init_nodes
       end do
     end do
 
-  end subroutine maxwell
+end subroutine maxwell
 
 
-  !----------------------------------------------------------------------------!
-  !>  subroutine: **temperature**
-  !!  This is the thermostat
-  !!  
-  !!  
-  !!  
-  !----------------------------------------------------------------------------!
-  subroutine temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
+subroutine temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
+!!------------------------------------------------------------------------------
+!!  subroutine: **temperature**
+!!  This is the thermostat
+!!
+!!
+!!
+!!------------------------------------------------------------------------------
     ! Compute the temperature
     !arguments
     real(8)                        :: Temp
@@ -3914,361 +3902,359 @@ end subroutine init_nodes
 
 180 format ('>>> WARNING: hot atom, i =',i10,' Temp(i)=',f10.2)
 
-  end subroutine temperature
+end subroutine temperature
 
 
-!------------------------------------------------------------------------------!
-!>  subroutine: **md_run**
-!!  Prepare an md run
+subroutine md_run
+!!-------------------------------------------------------------------------------
+!! subroutine **md_run**
+!! Prepare an md run
 !! Petra W changed 2002-10-01
 !! This subroutine has the main algorithms for the equations of motion.
-!------------------------------------------------------------------------------!
-  subroutine md_run
-
-    ! local variables
-    integer                         :: i,j,k,niter
-    integer                         :: i3
-    real(8)                         :: Temp,Tlast
-    real(8)                         :: Ekinmax
-    real(8)                         :: Tscale_solute,Tscale_solvent
-    real(8)                         :: time0, time1, time_per_step, startloop
-    integer(4)                      :: time_completion
+!!-------------------------------------------------------------------------------
+  ! local variables
+  integer                         :: i,j,k,niter
+  integer                         :: i3
+  real(8)                         :: Temp,Tlast
+  real(8)                         :: Ekinmax
+  real(8)                         :: Tscale_solute,Tscale_solvent
+  real(8)                         :: time0, time1, time_per_step, startloop
+  integer(4)                      :: time_completion
 
 #if defined(PROFILING)
-    real(8)                         :: start_loop_time1, start_loop_time2
-    profile(1)%name = 'NB_update'
-    profile(2)%name = '   nbwwlist_time'
-    profile(3)%name = '   nbpplist_time'
-    profile(4)%name = '   nbpwlist_time'
-    profile(5)%name = '   nbqplist_time'
-    profile(6)%name = '   nbqwlist_time'
-    profile(7)%name = 'SHAKE'
-    profile(8)%name = 'Bonded Terms'
-    profile(9)%name = 'Restraints'
-    profile(10)%name = 'Nonbonded Terms'
-    profile(11)%name = 'Update vel. & coords.'
+  real(8)                         :: start_loop_time1, start_loop_time2
+  profile(1)%name = 'NB_update'
+  profile(2)%name = '   nbwwlist_time'
+  profile(3)%name = '   nbpplist_time'
+  profile(4)%name = '   nbpwlist_time'
+  profile(5)%name = '   nbqplist_time'
+  profile(6)%name = '   nbqwlist_time'
+  profile(7)%name = 'SHAKE'
+  profile(8)%name = 'Bonded Terms'
+  profile(9)%name = 'Restraints'
+  profile(10)%name = 'Nonbonded Terms'
+  profile(11)%name = 'Update vel. & coords.'
 #endif
 
 #if defined(PROFILING)
 #if defined(USE_MPI)
-    if (nodeid .eq. 0) then
-      allocate(all_node_times(num_profiling_times*numnodes), stat=alloc_status) !vector for storing all node's node_times, used by mpi_gather at end of md_run
-      call check_alloc('MPI profiling')
-    end if
-    allocate(node_times(num_profiling_times), stat=alloc_status) !each node's profiling times, used at end of md_run by mpi_gather
+  if (nodeid .eq. 0) then
+    allocate(all_node_times(num_profiling_times*numnodes), stat=alloc_status) !vector for storing all node's node_times, used by mpi_gather at end of md_run
     call check_alloc('MPI profiling')
+  end if
+  allocate(node_times(num_profiling_times), stat=alloc_status) !each node's profiling times, used at end of md_run by mpi_gather
+  call check_alloc('MPI profiling')
 
-    all_node_times(:) = 0.0
-    node_times(:) = 0.0
+  all_node_times(:) = 0.0
+  node_times(:) = 0.0
 
 #endif
 #endif
 
 
-    !Define number of coord to send/receive
-    nat3=natom*3
+  !Define number of coord to send/receive
+  nat3=natom*3
 
-    ! calculate maximum temperature
-    !**Martin Nervall-> Only master calc. temp for now.
-    if (nodeid .eq. 0) then
-      Ekinmax = 1000.0*Ndegf*boltz*Temp0/2.0/real(natom)
+  ! calculate maximum temperature
+  !**Martin Nervall-> Only master calc. temp for now.
+  if (nodeid .eq. 0) then
+    Ekinmax = 1000.0*Ndegf*boltz*Temp0/2.0/real(natom)
 
-      call temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
-      !store old Temp
-      Tlast = Temp
+    call temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
+    !store old Temp
+    Tlast = Temp
+  end if
+
+  if (nodeid .eq. 0) then
+    ! master node only: print initial temperatures
+    write (*,*)
+    write (*,120) 'Initial', Temp, Tfree
+    if ( detail_temps ) then
+      write (*,120) 'Solvent', Temp_solvent, Tfree_solvent
+      write (*,120) 'Solute', Temp_solute, Tfree_solute
+       ! write (*,120) 'Excl solute, solvent', Texcl_solute, Texcl_solvent
     end if
+120 format(a7,' temperatures are : Ttot =',f10.2,' Tfree =',f10.2)
+    write (*,*)
 
-    if (nodeid .eq. 0) then
-      ! master node only: print initial temperatures
-      write (*,*)
-      write (*,120) 'Initial', Temp, Tfree
-      if ( detail_temps ) then
-        write (*,120) 'Solvent', Temp_solvent, Tfree_solvent
-        write (*,120) 'Solute', Temp_solute, Tfree_solute
-         ! write (*,120) 'Excl solute, solvent', Texcl_solute, Texcl_solvent
-      end if
-120   format(a7,' temperatures are : Ttot =',f10.2,' Tfree =',f10.2)
-      write (*,*)
+    ! init timer
+    time0 = rtime()
 
-      ! init timer
-      time0 = rtime()
-
-      ! Init timer of total loop time
-      startloop = rtime()
-    end if
+    ! Init timer of total loop time
+    startloop = rtime()
+  end if
 
 
-    !***********************************************************************
-    !       begin MAIN DYNAMICS LOOP (Verlet leap-frog algorithm)
-    !***********************************************************************
+  !***********************************************************************
+  !       begin MAIN DYNAMICS LOOP (Verlet leap-frog algorithm)
+  !***********************************************************************
 
-    ! No loop (only calc. energies) if compiling with the DUM flag
+  ! No loop (only calc. energies) if compiling with the DUM flag
 #ifndef DUM
-    do istep = 0, nsteps-1
+  do istep = 0, nsteps-1
 #endif
-      if ( mod(istep, NBcycle) .eq. 0 ) then
+    if ( mod(istep, NBcycle) .eq. 0 ) then
 
-        ! every NBcycle steps:
-        !Put molecules back in box for nice visualization, needs to be here to prevent problems with LRF
-        !Update cgp_centers for LRF
-        !only call put_back_in_box if using PBC and either solute or solvent should be put back in box
-        if( use_PBC .and. (put_solute_back_in_box .or. put_solvent_back_in_box) ) then
-          call put_back_in_box()
-        end if
-
-        if ((nodeid .eq. 0) .and. (istep > 0)) then
-          ! print timing info
-          call centered_heading('Timing', '-')
-          time1 = rtime()
-          time_per_step = (time1-time0)/NBcycle
-          time_completion = int(time_per_step*(nsteps-istep)/60)
-          time0 = time1
-          write(*,222) time_per_step, time_completion
-222       format('Seconds per step (wall-clock): ',f5.2,&
-            ' Estimated completion in',i6,' minutes')
-        end if
-
-        ! update lists of nonbonded interaction pairs
-        if (nodeid .eq. 0) then
-          call centered_heading('Nonbonded pair list generation', '-')
-        end if
-        call make_pair_lists
-#if defined(DUMP)
-        write(*,332) 'solute-solute', 'solute-water', 'water-water', 'Q-solute', 'Q-water'
-        write(*,333) nodeid, 'count', nbpp_pair, nbpw_pair, &
-          &  nbww_true_pair, nbqp_pair, 3*nqat*nbqw_pair
-
-#if defined(USE_MPI)
-        !reduce totnxx, i.e. collect # pairs found by slave nodes
-        nbxx(1)=nbpp_pair
-        nbxx(2)=nbpw_pair
-        nbxx(3)=nbww_true_pair
-        nbxx(4)=nbqp_pair
-        nbxx(5)=3*nqat*nbqw_pair
-
-        call MPI_Reduce(nbxx,nbxx_tot,5,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,ierr)
-        if (ierr .ne. 0) call die('run/Reduce')
-          if (nodeid .eq. 0) then
-            totnbpp=nbxx_tot(1)
-            totnbpw=nbxx_tot(2)
-            totnbww=nbxx_tot(3)
-            totnbqp=nbxx_tot(4)
-            totnbqw=nbxx_tot(5)
-            write(*,99) 'total', totnbpp,totnbpw,totnbww,totnbqp,totnbqw
-          end if
-99      format(a10,1x,5(1x,i12))
-#endif
-332     format('node value ',5a13)
-333     format(i4,1x,a5,1x,5(1x,i12))
-#endif
-        end if ! every NBcycle steps
-
-
-      ! --- start of time step ---
-      ! get potential energy and derivatives from FF
-      call pot_energy
-
-      if(nodeid .eq. 0) then
-        if ( mod(istep,iout_cycle) == 0 .and. monitor_group_pairs > 0) then
-          call nonbond_monitor
-        end if
-
-        ! off-diagonals
-        if ( noffd .gt. 0 ) call offdiag
-
-#ifndef DUM
-        ! update velocities from accelerations,
-        ! scale velocities & update positions from velocities
-#if defined (PROFILING)
-        start_loop_time1 = rtime()
-#endif
-
-        !solute atoms first
-        do i=1,nat_solute
-          i3=i*3-3
-          v(i3+1)= ( v(i3+1)-d(i3+1)*winv(i)*dt ) * Tscale_solute
-          xx(i3+1) = x(i3+1)
-          x(i3+1) = x(i3+1) + v(i3+1)*dt
-
-          v(i3+2)= ( v(i3+2)-d(i3+2)*winv(i)*dt ) * Tscale_solute
-          xx(i3+2) = x(i3+2)
-          x(i3+2) = x(i3+2) + v(i3+2)*dt
-
-          v(i3+3)= ( v(i3+3)-d(i3+3)*winv(i)*dt ) * Tscale_solute
-          xx(i3+3) = x(i3+3)
-          x(i3+3) = x(i3+3) + v(i3+3)*dt
-        end do
-
-        !now solvent atoms
-        do i=nat_solute+1,natom
-          i3=i*3-3
-          v(i3+1)= ( v(i3+1)-d(i3+1)*winv(i)*dt ) * Tscale_solvent
-          xx(i3+1) = x(i3+1)
-          x(i3+1) = x(i3+1) + v(i3+1)*dt
-
-          v(i3+2)= ( v(i3+2)-d(i3+2)*winv(i)*dt ) * Tscale_solvent
-          xx(i3+2) = x(i3+2)
-          x(i3+2) = x(i3+2) + v(i3+2)*dt
-
-          v(i3+3)= ( v(i3+3)-d(i3+3)*winv(i)*dt ) * Tscale_solvent
-          xx(i3+3) = x(i3+3)
-          x(i3+3) = x(i3+3) + v(i3+3)*dt
-        end do
-#if defined (PROFILING)
-        profile(11)%time = profile(11)%time + rtime() - start_loop_time1
-#endif
-
-        ! shake if necessary
-        if(shake_constraints > 0) then
-          niter=shake(xx, x)
-          v(:) = (x(:) - xx(:)) / dt
-        end if
-
-        ! --- end of time step ---
-#if defined (PROFILING)
-        start_loop_time2 = rtime()
-#endif
-
-        ! calculate temperature and scaling factor
-        call temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
-#if defined (PROFILING)
-        profile(12)%time = profile(12)%time + rtime() - start_loop_time2
-#endif
-
-      end if !if(nodeid .eq. 0)
-
-
-      !change volume
-      if( use_PBC .and. constant_pressure) then
-        if( mod(istep, ivolume_cycle)==0 .and. istep>0 ) then
-          call MC_volume
-        end if
+      ! every NBcycle steps:
+      !Put molecules back in box for nice visualization, needs to be here to prevent problems with LRF
+      !Update cgp_centers for LRF
+      !only call put_back_in_box if using PBC and either solute or solvent should be put back in box
+      if( use_PBC .and. (put_solute_back_in_box .or. put_solvent_back_in_box) ) then
+        call put_back_in_box()
       end if
 
-#if defined(USE_MPI)
-      call MPI_Bcast(x, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-      if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
-#endif
+      if ((nodeid .eq. 0) .and. (istep > 0)) then
+        ! print timing info
+        call centered_heading('Timing', '-')
+        time1 = rtime()
+        time_per_step = (time1-time0)/NBcycle
+        time_completion = int(time_per_step*(nsteps-istep)/60)
+        time0 = time1
+        write(*,222) time_per_step, time_completion
+222     format('Seconds per step (wall-clock): ',f5.2,&
+          ' Estimated completion in',i6,' minutes')
+      end if
 
-      ! print [intermediate] results (master node only)
+      ! update lists of nonbonded interaction pairs
       if (nodeid .eq. 0) then
-        ! trajectory, energy data, output and backup restart file
-        if ( mod(istep,itrj_cycle) == 0 .and. istep > 0) then
-          ! write_trj: write x to the trajectory file
-          call write_trj
-        end if
-        ! energies
-        if ( mod(istep, iene_cycle) == 0 .and. istep > 0) then
-          ! nrgy_put_ene(unit, e2, OFFD): print 'e2'=EQ and OFFD to unit 'unit'=11
-          call put_ene(11, EQ, OFFD)
-        end if
-        ! end-of-line, then call write_out, which will print a report on E and EQ
-        if ( mod(istep,iout_cycle) == 0 ) then
-          call write_out
-        end if
-        ! backup file of coordinates and velocities
-        if ( mod(istep,1000) .eq. 0 ) then
-          call write_xfin
-        end if
-        if ( abs(Temp-Tlast)/Temp > TEMP_PRINT_THRESHOLD .or. &
-          (mod(istep, itemp_cycle) == 0 .and. istep > 0)) then
-          ! temperatures
-          Tlast = Temp
-          write(*,201) istep, Temp, Tfree
-          if (detail_temps) then
-            write(*,2020) Tfree_solute, Tfree_solvent
-             !  write(*,2030) Texcl_solute, Texcl_solvent
-          end if
-        end if
+        call centered_heading('Nonbonded pair list generation', '-')
+      end if
+      call make_pair_lists
+#if defined(DUMP)
+      write(*,332) 'solute-solute', 'solute-water', 'water-water', 'Q-solute', 'Q-water'
+      write(*,333) nodeid, 'count', nbpp_pair, nbpw_pair, &
+        &  nbww_true_pair, nbqp_pair, 3*nqat*nbqw_pair
 
-      end if ! print results
+#if defined(USE_MPI)
+      !reduce totnxx, i.e. collect # pairs found by slave nodes
+      nbxx(1)=nbpp_pair
+      nbxx(2)=nbpw_pair
+      nbxx(3)=nbww_true_pair
+      nbxx(4)=nbqp_pair
+      nbxx(5)=3*nqat*nbqw_pair
+
+      call MPI_Reduce(nbxx,nbxx_tot,5,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      if (ierr .ne. 0) call die('run/Reduce')
+      if (nodeid .eq. 0) then
+        totnbpp=nbxx_tot(1)
+        totnbpw=nbxx_tot(2)
+        totnbww=nbxx_tot(3)
+        totnbqp=nbxx_tot(4)
+        totnbqw=nbxx_tot(5)
+        write(*,99) 'total', totnbpp,totnbpw,totnbww,totnbqp,totnbqw
+      end if
+99    format(a10,1x,5(1x,i12))
+#endif
+332   format('node value ',5a13)
+333   format(i4,1x,a5,1x,5(1x,i12))
+#endif
+    end if ! every NBcycle steps
 
 
-    end do ! time step
+    ! --- start of time step ---
+    ! get potential energy and derivatives from FF
+    call pot_energy
+
+    if(nodeid .eq. 0) then
+      if ( mod(istep,iout_cycle) == 0 .and. monitor_group_pairs > 0) then
+        call nonbond_monitor
+      end if
+
+      ! off-diagonals
+      if ( noffd .gt. 0 ) call offdiag
+
+#ifndef DUM
+      ! update velocities from accelerations,
+      ! scale velocities & update positions from velocities
+#if defined (PROFILING)
+      start_loop_time1 = rtime()
+#endif
+
+      !solute atoms first
+      do i=1,nat_solute
+        i3=i*3-3
+        v(i3+1)= ( v(i3+1)-d(i3+1)*winv(i)*dt ) * Tscale_solute
+        xx(i3+1) = x(i3+1)
+        x(i3+1) = x(i3+1) + v(i3+1)*dt
+
+        v(i3+2)= ( v(i3+2)-d(i3+2)*winv(i)*dt ) * Tscale_solute
+        xx(i3+2) = x(i3+2)
+        x(i3+2) = x(i3+2) + v(i3+2)*dt
+
+        v(i3+3)= ( v(i3+3)-d(i3+3)*winv(i)*dt ) * Tscale_solute
+        xx(i3+3) = x(i3+3)
+        x(i3+3) = x(i3+3) + v(i3+3)*dt
+      end do
+
+      !now solvent atoms
+      do i=nat_solute+1,natom
+        i3=i*3-3
+        v(i3+1)= ( v(i3+1)-d(i3+1)*winv(i)*dt ) * Tscale_solvent
+        xx(i3+1) = x(i3+1)
+        x(i3+1) = x(i3+1) + v(i3+1)*dt
+
+        v(i3+2)= ( v(i3+2)-d(i3+2)*winv(i)*dt ) * Tscale_solvent
+        xx(i3+2) = x(i3+2)
+        x(i3+2) = x(i3+2) + v(i3+2)*dt
+
+        v(i3+3)= ( v(i3+3)-d(i3+3)*winv(i)*dt ) * Tscale_solvent
+        xx(i3+3) = x(i3+3)
+        x(i3+3) = x(i3+3) + v(i3+3)*dt
+      end do
+#if defined (PROFILING)
+      profile(11)%time = profile(11)%time + rtime() - start_loop_time1
+#endif
+
+      ! shake if necessary
+      if(shake_constraints > 0) then
+        niter=shake(xx, x)
+        v(:) = (x(:) - xx(:)) / dt
+      end if
+
+      ! --- end of time step ---
+#if defined (PROFILING)
+      start_loop_time2 = rtime()
+#endif
+
+      ! calculate temperature and scaling factor
+      call temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
+#if defined (PROFILING)
+      profile(12)%time = profile(12)%time + rtime() - start_loop_time2
+#endif
+
+    end if
+
+
+    !change volume
+    if( use_PBC .and. constant_pressure) then
+      if( mod(istep, ivolume_cycle)==0 .and. istep>0 ) then
+        call MC_volume
+      end if
+    end if
+
+#if defined(USE_MPI)
+    call MPI_Bcast(x, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
+#endif
+
+    ! print [intermediate] results (master node only)
+    if (nodeid .eq. 0) then
+      ! trajectory, energy data, output and backup restart file
+      if ( mod(istep,itrj_cycle) == 0 .and. istep > 0) then
+        ! write_trj: write x to the trajectory file
+        call write_trj
+      end if
+      ! energies
+      if ( mod(istep, iene_cycle) == 0 .and. istep > 0) then
+        ! nrgy_put_ene(unit, e2, OFFD): print 'e2'=EQ and OFFD to unit 'unit'=11
+        call put_ene(11, EQ, OFFD)
+      end if
+      ! end-of-line, then call write_out, which will print a report on E and EQ
+      if ( mod(istep,iout_cycle) == 0 ) then
+        call write_out
+      end if
+      ! backup file of coordinates and velocities
+      if ( mod(istep,1000) .eq. 0 ) then
+        call write_xfin
+      end if
+      if ( abs(Temp-Tlast)/Temp > TEMP_PRINT_THRESHOLD .or. &
+        (mod(istep, itemp_cycle) == 0 .and. istep > 0)) then
+        ! temperatures
+        Tlast = Temp
+        write(*,201) istep, Temp, Tfree
+        if (detail_temps) then
+          write(*,2020) Tfree_solute, Tfree_solvent
+           !  write(*,2030) Texcl_solute, Texcl_solvent
+        end if
+      end if
+
+    end if ! print results
+
+
+  end do ! time step
 201 format('Temperature at step',i8,':         T_tot=',f10.1,'         T_free=',f10.1)
 2020 format('                             T_free_solute=',f10.1,' T_free_solvent=',f10.1)
 2030 format('                             T_excl_solute=',f10.1,' T_excl_solvent=',f10.1)
 
 
-         !***********************************************************************
-         !       end MAIN DYNAMICS LOOP
-         !***********************************************************************
+!*******************************************************************************
+!       end MAIN DYNAMICS LOOP
+!*******************************************************************************
 
-         ! end of Qdum exclusion
+! end of Qdum exclusion
 #else
-  end if
+! Why is the following end if seemingly alone?
+! Odly enough it works
+end if
 #endif
 
-  ! write final trajectory image when istep = nsteps
+! write final trajectory image when istep = nsteps
 #ifndef DUM
-  if (nodeid .eq. 0) then
-    if ( mod(istep,itrj_cycle) == 0) call write_trj
-  end if
+if (nodeid .eq. 0) then
+  if ( mod(istep,itrj_cycle) == 0) call write_trj
+end if
 #endif
 
-  ! write output for final step and final coords
-  call make_pair_lists
-  call pot_energy
-  if (nodeid .eq. 0) then
-    write(*,*)
-    call write_out
-    call write_xfin
-  end if
+! write output for final step and final coords
+call make_pair_lists
+call pot_energy
+if (nodeid .eq. 0) then
+  write(*,*)
+  call write_out
+  call write_xfin
+end if
 
 
 
-  if (nodeid .eq. 0) then
-    time1 = rtime()
-    write (*,202) time1 - startloop
+if (nodeid .eq. 0) then
+  time1 = rtime()
+  write (*,202) time1 - startloop
 202 format('Total time of main loop:                     ', f15.1,'(s)')
-  end if
+end if
 #if defined(PROFILING)
-  !Print more profiling info
+!Print more profiling info
 
 #if defined(USE_MPI)
-  do i=1,num_profiling_times
-    node_times(i) = profile(i)%time
+do i=1,num_profiling_times
+  node_times(i) = profile(i)%time
+end do
+call MPI_GATHER(node_times,num_profiling_times,MPI_REAL8,all_node_times,num_profiling_times,MPI_REAL8,0,MPI_COMM_WORLD,ierr)
+if (ierr .ne. 0) call die('md_run/MPI_GATHER profiling times')
+
+if (nodeid .eq. 0) then
+  write (*,210,advance='no')
+  do j=0,numnodes-1
+    write (*,209,advance='no') j
   end do
-  call MPI_GATHER(node_times,num_profiling_times,MPI_REAL8,all_node_times,num_profiling_times,MPI_REAL8,0,MPI_COMM_WORLD,ierr)
-  if (ierr .ne. 0) call die('md_run/MPI_GATHER profiling times')
+  write(*,*)
 
-  if (nodeid .eq. 0) then
-    write (*,210,advance='no')
+  do i=1,num_profiling_times
+    write (*,207,advance='no') profile(i)%name
     do j=0,numnodes-1
-      write (*,209,advance='no') j
+      write (*,208,advance='no') all_node_times(i+j*num_profiling_times)
     end do
-    write(*,*)
-
-    do i=1,num_profiling_times
-      write (*,207,advance='no') profile(i)%name
-      do j=0,numnodes-1
-        write (*,208,advance='no') all_node_times(i+j*num_profiling_times)
-      end do
-      write (*,*) ' (s)'
-    end do
+    write (*,*) ' (s)'
+  end do
 
 207 format('Total time of ',A25,T40,': ')
 208 format(f10.1,' ')
 209 format(I11)
 210 format(T30,'node:     ')
-
-    write (*,*)
-
-  end if
+  write (*,*)
+end if
 
 #else
-
-  do i=1,num_profiling_times
-    write (*,207) profile(i)%name,profile(i)%time
-  end do
+do i=1,num_profiling_times
+  write (*,207) profile(i)%name,profile(i)%time
+end do
 207 format('Total time of ',A25,T40,': ',f15.1,' (s).')
 #endif
 #endif
 
+
 end subroutine md_run
 
 
-!-----------------------------------------------------------------------
 subroutine nbpp_count(npp, nppcgp)
    ! arguments
   integer                                         :: npp
@@ -7356,9 +7342,6 @@ subroutine make_qconn
 end subroutine make_qconn
 
 
-!------------------------------------------------------------------------------
-
-
 recursive subroutine find_bonded(origin, current, level, state)
    !args
   integer, intent(in)                     ::      origin, current, level, state
@@ -7421,7 +7404,6 @@ end subroutine find_bonded
 
 
 integer function nbqq_count()
-
   integer                                         ::      iq, j, jq, is
 
   nbqq_pair(:) = 0
@@ -13352,7 +13334,7 @@ subroutine pot_energy
 
 #if defined (USE_MPI)
   if (nodeid .eq. 0) then
-    !First post recieves for gathering data from slaves
+    !First post receives for gathering data from slaves
     call gather_nonbond
   end if
 #endif
@@ -16099,6 +16081,5 @@ integer function get_atom_from_resnum_atnum(aid)
 120 format('>>>>> ERROR: There is no atom number ',i4,' in residue ',i4,'.')
 end function get_atom_from_resnum_atnum
 
-!-------------------------------------------------------------------------------
 
 end module md

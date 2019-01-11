@@ -1,8 +1,8 @@
-Ligand in a water sphere test.
+Ligand in a water sphere test.  
 ================================================================================
 
 This test follows an initial equilibration/heating protocol performed 
-in 5 steps and then a dynamics run split into 5 identical steps. A total of
+in 5 steps and then a dynamics run split into 4 identical steps. A total of
 200ps are simulated after equilibration.
 
 The system is a simple ligand in a water sphere and the
@@ -16,10 +16,10 @@ executable in you system and also the version of MPI you will use to run the
 simulation in parallel (qdynp) if such is the case.
 
 
-Equilibration (Heating)
+Equilibration (Heating)  
 --------------------------------------------------------------------------------
 
-### Step1
+### Step1  
  - 100 steps / 0.1 fs ea. = 0.01ps
  - temp = 1
  - bath coupling 1
@@ -27,7 +27,7 @@ Equilibration (Heating)
  - Local Reaction Field as Taylor expansion = off
 
 
-### Step2
+### Step2  
  - 1000 steps / 2.0 fs ea. = 2ps
  - temp = 50
  - bath coupling 10
@@ -35,7 +35,7 @@ Equilibration (Heating)
  - Local Reaction Field as Taylor expansion = on
 
 
-### Step3
+### Step3  
  - 1000 steps / 2.0 fs ea. = 2ps
  - temp = 150
  - bath coupling 10
@@ -43,7 +43,7 @@ Equilibration (Heating)
  - Local Reaction Field as Taylor expansion = on
 
 
-### Step4
+### Step4  
  - 5000 steps / 2.0 fs ea. = 10ps
  - temp = 300
  - bath coupling 10
@@ -51,7 +51,7 @@ Equilibration (Heating)
  - Local Reaction Field as Taylor expansion = on
 
 
-### Step5
+### Step5  
  - 25000 steps / 2.0 fs ea. = 50ps
  - temp = 300
  - bath coupling 100
@@ -63,13 +63,17 @@ Equilibration (Heating)
 Short Production Run
 --------------------------------------------------------------------------------
 
-### Step1 through Step5 (identical steps total 200ps)
+### Step1 through Step4 (identical steps total 160ps)  
  - 20000 steps / 2.0 fs ea. = 40ps
  - temp = 300
  - bath coupling 100
  - hydrogen shake on
  - Local Reaction Field as Taylor expansion = on
 
+### Step5 2000ps, 0.2ns total.  
+ - Same as Step1-Step4 but longer. Used for the timing benchmark table below.
+
+  
 
 Benchmarks
 --------------------------------------------------------------------------------

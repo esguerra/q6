@@ -57,7 +57,7 @@ contains
 
 
 subroutine qprep_from_inputfile(filename)
-!!  subroutine: qprep_from_inputfile
+!!  subroutine  qprep_from_inputfile
 !!  Read input from file and execute commands  
 !!-------------------------------------------------------------------------------
   character(200)  :: filename
@@ -86,7 +86,7 @@ end subroutine qprep_from_inputfile
 
 
 subroutine qprep_from_commandline
-!!  subroutine: qprep_from_commandline
+!!  subroutine  qprep_from_commandline
 !!  Read input from command line and execute commands  
 !!-------------------------------------------------------------------------------
   character(200) :: command
@@ -107,7 +107,7 @@ end subroutine qprep_from_commandline
 
 
 subroutine parse_command(command)
-!!  subroutine: parse_command(command)
+!!  subroutine  parse_command(command)
 !!  Parse a command and call corresponding subroutine  
 !!-------------------------------------------------------------------------------
   character(*), intent(IN) :: command
@@ -184,7 +184,7 @@ end subroutine parse_command
 
 
 subroutine help
-!!  subroutine: help
+!!  subroutine  help
 !!  Give help on commands  
 !!-------------------------------------------------------------------------------
   write( *, * )
@@ -280,7 +280,7 @@ end subroutine help
 
 
 subroutine startup
-!!  subroutine: startup
+!!  subroutine  startup
 !!  Startup  
 !!-------------------------------------------------------------------------------
   print '(a)',  '--------------------------------------------------------------------------------'
@@ -304,7 +304,7 @@ end subroutine startup
 
 
 subroutine shutdown
-!!  subroutine: shutdown
+!!  subroutine  shutdown
 !!  Shutdown call  
 !!-------------------------------------------------------------------------------
   call prep_shutdown
@@ -313,7 +313,7 @@ end subroutine shutdown
 
   
 subroutine commandlineoptions
-!!  subroutine: commandlineoptions
+!!  subroutine  commandlineoptions
 !!  
 !!-------------------------------------------------------------------------------
 do i = 1, command_argument_count()
@@ -335,7 +335,7 @@ end subroutine commandlineoptions
 
 
 subroutine print_help()
-!!  subroutine: print_help
+!!  subroutine  print_help
 !!  
 !!-------------------------------------------------------------------------------
   print '(a)', 'usage:'

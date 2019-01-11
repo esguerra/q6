@@ -33,14 +33,16 @@ ifeq ($(COMP),ifort)
 
 
 ################################################################################
-# OSX Sierra using gfortran 5.1
+# OSX Mojave using gfortran 8.1.0
 ################################################################################
 else ifeq ($(COMP),osx)
 	FC=             gfortran
 	FC_OPT=         -O3
-	FFLAGS=         -ffree-line-length-none -fcray-pointer \
-	                -static-libgfortran -fall-intrinsics -std=legacy \
-	                -Wall -Wtabs -fstack-protector ${FC_OPT} -DG95=1
+#	FFLAGS=         -ffree-line-length-none -fcray-pointer \
+#	                -static-libgfortran -fall-intrinsics -std=legacy \
+#	                -Wall -Wtabs -fstack-protector ${FC_OPT} -DG95=1
+	FFLAGS=         -Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 \
+                   -ffast-math -funroll-loops
 
 	FPP_FLG=        -cpp
 

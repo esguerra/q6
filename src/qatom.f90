@@ -59,80 +59,80 @@ module qatom
   integer(AI), allocatable                :: iqexpnb(:), jqexpnb(:)
 
   integer                                 :: nqlib
-  real(4), allocatable            ::      qcrg(:,:)
-  real(8), allocatable            ::      qmass(:)
-  real(8), allocatable            ::      qavdw(:,:), qbvdw(:,:)
+  real(4), allocatable                    :: qcrg(:,:)
+  real(8), allocatable                    :: qmass(:)
+  real(8), allocatable                    :: qavdw(:,:), qbvdw(:,:)
 
-  integer                         ::      nqbond
+  integer                                 :: nqbond
 
   type QBOND_TYPE
-     integer(AI)             ::      i,j
-     integer(TINY)           ::      cod(max_states)
+     integer(AI)                          :: i,j
+     integer(TINY)                        :: cod(max_states)
   end type QBOND_TYPE
 
   type QBONDLIB_TYPE
      !Morse diss. en, Morse Alpha, Morse/Harm. r0
-     real(8)                                 ::      Dmz, amz, r0 
+     real(8)                              :: Dmz, amz, r0
      !Harm. force const
-     real(8)                                 ::      fk
+     real(8)                              :: fk
   end type QBONDLIB_TYPE
 
-  type(QBOND_TYPE), allocatable    :: qbnd(:)
-  type(QBONDLIB_TYPE), allocatable :: qbondlib(:)
+  type(QBOND_TYPE), allocatable           :: qbnd(:)
+  type(QBONDLIB_TYPE), allocatable        :: qbondlib(:)
 
 
   type QANGLE_TYPE
-     integer(AI)                             ::      i,j,k
-     integer(TINY)                   ::      cod(max_states)
+     integer(AI)                          :: i,j,k
+     integer(TINY)                        :: cod(max_states)
   end type QANGLE_TYPE
 
-  integer                                         ::      nqangle
+  integer                                 :: nqangle
 
-  type(QANGLE_TYPE), allocatable::        qang(:)
-  type(ANGLIB_TYPE), allocatable::        qanglib(:)
+  type(QANGLE_TYPE), allocatable          :: qang(:)
+  type(ANGLIB_TYPE), allocatable          :: qanglib(:)
 
-  integer                                         :: nqtor
-  integer(AI), allocatable                        :: iqtor(:),jqtor(:),kqtor(:),lqtor(:)
-  integer(TINY), allocatable                      :: qtorcod(:,:)
-  real(8), allocatable                            :: qfktor(:),qrmult(:),qdeltor(:)
+  integer                                 :: nqtor
+  integer(AI), allocatable                :: iqtor(:),jqtor(:),kqtor(:),lqtor(:)
+  integer(TINY), allocatable              :: qtorcod(:,:)
+  real(8), allocatable                    :: qfktor(:),qrmult(:),qdeltor(:)
 
-  integer                                         :: nqimp
-  integer(AI), allocatable        ::      iqimp(:),jqimp(:),kqimp(:),lqimp(:)
-  integer(TINY), allocatable      ::      qimpcod(:,:)
-  real(8), allocatable            ::      qfkimp(:),qimp0(:)
+  integer                                 :: nqimp
+  integer(AI), allocatable                :: iqimp(:),jqimp(:),kqimp(:),lqimp(:)
+  integer(TINY), allocatable              :: qimpcod(:,:)
+  real(8), allocatable                    :: qfkimp(:),qimp0(:)
 
-  integer                                         ::      nang_coupl,ntor_coupl,nimp_coupl
-  integer(AI)                                     ::      iang_coupl(3,max_qat)
-  integer(AI)                                     ::      itor_coupl(3,max_qat)
-  integer(AI)                                     ::      iimp_coupl(3,max_qat)
+  integer                                 :: nang_coupl,ntor_coupl,nimp_coupl
+  integer(AI)                             :: iang_coupl(3,max_qat)
+  integer(AI)                             :: itor_coupl(3,max_qat)
+  integer(AI)                             :: iimp_coupl(3,max_qat)
 
-  integer                                         ::      nqshake
-  integer(AI)                             ::      iqshake(max_qat),jqshake(max_qat)
-  real(8)                                         ::      qshake_dist(max_qat,max_states)
+  integer                                 :: nqshake
+  integer(AI)                             :: iqshake(max_qat),jqshake(max_qat)
+  real(8)                                 :: qshake_dist(max_qat,max_states)
 
-  integer                                         ::      noffd
-  type(OFFDIAG_SAVE), allocatable::       offd(:)
-  type(OFFDIAG_AUX), allocatable::        offd2(:)
+  integer                                 :: noffd
+  type(OFFDIAG_SAVE), allocatable         :: offd(:)
+  type(OFFDIAG_AUX), allocatable          :: offd2(:)
 
-  integer                                             ::      nexspec
+  integer                                 :: nexspec
   type SPECEX_TYPE
-     integer(AI)                             ::      i,j
-     logical                                 ::      flag(max_states)
+     integer(AI)                          :: i,j
+     logical                              :: flag(max_states)
   end type SPECEX_TYPE
-  type(SPECEX_TYPE), allocatable :: exspec(:)
+  type(SPECEX_TYPE), allocatable          :: exspec(:)
 
   ! Monitoring of nonbonded interactions between selected groups of atoms
   type monitor_group_pair_TYPE
-     integer                                 ::      i,j
-     real(8)                                 ::      Vel(max_states), Vlj(max_states)
-     real(8)                                 ::      Vwel, Vwlj, Vwsum
+     integer                              :: i,j
+     real(8)                              :: Vel(max_states), Vlj(max_states)
+     real(8)                              :: Vwel, Vwlj, Vwsum
   end type  monitor_group_pair_TYPE
 
   type(monitor_group_pair_TYPE), allocatable::monitor_group_pair(:)
 
   type monitor_atom_group_TYPE
-     integer, pointer                      :: atom(:) ! the atoms
-     integer                               :: n  ! #atoms
+     integer, pointer                     :: atom(:) ! the atoms
+     integer                              :: n  ! #atoms
   end type monitor_atom_group_TYPE
 
   type (monitor_atom_group_TYPE), allocatable::monitor_atom_group(:)
@@ -145,38 +145,44 @@ module qatom
 
   !type holding all scaling factors for electrostatic interactions in qq-pairs
   type qq_el_scale_type
-     integer(AI)      :: iqat, jqat
-     real(8)          :: el_scale(max_states) ! holds the el_scale for different states "masoud Oct_2013"
+     integer(AI)                          :: iqat, jqat
+     real(8)                              :: el_scale(max_states) ! holds the el_scale for different states "masoud Oct_2013"
   end type qq_el_scale_type
 
   type(qq_el_scale_type),allocatable      :: qq_el_scale(:) 
 
-  integer               ::nel_scale !number of defined scale factors
+  integer                                 :: nel_scale !number of defined scale factors
 
-  integer                                         :: tmpindex,numsoftlines,i2
-  real(8), allocatable                            :: sc_lookup(:,:,:), alpha_max(:,:)
-  real(8)                                         :: sc_aq,sc_bq,sc_aj,sc_bj,alpha_max_tmp
-  logical                                         :: softcore_use_max_potential
+  integer                                 :: tmpindex,numsoftlines,i2
+  real(8), allocatable                    :: sc_lookup(:,:,:), alpha_max(:,:)
+  real(8)                                 :: sc_aq,sc_bq,sc_aj,sc_bj,alpha_max_tmp
+  logical                                 :: softcore_use_max_potential
 
   !-----------------------------------------------------------------------
   !       fep/evb energies
   !-----------------------------------------------------------------------
-  type(Q_ENERGIES), allocatable:: EQ(:)
-  real(8)                                         :: Hij(max_states,max_states)
-  real(8)                                         :: EMorseD(max_qat)
-  real(8)                                         :: dMorse_i(3,max_qat)
-  real(8)                                         :: dMorse_j(3,max_qat)
+  type(Q_ENERGIES), allocatable          :: EQ(:)
+  real(8)                                :: Hij(max_states,max_states)
+  real(8)                                :: EMorseD(max_qat)
+  real(8)                                :: dMorse_i(3,max_qat)
+  real(8)                                :: dMorse_j(3,max_qat)
 
   !miscellany
-  logical                                         :: use_new_fep_format
+  logical                                :: use_new_fep_format
+
+
+
+
+  
 
 contains
 
-  !-------------------------------------------------------------------------
-
-  subroutine qatom_startup
-    ! initialize used modules
-!    call prmfile_startup
+subroutine qatom_startup
+!!-------------------------------------------------------------------------------  
+!!  subroutine **qatom_startup**
+!!  initialize used modules
+!!  call prmfile_startup
+!!-------------------------------------------------------------------------------    
     call nrgy_startup
 
     ! initialize constants
@@ -184,31 +190,35 @@ contains
     deg2rad = pi/180.0
 
 100 format(a,' module',t30,'version ',a,t50,'(modified on ',a,')')
-  end subroutine qatom_startup
+end subroutine qatom_startup
 
-  !-------------------------------------------------------------------------
 
-  subroutine qatom_shutdown
-    integer                                         ::      alloc_status
-    deallocate(EQ, stat=alloc_status)
-    deallocate(iqseq, qiac, iqexpnb, jqexpnb, qcrg, stat=alloc_status)
-    deallocate(qmass, stat=alloc_status)
-    deallocate(qavdw, qbvdw, stat=alloc_status)
-    deallocate(qbnd, qbondlib, stat=alloc_status)
-    deallocate(qang, stat=alloc_status)
-    deallocate(qanglib, stat=alloc_status)
-    deallocate(iqtor, jqtor, kqtor, lqtor, qtorcod, stat=alloc_status)
-    deallocate(qfktor, qrmult, qdeltor, stat=alloc_status)
-    deallocate(iqimp, jqimp, kqimp, lqimp, qimpcod, stat=alloc_status)
-    deallocate(qfkimp,qimp0, stat=alloc_status)
-    deallocate(exspec, stat=alloc_status)
-    deallocate(offd, offd2, stat=alloc_status)
-    if (allocated(qq_el_scale)) deallocate(qq_el_scale)
-  end subroutine qatom_shutdown
+subroutine qatom_shutdown
+!!-------------------------------------------------------------------------------  
+!!  subroutine **qatom_shutdown**
+!!  
+!!  
+!!-------------------------------------------------------------------------------    
+  integer                              :: alloc_status
+  deallocate(EQ, stat=alloc_status)
+  deallocate(iqseq, qiac, iqexpnb, jqexpnb, qcrg, stat=alloc_status)
+  deallocate(qmass, stat=alloc_status)
+  deallocate(qavdw, qbvdw, stat=alloc_status)
+  deallocate(qbnd, qbondlib, stat=alloc_status)
+  deallocate(qang, stat=alloc_status)
+  deallocate(qanglib, stat=alloc_status)
+  deallocate(iqtor, jqtor, kqtor, lqtor, qtorcod, stat=alloc_status)
+  deallocate(qfktor, qrmult, qdeltor, stat=alloc_status)
+  deallocate(iqimp, jqimp, kqimp, lqimp, qimpcod, stat=alloc_status)
+  deallocate(qfkimp,qimp0, stat=alloc_status)
+  deallocate(exspec, stat=alloc_status)
+  deallocate(offd, offd2, stat=alloc_status)
+  if (allocated(qq_el_scale)) deallocate(qq_el_scale)
+end subroutine qatom_shutdown
 
-  !-------------------------------------------------------------------------
 
-  logical function qatom_old_load_atoms(fep_file)
+
+logical function qatom_old_load_atoms(fep_file)
     !arguments
     character(*), intent(in)        ::      fep_file
     ! *** local variables
@@ -236,27 +246,27 @@ contains
     write (*,40) (iqseq(i),i=1,nqat)
 40  format ('Atom nos.:',10i6)
     qatom_old_load_atoms = .true.
-  end function qatom_old_load_atoms
+end function qatom_old_load_atoms
 
-  !-------------------------------------------------------------------------
 
-  logical function qatom_load_atoms(fep_file)
+
+logical function qatom_load_atoms(fep_file)
     !arguments
-    character(*), intent(in)        ::      fep_file
+    character(*), intent(in)        :: fep_file
     ! *** local variables
-    integer                                 ::      i,j,k,iat,ires,iatq
-    integer                                 ::      s, topno, icase, stat, last, add_res
-    integer                                 ::      qflag(max_states)
-    integer                                 ::      type_count !counts number of parameters
-    logical                                 ::      yes
-    character(len=4)                ::      offset_name
-    character(len=4)                ::      res_name
-    character(len=7)                ::      res_str
-    character(len=50)               ::      line
-    character(len=50)               ::      word
-    character(len=4), allocatable :: names(:)
-    integer                                 ::      offset_residue, max_res, resno
-    integer, allocatable    ::  residues(:)
+    integer                         :: i,j,k,iat,ires,iatq
+    integer                         :: s, topno, icase, stat, last, add_res
+    integer                         :: qflag(max_states)
+    integer                         :: type_count !counts number of parameters
+    logical                         :: yes
+    character(len=4)                :: offset_name
+    character(len=4)                :: res_name
+    character(len=7)                :: res_str
+    character(len=50)               :: line
+    character(len=50)               :: word
+    character(len=4), allocatable   :: names(:)
+    integer                         :: offset_residue, max_res, resno
+    integer, allocatable            :: residues(:)
     !.......................................................................
 
     use_new_fep_format = .true.
@@ -531,12 +541,12 @@ contains
 31  format ('Assigning q-atoms from residues: ',5i6)
 40  format ('Atom nos.:',10i6)
 
-  end function qatom_load_atoms
+end function qatom_load_atoms
 
 
-  !-------------------------------------------------------------------------
 
-  logical function qatom_old_load_fep()
+
+logical function qatom_old_load_fep()
     ! *** local variables
     character                                     ::      libtext*80,qaname*2
     integer                                       ::      i,j,k,iat
@@ -857,11 +867,11 @@ contains
 
 999 close(4)
     qatom_old_load_fep = .true.
-  !.......................................................................
-  end function qatom_old_load_fep
 
-  !-----------------------------------------------------------------------
-  logical function qatom_load_fep(fep_file)
+end function qatom_old_load_fep
+
+
+logical function qatom_load_fep(fep_file)
     !arguments
     character(*), intent(in)              :: fep_file
     ! *** local variables
@@ -1546,7 +1556,7 @@ contains
 620 format (i7,1x,3i7,f8.2,f6.2)
 622 format('>>>>> ERROR: Invalid combination of states: ',2i5)
 
-    !************Softcore section************  MPA
+    !************Softcore section************  MPA  Martin Per Ander??
     if (allocated(sc_lookup))    deallocate (sc_lookup)
     allocate (alpha_max(nqat,nstates),sc_lookup(nqat,natyps+nqat,nstates))
 
@@ -1728,11 +1738,11 @@ contains
     qatom_load_fep = .false.
 1900 format('>>>>> ERROR: Read error at line ',i2,' of section [',a,']')     
     !.......................................................................
-  end function qatom_load_fep
+end function qatom_load_fep
 
   !-------------------------------------------------------------------------
 
-  logical function bond_harmonic_in_any_state(k)
+logical function bond_harmonic_in_any_state(k)
     integer, intent(in)                     ::      k
     integer                                         ::      st
 
@@ -1747,6 +1757,6 @@ contains
        end if
     end do
 547 format('>>>>> ERROR: Bond',i3,' is harmonic in state',i2)   
-  end function bond_harmonic_in_any_state
+end function bond_harmonic_in_any_state
 
 end module qatom
