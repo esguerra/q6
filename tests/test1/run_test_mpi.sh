@@ -29,7 +29,7 @@ fi
 # For now bc is doing the sum, but BEWARE, maybe bc is not installed on all nodes.
 # CORES=`grep processor /proc/cpuinfo | wc -l`
 # CORES=`grep "cpu cores" /proc/cpuinfo | awk '{print $4}' | paste -sd+ | bc`
-CORES=8
+CORES=4
 echo "Running simulation on $CORES cores."
 
 rm -f eq{1..5}.log dc{1..5}.log >& /dev/null
@@ -41,7 +41,7 @@ FAILED="(\033[0;31m FAILED \033[0m)"
 for step in {1..5}
 do
  echo -n "Running equilibration step ${step} of 5                         "
- if time mpirun -np $CORES qdynp eq${step}.inp > eq${step}.log
+ if time mpirun -np $CORES --allow-run-as-root qdynp eq${step}.inp > eq${step}.log
  then echo -e "$OK"
  else 
   echo -e "$FAILED"
@@ -54,7 +54,7 @@ done
 for step in {1..5}
 do
  echo -n "Running production run step ${step} of 5                        "
- if time mpirun -np $CORES qdynp dc${step}.inp > dc${step}.log
+ if time mpirun -np $CORES --allow-run-as-root qdynp dc${step}.inp > dc${step}.log
   then echo -e "$OK"
  else 
   echo -e "$FAILED"
