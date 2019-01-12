@@ -28,6 +28,8 @@ fi
 # The cores need then to be added to get the total number of cores available per node.
 # For now bc is doing the sum, but BEWARE, maybe bc is not installed on all nodes.
 # CORES=`grep processor /proc/cpuinfo | wc -l`
+NUMCORES=`grep processor /proc/cpuinfo | wc -l`
+echo $NUMCORES
 # CORES=`grep "cpu cores" /proc/cpuinfo | awk '{print $4}' | paste -sd+ | bc`
 CORES=4
 echo "Running simulation on $CORES cores."
@@ -51,7 +53,7 @@ do
 done
 
 
-for step in {1..5}
+for step in {1..4}
 do
  echo -n "Running production run step ${step} of 5                        "
  if time mpirun -np $CORES --allow-run-as-root qdynp dc${step}.inp > dc${step}.log
