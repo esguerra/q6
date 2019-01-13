@@ -7,12 +7,7 @@ RUN dnf -y install make gcc-gfortran libgfortran-static openmpi openmpi-devel gi
 RUN dnf clean all
 
 RUN git clone https://github.com/esguerra/q6.git /root/q6
-RUN cd /root/q6/src
-RUN pwd
-RUN module load mpi/openmpi-x86_64
-RUN make all COMP=gcc
-RUN make mpi COMP=gcc
-RUN cd ../tests/test1
-RUN ./run_test_mpi.sh
+RUN cd /root/q6/src && pwd && source ~/.bashrc && module load mpi/openmpi-x86_64 && make all COMP=gcc && make mpi COMP=gcc && cd ../tests/test1 && ./run_test_mpi.sh
+
 
 
