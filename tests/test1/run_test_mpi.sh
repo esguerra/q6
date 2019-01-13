@@ -30,7 +30,7 @@ fi
 # CORES=`grep processor /proc/cpuinfo | wc -l`
 NUMCORES=`grep processor /proc/cpuinfo | wc -l`
 # CORES=`grep "cpu cores" /proc/cpuinfo | awk '{print $4}' | paste -sd+ | bc`
-CORES=2
+CORES=4
 echo "Running simulation on $CORES cores out of $NUMCORES available"
 
 rm -f eq{1..5}.log dc{1..5}.log >& /dev/null
