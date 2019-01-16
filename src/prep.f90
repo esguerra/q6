@@ -3929,7 +3929,7 @@ subroutine readpdb()
     return
   end if
 
-  CALL clearpdb !get rid of old PDB data.
+  call clearpdb !get rid of old PDB data.
   call allocate_for_pdb(atoms, residues, molecules) !make space for new topology
   !clear hydrogen make flags
   makeH(:) = .false.
@@ -3951,7 +3951,7 @@ subroutine readpdb()
     else if(line(1:6) /= 'HETATM' .and. line(1:6) /= 'ATOM  ') then
             !do nothing
     else
-      READ(line, 10, end = 100, err = 200) atnam_tmp, resnam_tmp, &
+      read(line, 10, end = 100, err = 200) atnam_tmp, resnam_tmp, &
         resnum_tmp, xtmp(1:3)
 
       ! ---   New residue ?
@@ -4111,7 +4111,7 @@ subroutine readpdb()
   write( * , '(a)') 'If the problem is in the library you need to correct it and do',&
     'clearlib and readlib before trying readpdb again.'
   close(3)
-  CALL clearpdb
+  call clearpdb
   pdb_file = ''
 end subroutine readpdb
 
@@ -4445,7 +4445,7 @@ end subroutine set_cgp
 
 subroutine set_crg
 !!-------------------------------------------------------------------------------
-!!  subroutine set_cgp
+!!  subroutine set_crg
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -4476,8 +4476,8 @@ subroutine set_iac
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
-  integer                                         :: ires, i, ntot, iaci
-  logical                                         :: used(max_atyps)
+  integer                          :: ires, i, ntot, iaci
+  logical                          :: used(max_atyps)
 
   used(:) = .false.
   ntot = 0
@@ -4546,9 +4546,9 @@ subroutine set_solvent_type
 !!  set solvent type (SPC-like, TIP3P-like or general)
 !!-------------------------------------------------------------------------------
   !locals
-  integer                                         :: irc_solvent
-  integer                                         :: i, iac_H1, iac_H2
-  logical                                         :: dummy
+  integer                          :: irc_solvent
+  integer                          :: i, iac_H1, iac_H2
+  logical                          :: dummy
 
   solvent_type = SOLVENT_GENERAL
 
@@ -6111,8 +6111,7 @@ subroutine writepdb
     iwrite_g = 1
   case default
     iwrite_g = 0
-  end select      
-
+  end select
 
 !   PDB format(we need only atom name, res. name, number and coords):
 !   The format is
@@ -6143,17 +6142,22 @@ subroutine writepdb
 ! PDB standard minus B-factors 10
 ! format(a6,i5,1x,a4,a1,a3,1x,a1,i4,a1,3x,3f8.3)
 ! See the readpdb subroutine for specification of the format
-! Old format  10 format(a6,i5,2x,a4,a4,i5,4x,3f8.3)      
+! Old format  10 format(a6,i5,2x,a4,a4,i5,4x,3f8.3)
 ! TODO: Fix writing of chainID, requires chain info in topology.
 ! (PDBtype,atomNr,atomName,resName,resNr,coords)
-!10      format(a6,i5,1x,a5,a3,2x,i4,4x,3f8.3)  pre-Geir Isaksen suggestion.
-10 format(a6,i5,1x,a5,a4,1x,i4,4x,3f8.3) ! four letter residue names
-11      format(a6,11x,a4,1x,i4) !For TER cards
+! Changed format to write atom names according to PDB standard - in positions 13-16 (not 14-17)
+!  with leading space for those with less than four characters (14-16). Note: Two-character elements
+!  (Ca, Mg, Cl..) do not conform to the standard (13-), since they also start at 14. (M.Purg)
+! 10 format(a6,i5,1x,a5,a3,2x,i4,4x,3f8.3)  pre-Geir Isaksen suggestion.
+! 10 format(a6,i5,1x,a5,a4,1x,i4,4x,3f8.3) ! four letter residue names old mauricio
+10 format(a6,i5,2x,a4,a4,1x,i4,4x,3f8.3)   !ATOM/HETATM - less than four character atom name
+11 format(a6,11x,a4,1x,i4) !For TER cards
+12 format(a6,i5,1x,a4,1x,a4,1x,i4,4x,3f8.3)  !ATOM/HETATM - four character atom name
   iat = 0
   imol = 1
   wrote_atom_in_molecule = .false.
   do i = 1, nres
-    if(lib(res(i)%irc )%HETATM) then
+    if(lib(res(i)%irc)%HETATM) then
       PDBtype = 'HETATM'
     else
       PDBtype = 'ATOM  '
@@ -6162,8 +6166,13 @@ subroutine writepdb
       iat = iat + 1
       !write only atoms in mask
       if(mask%mask(iat)) then
-        write(3, 10) PDBtype, iat, lib(res(i)%irc )%atnam(j), res(i)%name,&
-          i,xtop(iat*3-2:iat*3)
+        if(len_trim(lib(res(i)%irc)%atnam(j)) .lt. 4) then
+          write(3, 10) PDBtype, iat, lib(res(i)%irc)%atnam(j), res(i)%name,&
+            i,xtop(iat*3-2:iat*3)
+        else
+          write(3, 12) PDBtype, iat, lib(res(i)%irc)%atnam(j), res(i)%name,&
+            i,xtop(iat*3-2:iat*3)
+        end if
         wrote_atom_in_molecule = .true.
       end if
     end do
@@ -6183,7 +6192,7 @@ subroutine writepdb
     if(lib(res(i)%irc)%HETATM) then !only for HETATM groups
       j = 1
       !work through all bonds
-      do while(j <= lib(res(i)%irc)%nbnd) 
+      do while(j <= lib(res(i)%irc)%nbnd)
         !this is the first atom
         iat = res(i)%start - 1 + lib(res(i)%irc)%bnd(j)%i
         !find a set of up to four bonds from this atom
@@ -6201,7 +6210,7 @@ subroutine writepdb
       end do
     end if
   end do
-20   format('CONECT',5i5)
+20  format('CONECT',5i5)
 
   write( * , '(/,a,/)') 'PDB file successfully written.'
 
