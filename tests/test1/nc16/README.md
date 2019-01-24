@@ -1,9 +1,9 @@
-Ligand in a water sphere test.  
+Ligand in a water sphere test.
 ================================================================================
 
 This test follows an initial equilibration/heating protocol performed 
-in 5 steps and then a dynamics run split into 4 identical steps totalling
-160ps. A final "production run" of 200ps is run from file dc5.inp
+in 5 steps and then a dynamics run split into 5 identical steps. A total of
+200ps are simulated after equilibration.
 
 The system is a simple ligand in a water sphere and the
 force-field used is the OPLSAA force field from Jorgensen's lab.
@@ -16,10 +16,10 @@ executable in you system and also the version of MPI you will use to run the
 simulation in parallel (qdynp) if such is the case.
 
 
-Equilibration (Heating)  
+Equilibration (Heating)
 --------------------------------------------------------------------------------
 
-### Step1  
+### Step1
  - 100 steps / 0.1 fs ea. = 0.01ps
  - temp = 1
  - bath coupling 1
@@ -27,7 +27,7 @@ Equilibration (Heating)
  - Local Reaction Field as Taylor expansion = off
 
 
-### Step2  
+### Step2
  - 1000 steps / 2.0 fs ea. = 2ps
  - temp = 50
  - bath coupling 10
@@ -35,7 +35,7 @@ Equilibration (Heating)
  - Local Reaction Field as Taylor expansion = on
 
 
-### Step3  
+### Step3
  - 1000 steps / 2.0 fs ea. = 2ps
  - temp = 150
  - bath coupling 10
@@ -43,7 +43,7 @@ Equilibration (Heating)
  - Local Reaction Field as Taylor expansion = on
 
 
-### Step4  
+### Step4
  - 5000 steps / 2.0 fs ea. = 10ps
  - temp = 300
  - bath coupling 10
@@ -51,7 +51,7 @@ Equilibration (Heating)
  - Local Reaction Field as Taylor expansion = on
 
 
-### Step5  
+### Step5
  - 25000 steps / 2.0 fs ea. = 50ps
  - temp = 300
  - bath coupling 100
@@ -63,36 +63,24 @@ Equilibration (Heating)
 Short Production Run
 --------------------------------------------------------------------------------
 
-### Step1 through Step4 (identical steps total 160ps)  
+### Step1 through Step5 (identical steps total 200ps)
  - 20000 steps / 2.0 fs ea. = 40ps
  - temp = 300
  - bath coupling 100
  - hydrogen shake on
  - Local Reaction Field as Taylor expansion = on
 
-### Step5 2000ps, 0.2ns total.  
- - Same as Step1-Step4 but longer. Used for the timing benchmark table below.
-
-  
 
 Benchmarks
 --------------------------------------------------------------------------------
 
-The system has:
-
-Total TIP3P waters = 1141
-Total ligand atoms = 46
-
 
 |  Machine     | Compiler    | Comp. time (min) | Sim. time (ns) | Num Proc. |    Date    |
 |:-------------|:-----------:|:----------------:|:--------------:|:---------:|:----------:|
-| csb          | no-impi     | xx.xx            |      0.20      |   16      | 2019-01-11 |
-| tetralith    | ifort 18.0.3|  3.57            |      0.20      |   16      | 2019-01-11 |
+| csb          | no-impi     | xx.xx            |      0.20      |   16      | 2017-12-13 |
 | kebnekeise   | ifort 18.0.1|  6.38            |      0.20      |   20      | 2017-12-13 |
 | hebbe        | ifort       | xx.xx            |      0.20      |   20      | 2017-12-13 |
-| laptop       | gcc 8.1.0   | 11.17            |      0.20      |    8      | 2019-01-11 |
-| csb          | gcc 8.2.0   |  5.84            |      0.20      |   16      | 2019-01-11 |
-| tetralith    | gcc 8.2.0   |  9.28            |      0.20      |   16      | 2019-01-11 |
+| csb          | gcc 6.2.0   | 10.38            |      0.20      |   16      | 2017-12-13 |
 | kebnekeise   | gcc 6.4.0   |  7.33            |      0.20      |   20      | 2017-12-12 |
 | hebbe        | gcc 6.3.0   | 10.47            |      0.20      |   20      | 2017-12-13 |
 
