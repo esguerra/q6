@@ -314,17 +314,17 @@ module md
 
   !shake types & variables
   !convergence criterion (fraction of distance)
-  real(8), parameter               :: SHAKE_TOL = 0.0001
-  integer, parameter               :: SHAKE_MAX_ITER = 1000
+  real(8), parameter               :: shake_tol = 0.0001
+  integer, parameter               :: shake_max_iter = 1000
 
   type shake_bond_type
-    integer(AI)                   :: i,j
+    integer(ai)                   :: i,j
     real(8)                       :: dist2
     logical                       :: ready
   end type shake_bond_type
 
   type shake_mol_type
-    integer                       :: nconstraints
+    integer                        :: nconstraints
     type(shake_bond_type), pointer :: bond(:)
   end type shake_mol_type
 
@@ -2022,13 +2022,18 @@ subroutine init_nodes
   call MPI_Bcast(xpcent, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
   if (ierr .ne. 0) call die('init_nodes/MPI_Bcast xpcent')
 
-  !**MN-> Needed if SHAKE is to be parallelized
+  !** Martin Nervall-> Needed if SHAKE is to be parallelized
   ! shake/temperature parameters
   !call MPI_Bcast(shake_constraints, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)  !bara i init_shake & md_run
   !if (ierr .ne. 0) call die('init_nodes/MPI_Bcast shake_constraints')
   !call MPI_Bcast(shake_molecules, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
   !call MPI_Bcast(Ndegf, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
   !call MPI_Bcast(Ndegfree, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
+  !
+  ! Interestingly Martin Nervall graduated in 2007 from his PhD, but it was only until 2011
+  ! that a parallel implementation of SHAKE was made public.
+  ! elber_hess2011 Eur. Phys. J. Spec. Top., 2011, 200, 211-223
+  ! Note then that the code lacks a parallel implementation of SHAKE.
 
   ! a bunch of vars from the TOPO module
   call MPI_Bcast(nat_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
@@ -2319,199 +2324,203 @@ end subroutine init_nodes
 
 
 subroutine init_shake
-    !
-    ! initialize shake constraints
-    !
-    !locals
-    integer :: mol, b, ia, ja, constr, angle
-    real(8) :: exclshk
-    integer :: src, trg
-    integer :: solute_shake_constraints
+!!!-------------------------------------------------------------------------------
+!!  subroutine  **init_shake**
+!!
+!!  initialize shake constraints
+!!
+!!!-------------------------------------------------------------------------------
+  !locals
+  integer :: mol, b, ia, ja, constr, angle
+  real(8) :: exclshk
+  integer :: src, trg
+  integer :: solute_shake_constraints
 
-    !allocate molecule list
-    allocate(shake_mol(nmol), stat=alloc_status)
-    call check_alloc('shake molecule array')
+  !allocate molecule list
+  allocate(shake_mol(nmol), stat=alloc_status)
+  call check_alloc('shake molecule array')
 
-    shake_mol(:)%nconstraints = 0
-    mol = 0
-    exclshk = 0.
+  shake_mol(:)%nconstraints = 0
+  mol = 0
+  exclshk = 0.
 
-    !count bonds to be constrained in each molecule
-    !also count shake constraints involving excluded atoms
-    do b=1,nbonds
-      ia = bnd(b)%i
-      ja = bnd(b)%j
-      do while(ia >= istart_mol(mol+1))
-        !new molecule
-        mol = mol +1
-      end do
-      !skip redefined bonds
-      if(bnd(b)%cod == 0) cycle
-      if((shake_hydrogens .and. (.not. heavy(ia) .or. .not. heavy(ja))) .or. &
-        (shake_solute .and. ia <= nat_solute) .or. &
-        (shake_solvent .and. ia > nat_solute)) then
-        shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints + 1
-
-        if( .not. use_PBC ) then
-          if(excl(ia)) exclshk = exclshk + 0.5
-          if(excl(ja)) exclshk = exclshk + 0.5
-        end if
-
-      end if
-
+  !count bonds to be constrained in each molecule
+  !also count shake constraints involving excluded atoms
+  do b=1,nbonds
+    ia = bnd(b)%i
+    ja = bnd(b)%j
+    do while(ia >= istart_mol(mol+1))
+      !new molecule
+      mol = mol +1
     end do
-    !count extra shake constraints from fep file in appropriate molecule
-    do b = 1, nqshake
-      ia=iqshake(b)
-      mol = 1
-      do while(ia >= istart_mol(mol+1))
-        mol = mol + 1
-      end do
+    !skip redefined bonds
+    if(bnd(b)%cod == 0) cycle
+    if((shake_hydrogens .and. (.not. heavy(ia) .or. .not. heavy(ja))) .or. &
+      (shake_solute .and. ia <= nat_solute) .or. &
+      (shake_solvent .and. ia > nat_solute)) then
       shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints + 1
-    end do
 
-    !allocate bond lists for each molecule
-    do mol = 1, nmol
-      !allocate(sbtemp(nconstr(mol), status = alloc_status)
-      allocate(shake_mol(mol)%bond(shake_mol(mol)%nconstraints), stat = alloc_status)
-      call check_alloc('shake bond array')
-       !shake_mol(mol)%bonds => sbtemp
-    end do
+      if( .not. use_PBC ) then
+        if(excl(ia)) exclshk = exclshk + 0.5
+        if(excl(ja)) exclshk = exclshk + 0.5
+      end if
 
-    mol = 0
-    !add the constraint
-    do b=1,nbonds
-      ia = bnd(b)%i
-      ja = bnd(b)%j
-      do while(ia >= istart_mol(mol+1))
-        !new molecule
-        mol = mol +1
-        shake_mol(mol)%nconstraints = 0
-      end do
-      !skip redefined bonds
-      if(bnd(b)%cod == 0) cycle
-      if((shake_hydrogens .and. (.not. heavy(ia) .or. .not. heavy(ja))) .or.&
-        (shake_solute .and. ia <= nat_solute) .or. &
-        (shake_solvent .and. ia > nat_solute)) then
-        shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints + 1
-        shake_mol(mol)%bond(shake_mol(mol)%nconstraints)%i = ia
-        shake_mol(mol)%bond(shake_mol(mol)%nconstraints)%j = ja
-        shake_mol(mol)%bond(shake_mol(mol)%nconstraints)%dist2 = &
-          bondlib(bnd(b)%cod)%bnd0**2
-        !set the bond code to -1 for shaken bonds
-        !bnd(b) will be deleted by shrink_topology
-        bnd(b)%cod = -1
+    end if
+
+  end do
+  !count extra shake constraints from fep file in appropriate molecule
+  do b = 1, nqshake
+    ia=iqshake(b)
+    mol = 1
+    do while(ia >= istart_mol(mol+1))
+      mol = mol + 1
+    end do
+    shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints + 1
+  end do
+
+  !allocate bond lists for each molecule
+  do mol = 1, nmol
+    !allocate(sbtemp(nconstr(mol), status = alloc_status)
+    allocate(shake_mol(mol)%bond(shake_mol(mol)%nconstraints), stat = alloc_status)
+    call check_alloc('shake bond array')
+     !shake_mol(mol)%bonds => sbtemp
+  end do
+
+  mol = 0
+  !add the constraint
+  do b=1,nbonds
+    ia = bnd(b)%i
+    ja = bnd(b)%j
+    do while(ia >= istart_mol(mol+1))
+      !new molecule
+      mol = mol +1
+      shake_mol(mol)%nconstraints = 0
+    end do
+    !skip redefined bonds
+    if(bnd(b)%cod == 0) cycle
+    if((shake_hydrogens .and. (.not. heavy(ia) .or. .not. heavy(ja))) .or.&
+      (shake_solute .and. ia <= nat_solute) .or. &
+      (shake_solvent .and. ia > nat_solute)) then
+      shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints + 1
+      shake_mol(mol)%bond(shake_mol(mol)%nconstraints)%i = ia
+      shake_mol(mol)%bond(shake_mol(mol)%nconstraints)%j = ja
+      shake_mol(mol)%bond(shake_mol(mol)%nconstraints)%dist2 = &
+        bondlib(bnd(b)%cod)%bnd0**2
+      !set the bond code to -1 for shaken bonds
+      !bnd(b) will be deleted by shrink_topology
+      bnd(b)%cod = -1
+    end if
+  end do
+
+  !add extra shake constraints from fep file to appropriate molecule
+  do b = 1, nqshake
+    ia=iqshake(b)
+    ja=jqshake(b)
+    mol = 1
+    do while(ia >= istart_mol(mol+1))
+      mol = mol + 1
+    end do
+    !see if already shaken
+    do constr = 1, shake_mol(mol)%nconstraints
+      if((ia == shake_mol(mol)%bond(constr)%i .and. &
+        ja == shake_mol(mol)%bond(constr)%j) .or. &
+        (ja == shake_mol(mol)%bond(constr)%i .and. &
+        ia == shake_mol(mol)%bond(constr)%j)) then
+        !found it: will overwrite
+        !also decrement number of constraints
+        shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints - 1
+        exit
       end if
     end do
+    !constr now contains the right index
+    shake_mol(mol)%bond(constr)%i = ia
+    shake_mol(mol)%bond(constr)%j = ja
+    shake_mol(mol)%bond(constr)%dist2 = &
+      dot_product(EQ(1:nstates)%lambda,qshake_dist(b,1:nstates))**2
+    shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints + 1
+  end do
 
-    !add extra shake constraints from fep file to appropriate molecule
-    do b = 1, nqshake
-      ia=iqshake(b)
-      ja=jqshake(b)
-      mol = 1
-      do while(ia >= istart_mol(mol+1))
-        mol = mol + 1
-      end do
-      !see if already shaken
-      do constr = 1, shake_mol(mol)%nconstraints
-        if((ia == shake_mol(mol)%bond(constr)%i .and. &
-          ja == shake_mol(mol)%bond(constr)%j) .or. &
-          (ja == shake_mol(mol)%bond(constr)%i .and. &
-          ia == shake_mol(mol)%bond(constr)%j)) then
-          !found it: will overwrite
-          !also decrement number of constraints
-          shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints - 1
+  !get total number of shake constraints in solute (used for separate scaling of temperatures)
+  solute_shake_constraints = sum(shake_mol(1:nmol-nwat)%nconstraints)
+
+
+  !remove molecules with zero constraints from list
+  trg = 1
+  src = 2
+  do while(src <= nmol)
+    if(shake_mol(trg)%nconstraints == 0) then
+      shake_mol(trg) = shake_mol(src)
+      !clear source
+      shake_mol(src)%nconstraints = 0
+      nullify(shake_mol(src)%bond)
+      src = src + 1
+    else
+      trg = trg + 1
+      if(trg == src) src = src + 1
+    end if
+  end do
+  shake_molecules = trg
+
+  !total number of constraints
+  shake_constraints = sum(shake_mol(1:shake_molecules)%nconstraints)
+  write(*,100) shake_constraints
+  write(*,101) shake_molecules
+100 format(/,'Number of shake constraints             = ',i10)
+101 format('No. molecules with shake constraints    = ',i10)
+  ! calculate #degrees of freedom
+  Ndegf=3*natom-shake_constraints    !changed from Ndegf=3*natom-3-shake_constraints, center of mass position is NOT CONstrained in the simulation, but IS constrained for initial temperatures....
+  Ndegfree=Ndegf-3*nexats+exclshk
+
+  Ndegf_solvent = Ndegf - 3*nat_solute + solute_shake_constraints
+  Ndegf_solute = Ndegf - Ndegf_solvent
+
+  Ndegfree_solvent = 3*(natom - nat_solute) - (shake_constraints - solute_shake_constraints)
+  Ndegfree_solute = Ndegfree - Ndegfree_solvent
+
+  if (Ndegfree_solvent*Ndegfree_solute .eq. 0) then    ! if either solvent or solute have 0 degrees of freedom, turn off separate scaling (in case it's on) and do not print detailed temperatures
+    detail_temps = .false.
+    separate_scaling = .false.
+  else
+    detail_temps = .true.
+  end if
+
+
+
+  !clear angles which are shaken (i and k atoms shaken)
+  do mol=1, shake_molecules
+    do constr = 1, shake_mol(mol)%nconstraints
+      ia = shake_mol(mol)%bond(constr)%i
+      ja = shake_mol(mol)%bond(constr)%j
+      do angle = 1, nangles
+        if((ang(angle)%i == ia .and. ang(angle)%k == ja) .or. &
+          (ang(angle)%i == ja .and. ang(angle)%k == ia)) then
+          ang(angle)%cod = 0
           exit
         end if
       end do
-      !constr now contains the right index
-      shake_mol(mol)%bond(constr)%i = ia
-      shake_mol(mol)%bond(constr)%j = ja
-      shake_mol(mol)%bond(constr)%dist2 = &
-        dot_product(EQ(1:nstates)%lambda,qshake_dist(b,1:nstates))**2
-      shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints + 1
     end do
-
-    !get total number of shake constraints in solute (used for separate scaling of temperatures)
-    solute_shake_constraints = sum(shake_mol(1:nmol-nwat)%nconstraints)
-
-
-    !remove molecules with zero constraints from list
-    trg = 1
-    src = 2
-    do while(src <= nmol)
-      if(shake_mol(trg)%nconstraints == 0) then
-        shake_mol(trg) = shake_mol(src)
-        !clear source
-        shake_mol(src)%nconstraints = 0
-        nullify(shake_mol(src)%bond)
-        src = src + 1
-      else
-        trg = trg + 1
-        if(trg == src) src = src + 1
-      end if
-    end do
-    shake_molecules = trg
-
-    !total number of constraints
-    shake_constraints = sum(shake_mol(1:shake_molecules)%nconstraints)
-    write(*,100) shake_constraints
-    write(*,101) shake_molecules
-100 format(/,'Number of shake constraints             = ',i10)
-101 format('No. molecules with shake constraints    = ',i10)
-    ! calculate #degrees of freedom
-    Ndegf=3*natom-shake_constraints    !changed from Ndegf=3*natom-3-shake_constraints, center of mass position is NOT CONstrained in the simulation, but IS constrained for initial temperatures....
-    Ndegfree=Ndegf-3*nexats+exclshk
-
-    Ndegf_solvent = Ndegf - 3*nat_solute + solute_shake_constraints
-    Ndegf_solute = Ndegf - Ndegf_solvent
-
-    Ndegfree_solvent = 3*(natom - nat_solute) - (shake_constraints - solute_shake_constraints)
-    Ndegfree_solute = Ndegfree - Ndegfree_solvent
-
-    if (Ndegfree_solvent*Ndegfree_solute .eq. 0) then    ! if either solvent or solute have 0 degrees of freedom, turn off separate scaling (in case it's on) and do not print detailed temperatures
-      detail_temps = .false.
-      separate_scaling = .false.
-    else
-      detail_temps = .true.
-    end if
-
-
-
-    !clear angles which are shaken (i and k atoms shaken)
-    do mol=1, shake_molecules
-      do constr = 1, shake_mol(mol)%nconstraints
-        ia = shake_mol(mol)%bond(constr)%i
-        ja = shake_mol(mol)%bond(constr)%j
-        do angle = 1, nangles
-          if((ang(angle)%i == ia .and. ang(angle)%k == ja) .or. &
-            (ang(angle)%i == ja .and. ang(angle)%k == ia)) then
-            ang(angle)%cod = 0
-            exit
-          end if
-        end do
-      end do
-    end do
+  end do
 end subroutine init_shake
 
 
 subroutine initial_shaking
-    !
-    ! initial shaking
-    !
-    integer                        :: niter
+!!!--------------------------------------------------------------------------------
+!!  subroutine  **initial_shaking**
+!!
+!!!--------------------------------------------------------------------------------
+  integer                        :: niter
 
-    xx(:)=x(:)
-    niter=shake(xx, x)
-    write(*,100) 'x', niter
+  xx(:)=x(:)
+  niter=shake(xx, x)
+  write(*,100) 'x', niter
 100 format('Initial ',a,'-shaking required',i4,&
-      ' interations per molecule on average.')
+    ' interations per molecule on average.')
 
-    xx(:)=x(:)-dt*v(:)
-    niter=shake(x, xx)      
-    write(*,100) 'v', niter
+  xx(:)=x(:)-dt*v(:)
+  niter=shake(x, xx)
+  write(*,100) 'v', niter
 
-    v(:)=(x(:)-xx(:))/dt
+  v(:)=(x(:)-xx(:))/dt
 
 end subroutine initial_shaking
 
@@ -4011,7 +4020,7 @@ subroutine md_run
         time_completion = int(time_per_step*(nsteps-istep)/60)
         time0 = time1
         write(*,222) time_per_step, time_completion
-222     format('Seconds per step (wall-clock): ',f5.2,&
+222     format('Seconds per step (wall-clock): ', f5.2, &
           ' Estimated completion in',i6,' minutes')
       end if
 
@@ -4022,8 +4031,7 @@ subroutine md_run
       call make_pair_lists
 #if defined(DUMP)
       write(*,332) 'solute-solute', 'solute-water', 'water-water', 'Q-solute', 'Q-water'
-      write(*,333) nodeid, 'count', nbpp_pair, nbpw_pair, &
-        &  nbww_true_pair, nbqp_pair, 3*nqat*nbqw_pair
+      write(*,333) nodeid, 'count', nbpp_pair, nbpw_pair, nbww_true_pair, nbqp_pair, 3*nqat*nbqw_pair
 
 #if defined(USE_MPI)
       !reduce totnxx, i.e. collect # pairs found by slave nodes
@@ -14436,7 +14444,7 @@ end function randm
 
 integer function shake(xx, x)
 !!-------------------------------------------------------------------------------
-!! function: shake
+!! function: **shake**
 !! This is the main SHAKE algorithm. Uncertain where it came from.
 !! Citation needed here.
 !! Could it be that it's QSHAKE, that is, holonomic constraints SHAKE,
@@ -14455,6 +14463,11 @@ integer function shake(xx, x)
 !! an option with a default value.
 !!
 !! SHAKE_TOL = 0.0001
+!!
+!! SHAKE is not parallelized in Q, to do so check-out the next reference.
+!! SHAKE parallelization.
+!! Eur Phys J Spec Top. 2011 Nov 1;200(1):211-223.
+!! Elber R, Ruymgaart AP, Hess B.
 !!-------------------------------------------------------------------------------
   !arguments
   real(8)                          :: xx(:), x(:)
@@ -14494,7 +14507,7 @@ integer function shake(xx, x)
           xij(3)  = x(i3+3) - x(j3+3)
           xij2    = xij(1)**2+xij(2)**2+xij(3)**2
           diff    = shake_mol(mol)%bond(ic)%dist2 - xij2
-          if(abs(diff) < SHAKE_TOL*shake_mol(mol)%bond(ic)%dist2) then
+          if(abs(diff) < shake_tol*shake_mol(mol)%bond(ic)%dist2) then
             shake_mol(mol)%bond(ic)%ready = .true. ! in range
           end if
           xxij(1) = xx(i3+1) - xx(j3+1)
@@ -14517,7 +14530,7 @@ integer function shake(xx, x)
       ! see if every constraint is met
       if(all(shake_mol(mol)%bond(1:shake_mol(mol)%nconstraints)%ready)) then
         exit !from iteration loop
-      elseif(nits >= SHAKE_MAX_ITER) then
+      elseif(nits >= shake_max_iter) then
         ! fail on too many iterations
         do ic=1,shake_mol(mol)%nconstraints
           if (.not. shake_mol(mol)%bond(ic)%ready) then
