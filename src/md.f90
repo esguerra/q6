@@ -14451,7 +14451,7 @@ integer function shake(xx, x)
 !! When looking at the code and comparing it to the MOLARIS subroutine
 !! shake_bond one can see that they're practically the same.
 !!
-!! shake tolerance is a hard-fixed on compilation number. should be changed to
+!! shake tolerance is hard-fixed on compilation number. should be changed to
 !! an option with a default value.
 !!
 !! SHAKE_TOL = 0.0001

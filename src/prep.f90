@@ -285,7 +285,7 @@ subroutine check_alloc(message)
 !!  
 !!------------------------------------------------------------------------------  
 !arguments
-  character(*) message
+  character(*) :: message
 
   if(alloc_status .ne. 0) then
     write(*,*) &
@@ -387,10 +387,10 @@ subroutine angle_ene(emax, nlarge, av_ene)
 !!  
 !!------------------------------------------------------------------------------  
 ! *** local variables
-  integer i, j, k, ia, ic, istart, iend, i3, j3, k3, nlarge
-  real rji(3), rjk(3), bji, bjk, scp, angle, da, ae, dv, f1, di(3),&
+  integer :: i, j, k, ia, ic, istart, iend, i3, j3, k3, nlarge
+  real    :: rji(3), rjk(3), bji, bjk, scp, angle, da, ae, dv, f1, di(3),&
   dk(3)
-  real emax, av_ene
+  real    :: emax, av_ene
 
 
   istart = 1
@@ -443,7 +443,7 @@ end subroutine angle_ene
 
 integer function anglecode(taci, tacj, tack)
 !!------------------------------------------------------------------------------
-!!  function anglecode
+!!  function **anglecode**
 !!
 !!------------------------------------------------------------------------------  
 !arguments
@@ -478,12 +478,12 @@ end function anglecode
 
 subroutine bond_ene(emax, nlarge, av_ene)
 !!-------------------------------------------------------------------------------
-!! subroutine bond_ene
+!! subroutine **bond_ene**
 !!
 !!-------------------------------------------------------------------------------  
   ! *** local variables
-  integer i, j, ib, ic, istart, iend, i3, j3, nlarge
-  real rij(3), b, db, be, dv, emax, av_ene
+  integer :: i, j, ib, ic, istart, iend, i3, j3, nlarge
+  real    :: rij(3), b, db, be, dv, emax, av_ene
 
   istart = 1
   iend = nbonds
@@ -523,7 +523,7 @@ end subroutine bond_ene
 
 character(keylength) function wildcard_tac(taci)
 !!-------------------------------------------------------------------------------  
-!! **function wildcard_tac**
+!! function **wildcard_tac**
 !!
 !!-------------------------------------------------------------------------------  
 !arguments
@@ -542,7 +542,7 @@ end function wildcard_tac
 
 integer function bondcode(taci, tacj)
 !!------------------------------------------------------------------------------
-!!  **function bondcode**
+!!  function **bondcode**
 !!
 !!------------------------------------------------------------------------------
   !arguments
@@ -575,12 +575,12 @@ end function bondcode
 
 subroutine changeimp
 !!-------------------------------------------------------------------------------
-!! subroutine changeimp
+!! subroutine **changeimp**
 !!
 !!-------------------------------------------------------------------------------  
   ! *** local variables
-  integer ii, ip, i, j, k, l, noptimp, nchange, nlarge
-  real emax, av_ene
+  integer :: ii, ip, i, j, k, l, noptimp, nchange, nlarge
+  real    :: emax, av_ene
 
   write( * , '(/,a)') '      Two options:  1. change specified impropers'
   write( * , '(a)') '                                      2. change all with E > Emax(k <---> l)'
@@ -617,13 +617,13 @@ end subroutine changeimp
 
 
 subroutine checkangs
-!-------------------------------------------------------------------------------
-!!  subroutine checkangs
-!
-!-------------------------------------------------------------------------------
+!!-------------------------------------------------------------------------------
+!!  subroutine **checkangs**
+!!
+!!-------------------------------------------------------------------------------
   ! *** local variables
-  integer nlarge
-  real emax, av_ene
+  integer :: nlarge
+  real    :: emax, av_ene
 
   write( *, * )
   emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
@@ -636,13 +636,13 @@ end subroutine checkangs
 
 
 subroutine checkbonds
-!-------------------------------------------------------------------------------
-!!  subroutine checkbonds
-!
-!-------------------------------------------------------------------------------
+!!-------------------------------------------------------------------------------
+!!  subroutine **checkbonds**
+!!
+!!-------------------------------------------------------------------------------
   ! *** local variables
-  integer nlarge
-  real emax, av_ene
+  integer :: nlarge
+  real    :: emax, av_ene
 
   write( *, * )
   emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
@@ -655,13 +655,13 @@ end subroutine checkbonds
 
 
 subroutine checkimps
-!-------------------------------------------------------------------------------
-!!  subroutine checkimps
-!
-!-------------------------------------------------------------------------------
+!!-------------------------------------------------------------------------------
+!!  subroutine **checkimps**
+!!
+!!-------------------------------------------------------------------------------
   ! *** local variables
-  integer nlarge
-  real emax, av_ene
+  integer :: nlarge
+  real    :: emax, av_ene
 
   write( *, * )
   emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
@@ -676,13 +676,13 @@ end subroutine checkimps
 
 
 subroutine checktors
-!-------------------------------------------------------------------------------
-!!  subroutine checktors
-!
-!-------------------------------------------------------------------------------
+!!-------------------------------------------------------------------------------
+!!  subroutine **checktors**
+!!
+!!-------------------------------------------------------------------------------
   ! *** local variables
-  integer nlarge
-  real emax, av_ene
+  integer :: nlarge
+  real    :: emax, av_ene
 
   write( *, * )
   emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
@@ -696,10 +696,10 @@ end subroutine checktors
 
 
 function cross_product(a, b)
-!-------------------------------------------------------------------------------
-!!  function cross_product
-!
-!-------------------------------------------------------------------------------
+!!-------------------------------------------------------------------------------
+!!  function **cross_product**
+!!
+!!-------------------------------------------------------------------------------
   real(8) :: a(3), b(3), cross_product(3)
   cross_product(1) = a(2) * b(3) - a(3) * b(2)
   cross_product(2) = a(3) * b(1) - a(1) * b(3)
@@ -708,10 +708,10 @@ end function cross_product
 
 
 subroutine xlink
-!-------------------------------------------------------------------------------
-!!  subroutine xlink
-!
-!-------------------------------------------------------------------------------
+!!-------------------------------------------------------------------------------
+!!  subroutine **xlink**
+!!
+!!-------------------------------------------------------------------------------
   !add cross-linking bonds like SS-bridges
   !locals
   integer                          :: ires, jres, iat, jat, i, j, b
@@ -1112,15 +1112,15 @@ end function impcode
 
 subroutine impr_ene(emax, nlarge, av_ene, mode)
 !!-------------------------------------------------------------------------------
-!!  subroutine impr_ene
+!!  subroutine **impr_ene**
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
-  integer i, j, k, l, ip, ic, i3, j3, k3, l3, nlarge, mode
-  real rji(3), rjk(3), rkl(3), rnj(3), rnk(3), bj, bk, scp,       &
-    phi, sgn, pe, dv, rki(3), rlj(3), dp(12), arg, f1, di(3),        &
-    dl(3)
-  real emax, av_ene
+  integer        :: i, j, k, l, ip, ic, i3, j3, k3, l3, nlarge, mode
+  real           :: rji(3), rjk(3), rkl(3), rnj(3), rnk(3), bj, bk, scp,  &
+               phi, sgn, pe, dv, rki(3), rlj(3), dp(12), arg, f1, di(3),  &
+               dl(3)
+  real           :: emax, av_ene
 
   nlarge = 0
   av_ene = 0
@@ -1199,12 +1199,12 @@ end subroutine impr_ene
 
 
 subroutine listres
-!-------------------------------------------------------------------------------
-!!  subroutine listres
+!!-------------------------------------------------------------------------------
+!!  subroutine **listres**
 !!  Shows the atom name and atom types corresponding to a residue number
-!-------------------------------------------------------------------------------
+!!-------------------------------------------------------------------------------
   ! *** local variables
-  integer i, iat, ires
+  integer                          :: i, iat, ires
   type(lib_entry_type), pointer    :: lp
 
 
@@ -1232,7 +1232,7 @@ subroutine listseq
 !
 !!-------------------------------------------------------------------------------
 ! *** local variables
-  integer i
+  integer                          :: i
 
   write( * , '(a,/)') 'Sequence listing:'
   write( *, 100) (i, res(i)%name, i = 1, nres)
@@ -1309,7 +1309,7 @@ subroutine makeangles
 !!-------------------------------------------------------------------------------
 ! *** local variables
 
-  integer ib, jb, ia, i, j, k, iaci, iacj, iack
+  integer                          :: ib, jb, ia, i, j, k, iaci, iacj, iack
   logical                          :: used(nang_prm+max_extrabnd)
   integer                          :: itrans(nang_prm+max_extrabnd)
 
@@ -1390,18 +1390,18 @@ subroutine makeangles
     end if
   end do
 
-  ! --- Make a list of actual angle types to be used
+! --- Make a list of actual angle types to be used
   used(:) = .false.
 
   nangcod = 0
   do i = 1, nangles
-    !       workaround to permit missing params
+!       workaround to permit missing params
     if(ang(i)%cod /=0) then
       if(.not. used(ang(i)%cod)) then
         used(ang(i)%cod ) = .true.
         nangcod = nangcod+1
         itrans(ang(i)%cod ) = nangcod
-        !copy all parameters for this angle type from parameter list to top
+        ! copy all parameters for this angle type from parameter list to top
         anglib(nangcod) = ang_prm(ang(i)%cod)
         ang(i)%cod = nangcod
       else
@@ -1472,11 +1472,11 @@ end subroutine makebonds
 
 integer function makeextrabonds()
 !!-------------------------------------------------------------------------------
-!!  **function makeextrabonds**
+!!  function **makeextrabonds**
 !!
 !!-------------------------------------------------------------------------------
   !locals
-  integer                                         :: ix, ib,iaci, iacj
+  integer                         :: ix, ib,iaci, iacj
   character(len=KEYLENGTH)        :: taci, tacj
 
   ! --- Add extra bonds like S-S bridges
@@ -1513,10 +1513,10 @@ subroutine set_bondcodes
 !!
 !!-------------------------------------------------------------------------------
 !locals
-  integer                                         :: ib, iaci, iacj
-  logical                                         :: used(nbnd_prm)
-  integer                                         :: itrans(nbnd_prm)
-  character(len=keylength)        :: taci, tacj
+  integer                          :: ib, iaci, iacj
+  logical                          :: used(nbnd_prm)
+  integer                          :: itrans(nbnd_prm)
+  character(len=keylength)         :: taci, tacj
 
   do ib = 1, nbonds
     iaci = iac(bnd(ib)%i)
@@ -1554,7 +1554,7 @@ end subroutine set_bondcodes
 
 integer function makesomebonds(startres, endres)
 !!-------------------------------------------------------------------------------
-!!  **function makesomebonds**
+!!  function **makesomebonds**
 !!
 !!-------------------------------------------------------------------------------
 !arguments
@@ -1608,7 +1608,7 @@ subroutine makeexlist
 !!  Make a list of excluded neighbors
 !!-------------------------------------------------------------------------------
   ! *** local variables
-  integer ib, ia, i, j, ioff
+  integer                          :: ib, ia, i, j, ioff
 
   nexnbrs = 0
   nexlong = 0
@@ -1728,35 +1728,35 @@ integer function genh(j, residue)
 !!
 !!-------------------------------------------------------------------------------
   !arguments
-  integer, intent(in)                     :: j, residue
+  integer, intent(in)              :: j, residue
   !locals
-  real(8)                                         :: xj(3), xk(3)
-  integer                                         :: ligand, H, kt, lt
-  real(8)                                         :: old_xH(3), xH(3), V, Vtot, dV(3), dvLast(3), gamma, dVtot(3)
-  real(8)                                         :: VtotLast
-  real(8)                                         :: dx(3), dx_line, rms_dV
-  real(8),parameter                       :: convergence_criterum = 0.1
-  real(8),parameter                       :: dV_scale = 0.025
-  real(8),parameter                       :: max_dx = 1. !max_dx is max distance of line search step in first CG iteration (�)
-  real(8)                                         :: local_min = 30
-  real(8)                                         :: tors_fk = 10.
-  integer, parameter                      :: max_cg_iterations = 100, max_line_iterations = 35
-  integer                                         :: cgiter, lineiter
-  real(8)                                         :: bnd0
-  integer                                         :: nHang, Hang_atom(max_conn)
-  integer                                         :: Hang_code(max_conn)
-  integer                                         :: rule
-  type(LIB_ENTRY_TYPE), pointer:: lp
-  integer                                         :: a, b, axis
-  real(8)                                         :: bond_length, db
-  real(8)                                         :: rjH(3), rjk(3), bjHinv, bjkinv
-  real(8)                                         :: scp, angle, angle_deg, dVangle, da, f1
-  real(8)                                         :: xkt(3), xlt(3), rjkt(3), rktlt(3)
-  real(8)                                         :: rnj(3), rnk(3), bj, bk
-  real(8)                                         :: phi, phi_deg, sgn, dVtors, arg, dH(3)
-  logical                                         :: flipped
-  integer                     :: setH
-  integer, parameter          :: nsetH = 5   !number of times to flip, if local min, and retry
+  real(8)                          :: xj(3), xk(3)
+  integer                          :: ligand, H, kt, lt
+  real(8)                          :: old_xH(3), xH(3), V, Vtot, dV(3), dvLast(3), gamma, dVtot(3)
+  real(8)                          :: VtotLast
+  real(8)                          :: dx(3), dx_line, rms_dV
+  real(8),parameter                :: convergence_criterum = 0.1
+  real(8),parameter                :: dV_scale = 0.025
+  real(8),parameter                :: max_dx = 1. !max_dx is max distance of line search step in first CG iteration (�)
+  real(8)                          :: local_min = 30
+  real(8)                          :: tors_fk = 10.
+  integer, parameter               :: max_cg_iterations = 100, max_line_iterations = 35
+  integer                          :: cgiter, lineiter
+  real(8)                          :: bnd0
+  integer                          :: nHang, Hang_atom(max_conn)
+  integer                          :: Hang_code(max_conn)
+  integer                          :: rule
+  type(LIB_ENTRY_TYPE), pointer    :: lp
+  integer                          :: a, b, axis
+  real(8)                          :: bond_length, db
+  real(8)                          :: rjH(3), rjk(3), bjHinv, bjkinv
+  real(8)                          :: scp, angle, angle_deg, dVangle, da, f1
+  real(8)                          :: xkt(3), xlt(3), rjkt(3), rktlt(3)
+  real(8)                          :: rnj(3), rnk(3), bj, bk
+  real(8)                          :: phi, phi_deg, sgn, dVtors, arg, dH(3)
+  logical                          :: flipped
+  integer                          :: setH
+  integer, parameter               :: nsetH = 5   !number of times to flip, if local min, and retry
         
   genH = 0
   xj(:) = xtop(3*j-2:3*j)
@@ -1982,7 +1982,7 @@ subroutine makeimps
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
-  integer                                         :: i
+  integer                          :: i
 
   nimps = 0
   nimps_solute = 0
@@ -2007,8 +2007,9 @@ subroutine imp_params
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
-  integer i, ii, iaci, iacj, iack, iacl
-  integer iused(nimp_prm+max_extrabnd), itrans(nimp_prm+max_extrabnd)
+  integer                          :: i, ii, iaci, iacj, iack, iacl
+  integer                          :: iused(nimp_prm+max_extrabnd), &
+  itrans(nimp_prm+max_extrabnd)
 
 
   do i = 1, nimps
@@ -2055,16 +2056,16 @@ end subroutine imp_params
 
 integer function find_atom(ires, atom)
 !!-------------------------------------------------------------------------------
-!!  **function find_atom**
+!!  function **find_atom**
 !!
 !!-------------------------------------------------------------------------------
   !arguments
-  integer                                         :: ires
-  character(len=5)                        :: atom
+  integer                          :: ires
+  character(len=5)                 :: atom
   !locals
-  integer                                         :: my_res, iat, irc
-  character(len=4)                        :: my_atom
-  integer                                         :: mol1, mol2
+  integer                          :: my_res, iat, irc
+  character(len=4)                 :: my_atom
+  integer                          :: mol1, mol2
 
   if(atom(1:1) == '-') then
     my_res = ires - 1
@@ -2342,10 +2343,10 @@ subroutine maketors
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
-  integer i, j, ic, jc, ib, it, iaci, iacj, iack, iacl
-  integer iused(ntor_prm+max_extrabnd), itrans(ntor_prm+max_extrabnd)
-  type(tor_codes)                         :: torcodes
-  integer                                 :: icod
+  integer                          :: i, j, ic, jc, ib, it, iaci, iacj, iack, iacl
+  integer                          :: iused(ntor_prm+max_extrabnd), itrans(ntor_prm+max_extrabnd)
+  type(tor_codes)                  :: torcodes
+  integer                          :: icod
   ! --- Make the torsion list
 
   ntors = 0
@@ -2439,7 +2440,7 @@ subroutine prompt(outtxt)
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
-  character( * ) outtxt
+  character( * )                   :: outtxt
   write( * , '(a,$)') outtxt
   return
 end subroutine prompt
@@ -2451,13 +2452,13 @@ real function randm(seed, seed_only)
 !!
 !!-------------------------------------------------------------------------------
   !arguments
-  integer, intent(in), optional:: seed
-  logical, intent(in), optional:: seed_only
+  integer, intent(in), optional    :: seed
+  logical, intent(in), optional    :: seed_only
   ! *** Local variables
-  integer, parameter                      :: m = 100000000, m1 = 10000, mult = 31415821
-  integer, save                           :: irand = 0
-  integer                                 :: irandh, irandl, multh, multl
-  real                                    :: r
+  integer, parameter               :: m = 100000000, m1 = 10000, mult = 31415821
+  integer, save                    :: irand = 0
+  integer                          :: irandh, irandl, multh, multl
+  real                             :: r
 
   if(present(seed)) then
     irand = mod(iabs(seed), m)
@@ -4262,7 +4263,7 @@ end subroutine readnext
 
 subroutine readframe
 !!-------------------------------------------------------------------------------
-!!  subroutine readframe
+!!  subroutine **readframe**
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
@@ -4277,11 +4278,11 @@ end subroutine readframe
 
 subroutine trajectory
 !!-------------------------------------------------------------------------------
-!!  subroutine trajectory
+!!  subroutine **trajectory**
 !!
 !!-------------------------------------------------------------------------------
 !locals
-  character(len=80)                       :: reply
+  character(len=80)                :: reply
 
   if(.not. topo_ok) then
     !can't do this without a topology
@@ -4343,7 +4344,7 @@ subroutine set_cgp
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
-  integer ires, igp, i, ntot, ntot_solute, i3
+  integer                          :: ires, igp, i, ntot, ntot_solute, i3
   integer                          :: switchatom, ia, ncgp_skipped = 0
   real                             :: r2
   real(8)                          :: cgp_cent(3)
@@ -4449,7 +4450,7 @@ subroutine set_crg
 !!
 !!-------------------------------------------------------------------------------
 ! *** local variables
-  integer ires, i, ntot
+  integer                          :: ires, i, ntot
 
   ntot = 0
 
@@ -4670,7 +4671,7 @@ end function set_boundary_condition
 
 logical function set_simulation_sphere()
 !!-------------------------------------------------------------------------------
-!!  subroutine set_simulation_sphere
+!!  subroutine **set_simulation_sphere**
 !!  get center coordinates
 !!  as residue_number:atom_name or x y z
 !!-------------------------------------------------------------------------------
@@ -5964,15 +5965,15 @@ end function torcode
 
 subroutine tors_ene(emax, nlarge, av_ene)
 !!-------------------------------------------------------------------------------
-!!  subroutine tors_ene
+!!  subroutine **tors_ene**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
-  integer i, j, k, l, ip, ic, i3, j3, k3, l3, nlarge
-  real rji(3), rjk(3), rkl(3), rnj(3), rnk(3), bj, bk, scp,       &
-    phi, sgn, pe, dv, rki(3), rlj(3), dp(12), arg, f1, di(3),        &
-    dl(3)
-  real emax, av_ene
+  integer                          :: i, j, k, l, ip, ic, i3, j3, k3, l3, nlarge
+  real                             :: rji(3), rjk(3), rkl(3), rnj(3), rnk(3), &
+                                      bj, bk, scp, phi, sgn, pe, dv, &
+                                      rki(3), rlj(3), dp(12), arg, f1, di(3), dl(3)
+  real                             :: emax, av_ene
 
   nlarge = 0
   av_ene = 0
@@ -6378,21 +6379,21 @@ end subroutine writemol2
 
 subroutine writetop
 !!-------------------------------------------------------------------------------
-!!  subroutine writetop
+!!  subroutine **writetop**
 !!
 !!-------------------------------------------------------------------------------
   ! *** local variables
-  character(len=80)     :: filnam
-  character(len=10)     :: answer
-  integer i, j, ig
+  character(len=80)                :: filnam
+  character(len=10)                :: answer
+  integer                          :: i, j, ig
 
   ! --- Warn if missing parameters were found by maketop
   if(.not. topo_ok) then
     write( * ,  * ) 'WARNING: The topology is incomplete due to missing parameters!'
-    write( * ,  * ) 'Do you realLY want to write this erronenous topology?'
+    write( * ,  * ) 'Do you really want to write this erroneous topology?'
     write( * ,  * ) 'Enter yes to proceed, anything else to cancel.'
     call parse_reset
-    call get_string_arg(answer, '-----> Write _ERRONENOUS_ topology [yes/NO] ? ')
+    call get_string_arg(answer, '-----> Write _ERRONEOUS_ topology [yes/NO] ? ')
     if(answer/='yes') then
       return
     end if
@@ -6475,7 +6476,7 @@ end subroutine make_shell2
 
 logical function get_center_by_mass(center)
 !!------------------------------------------------------------------------------
-!!  **function get_center_by_mass**
+!!  function **get_center_by_mass**
 !!
 !!  Returns true if center of mass can be assigned
 !!  and returns center of mass for a mask of atoms in the vector 'center'

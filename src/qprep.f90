@@ -10,7 +10,7 @@
 
 
 program qprep
-!!  program: qprep
+!!  program: **qprep**
 !!  author: Johan Aqvist and John Marelius
 !!  qprep topology preparation main program  
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin  
