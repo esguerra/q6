@@ -53,7 +53,7 @@ Developer Docs
 --------------
 
 We are starting to document the code using doxygen and FORD.   
-Obviously you will need to install doxygen and or FORD (ver. 6.0.0)
+You will need to install doxygen and or FORD (ver. 6.0.0)
 first in order to generate the documentation.
 
 To generate the doxygen documentation do:  
@@ -71,6 +71,13 @@ The compiled developers documentation with the very useful UML-type,
 sort-of, graphs which FORD makes can be found at:  
 
 <http://qdyn.no-ip.org/developers/devdocs/index.html>
+
+
+Git development pipeline.
+-------------------------
+
+There are two main branches, prod and staging. The idea is that the
+prod (production) branch is the one which is more thorougly tested.
 
 
 Coding Standards
