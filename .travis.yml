@@ -25,4 +25,13 @@ script:
 #  - rm *.log *.dcd *.en
 
 
+# blocklist
+branches:
+  except:
+  - prod
+  - staging
 
+# safelist
+branches:
+  only:
+  - master
