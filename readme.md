@@ -76,8 +76,16 @@ sort-of, graphs which FORD makes can be found at:
 Git development pipeline.
 -------------------------
 
-There are two main branches, prod and staging. The idea is that the
-prod (production) branch is the one which is more thorougly tested.
+There are two main branches, *prod* and *staging*. The idea is that the
+prod (production) branch is the one which is more thorougly tested and
+the main one which will be sent to travis-ci for continuos integration
+of the code, and there is one staging branch which tracks prod and
+which every once in a while (optimally every month) will get merged
+into prod.
+Developers should work creating feature branches from the staging
+branch and making merge requests to the staging branch once their work
+is done. Then developers should merge themselves once at least two
+reviewers have approved the merge request.
 
 
 Coding Standards
