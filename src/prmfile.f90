@@ -872,10 +872,10 @@ end function prm_get_string_string
 
   logical function load()
     !locals
-    character(len=400)                      ::      line
-    integer                                         ::      stat
-    integer                                         ::      end_of_text, comment_start, start, scan_start, comment_pos
-    character                                       ::      WS*2, TAB
+    character(len=400)                      :: line
+    integer                                 :: stat
+    integer                                 :: end_of_text, comment_start, start, scan_start, comment_pos
+    character                               :: WS*2, TAB
 
     TAB = char(9)
     WS(1:1) = ' '

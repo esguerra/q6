@@ -34,7 +34,7 @@ installation in your computer. We compile the code regularly with
 intel-fortran and with gnu-fortran. Because of this we recommend to
 compile using the GNU Compiler Collection (GCC) in as current a
 version as possible. The following compilation example has been tested
-in Fedora28 using:
+in Fedora28:
 
     sudo dnf install gcc-gfortran libgfortran-static openmpi openmpi-devel git  
     module load mpi/openmpi-x86_64  
@@ -53,7 +53,7 @@ Developer Docs
 --------------
 
 We are starting to document the code using doxygen and FORD.   
-You will need to install doxygen and or FORD (ver. 6.0.0)
+Obviously you will need to install doxygen and or FORD (ver. 6.0.0)
 first in order to generate the documentation.
 
 To generate the doxygen documentation do:  
@@ -71,21 +71,6 @@ The compiled developers documentation with the very useful UML-type,
 sort-of, graphs which FORD makes can be found at:  
 
 <http://qdyn.no-ip.org/developers/devdocs/index.html>
-
-
-Git development pipeline.
--------------------------
-
-There are two main branches, *prod* and *staging*. The idea is that the
-prod (production) branch is the one which is more thorougly tested and
-the main one which will be sent to travis-ci for continuos integration
-of the code, and there is one staging branch which tracks prod and
-which every once in a while (optimally every month) will get merged
-into prod.
-Developers should work creating feature branches from the staging
-branch and making merge requests to the staging branch once their work
-is done. Then developers should merge themselves once at least two
-reviewers have approved the merge request.
 
 
 Coding Standards

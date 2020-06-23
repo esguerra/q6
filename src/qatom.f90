@@ -14,7 +14,7 @@ module qatom
 !!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
 !!  and Paul Bauer
 !!  **module qatom**
-!!  by John Marelius, Johan Aqvist & Martin Almlof
+!!  by John Marelius, Johan Aqvist, Martin Almlof, Martin Per Alnér (MPA)
 !!  Q-atom force field data and FEP file reading
 !!-------------------------------------------------------------------------------
   use sizes
@@ -22,7 +22,7 @@ module qatom
   use misc
   use prmfile
   use indexer
-  !use MPIGLOB
+  !use mpiglob
   use topo
 
   implicit none
@@ -52,11 +52,11 @@ module qatom
   integer                                 :: offset !offset number for topology atom numbers
   logical                                 :: qvdw_flag
   logical                                 :: qq_use_library_charges
-  integer(AI), allocatable                :: iqseq(:)
+  integer(ai), allocatable                :: iqseq(:)
   integer, allocatable                    :: qiac(:,:)
-  character(len=KEYLENGTH), allocatable   :: qtac(:)
+  character(len=keylength), allocatable   :: qtac(:)
   integer                                 :: nqexpnb
-  integer(AI), allocatable                :: iqexpnb(:), jqexpnb(:)
+  integer(ai), allocatable                :: iqexpnb(:), jqexpnb(:)
 
   integer                                 :: nqlib
   real(4), allocatable                    :: qcrg(:,:)
@@ -65,87 +65,85 @@ module qatom
 
   integer                                 :: nqbond
 
-  type QBOND_TYPE
-     integer(AI)                          :: i,j
-     integer(TINY)                        :: cod(max_states)
-  end type QBOND_TYPE
+  type qbond_type
+     integer(ai)                          :: i,j
+     integer(tiny)                        :: cod(max_states)
+  end type qbond_type
 
-  type QBONDLIB_TYPE
+  type qbondlib_type
      !Morse diss. en, Morse Alpha, Morse/Harm. r0
      real(8)                              :: Dmz, amz, r0
      !Harm. force const
      real(8)                              :: fk
-  end type QBONDLIB_TYPE
+  end type qbondlib_type
 
-  type(QBOND_TYPE), allocatable           :: qbnd(:)
-  type(QBONDLIB_TYPE), allocatable        :: qbondlib(:)
+  type(qbond_type), allocatable           :: qbnd(:)
+  type(qbondlib_type), allocatable        :: qbondlib(:)
 
-
-  type QANGLE_TYPE
-     integer(AI)                          :: i,j,k
-     integer(TINY)                        :: cod(max_states)
-  end type QANGLE_TYPE
+  type qangle_type
+     integer(ai)                          :: i,j,k
+     integer(tiny)                        :: cod(max_states)
+  end type qangle_type
 
   integer                                 :: nqangle
 
-  type(QANGLE_TYPE), allocatable          :: qang(:)
-  type(ANGLIB_TYPE), allocatable          :: qanglib(:)
+  type(qangle_type), allocatable          :: qang(:)
+  type(anglib_type), allocatable          :: qanglib(:)
 
   integer                                 :: nqtor
-  integer(AI), allocatable                :: iqtor(:),jqtor(:),kqtor(:),lqtor(:)
-  integer(TINY), allocatable              :: qtorcod(:,:)
+  integer(ai), allocatable                :: iqtor(:),jqtor(:),kqtor(:),lqtor(:)
+  integer(tiny), allocatable              :: qtorcod(:,:)
   real(8), allocatable                    :: qfktor(:),qrmult(:),qdeltor(:)
 
   integer                                 :: nqimp
-  integer(AI), allocatable                :: iqimp(:),jqimp(:),kqimp(:),lqimp(:)
-  integer(TINY), allocatable              :: qimpcod(:,:)
+  integer(ai), allocatable                :: iqimp(:),jqimp(:),kqimp(:),lqimp(:)
+  integer(tiny), allocatable              :: qimpcod(:,:)
   real(8), allocatable                    :: qfkimp(:),qimp0(:)
 
   integer                                 :: nang_coupl,ntor_coupl,nimp_coupl
-  integer(AI)                             :: iang_coupl(3,max_qat)
-  integer(AI)                             :: itor_coupl(3,max_qat)
-  integer(AI)                             :: iimp_coupl(3,max_qat)
+  integer(ai)                             :: iang_coupl(3,max_qat)
+  integer(ai)                             :: itor_coupl(3,max_qat)
+  integer(ai)                             :: iimp_coupl(3,max_qat)
 
   integer                                 :: nqshake
-  integer(AI)                             :: iqshake(max_qat),jqshake(max_qat)
+  integer(ai)                             :: iqshake(max_qat),jqshake(max_qat)
   real(8)                                 :: qshake_dist(max_qat,max_states)
 
   integer                                 :: noffd
-  type(OFFDIAG_SAVE), allocatable         :: offd(:)
-  type(OFFDIAG_AUX), allocatable          :: offd2(:)
+  type(offdiag_save), allocatable         :: offd(:)
+  type(offdiag_aux), allocatable          :: offd2(:)
 
   integer                                 :: nexspec
-  type SPECEX_TYPE
-     integer(AI)                          :: i,j
+  type specex_type
+     integer(ai)                          :: i,j
      logical                              :: flag(max_states)
-  end type SPECEX_TYPE
-  type(SPECEX_TYPE), allocatable          :: exspec(:)
+  end type specex_type
+  type(specex_type), allocatable          :: exspec(:)
 
   ! Monitoring of nonbonded interactions between selected groups of atoms
-  type monitor_group_pair_TYPE
+  type monitor_group_pair_type
      integer                              :: i,j
      real(8)                              :: Vel(max_states), Vlj(max_states)
      real(8)                              :: Vwel, Vwlj, Vwsum
-  end type  monitor_group_pair_TYPE
+  end type  monitor_group_pair_type
 
-  type(monitor_group_pair_TYPE), allocatable::monitor_group_pair(:)
+  type(monitor_group_pair_type), allocatable::monitor_group_pair(:)
 
-  type monitor_atom_group_TYPE
+  type monitor_atom_group_type
      integer, pointer                     :: atom(:) ! the atoms
      integer                              :: n  ! #atoms
-  end type monitor_atom_group_TYPE
+  end type monitor_atom_group_type
 
-  type (monitor_atom_group_TYPE), allocatable::monitor_atom_group(:)
+  type (monitor_atom_group_type), allocatable::monitor_atom_group(:)
 
   !the maximum number of atoms in a group to be monitored
   !this is limited by the line length used in the prmfile module!
-
   integer, parameter                      :: MAX_ATOMS_IN_SPECIAL_GROUP=30
   integer                                 :: monitor_group_pairs, monitor_groups
 
   !type holding all scaling factors for electrostatic interactions in qq-pairs
   type qq_el_scale_type
-     integer(AI)                          :: iqat, jqat
+     integer(ai)                          :: iqat, jqat
      real(8)                              :: el_scale(max_states) ! holds the el_scale for different states "masoud Oct_2013"
   end type qq_el_scale_type
 
@@ -161,24 +159,20 @@ module qatom
   !-----------------------------------------------------------------------
   !       fep/evb energies
   !-----------------------------------------------------------------------
-  type(Q_ENERGIES), allocatable          :: EQ(:)
-  real(8)                                :: Hij(max_states,max_states)
-  real(8)                                :: EMorseD(max_qat)
-  real(8)                                :: dMorse_i(3,max_qat)
-  real(8)                                :: dMorse_j(3,max_qat)
+  type(Q_ENERGIES), allocatable           :: EQ(:)
+  real(8)                                 :: Hij(max_states,max_states)
+  real(8)                                 :: EMorseD(max_qat)
+  real(8)                                 :: dMorse_i(3,max_qat)
+  real(8)                                 :: dMorse_j(3,max_qat)
 
   !miscellany
-  logical                                :: use_new_fep_format
+  logical                                 :: use_new_fep_format
 
 
-
-
-  
 
 contains
 
 subroutine qatom_startup
-!!-------------------------------------------------------------------------------  
 !!  subroutine **qatom_startup**
 !!  initialize used modules
 !!  call prmfile_startup
@@ -194,12 +188,10 @@ end subroutine qatom_startup
 
 
 subroutine qatom_shutdown
-!!-------------------------------------------------------------------------------  
 !!  subroutine **qatom_shutdown**
 !!  
-!!  
 !!-------------------------------------------------------------------------------    
-  integer                              :: alloc_status
+  integer                                 :: alloc_status
   deallocate(EQ, stat=alloc_status)
   deallocate(iqseq, qiac, iqexpnb, jqexpnb, qcrg, stat=alloc_status)
   deallocate(qmass, stat=alloc_status)
@@ -217,12 +209,14 @@ subroutine qatom_shutdown
 end subroutine qatom_shutdown
 
 
-
 logical function qatom_old_load_atoms(fep_file)
+!!  logical function **qatom_old_load_atoms**
+!!
+!!-------------------------------------------------------------------------------
     !arguments
-    character(*), intent(in)        ::      fep_file
+    character(*), intent(in)              :: fep_file
     ! *** local variables
-    integer                                       ::      i,j,k,iat
+    integer                               :: i, j, k, iat
     !.......................................................................
     qatom_old_load_atoms = .false.
 
@@ -233,14 +227,12 @@ logical function qatom_old_load_atoms(fep_file)
          action='read')
 
     ! --- # states, # q-atoms
-
     read (4,*) nstates,nqat
     write (*,20) nstates,nqat
 20  format ('No. of fep/evb states    = ',i5,5x, &
          'No. of fep/evb atoms     = ',i5)
     !allocate memory for qatom list
     allocate(iqseq(nqat))
-
 
     read (4,*) (iqseq(i),i=1,nqat)
     write (*,40) (iqseq(i),i=1,nqat)
@@ -249,8 +241,10 @@ logical function qatom_old_load_atoms(fep_file)
 end function qatom_old_load_atoms
 
 
-
 logical function qatom_load_atoms(fep_file)
+!!  logical function **qatom_load_atoms**
+!!
+!!-------------------------------------------------------------------------------
     !arguments
     character(*), intent(in)        :: fep_file
     ! *** local variables
@@ -267,10 +261,10 @@ logical function qatom_load_atoms(fep_file)
     character(len=4), allocatable   :: names(:)
     integer                         :: offset_residue, max_res, resno
     integer, allocatable            :: residues(:)
-    !.......................................................................
+
 
     use_new_fep_format = .true.
-    qatom_load_atoms = .true.                               !assume this for a start
+    qatom_load_atoms = .true.               !assume this for a start
     softcore_use_max_potential = .false.    !default
 
     call centered_heading('Reading Q atom list','-')
@@ -544,16 +538,17 @@ logical function qatom_load_atoms(fep_file)
 end function qatom_load_atoms
 
 
-
-
 logical function qatom_old_load_fep()
+!!  logical function **qatom_old_load_fep**
+!!
+!!-------------------------------------------------------------------------------
     ! *** local variables
-    character                                     ::      libtext*80,qaname*2
-    integer                                       ::      i,j,k,iat
-    integer                                       ::      nqcrg,nqcod
-    integer                                 ::      qflag(max_states)
+    character                             :: libtext*80, qaname*2
+    integer                               :: i, j, k, iat
+    integer                               :: nqcrg, nqcod
+    integer                               :: qflag(max_states)
     !temp. array to read integer flags before switching to logicals
-    integer                                 ::      exspectemp(max_states)
+    integer                               :: exspectemp(max_states)
 
     qatom_old_load_fep  = .false. 
 
@@ -872,6 +867,9 @@ end function qatom_old_load_fep
 
 
 logical function qatom_load_fep(fep_file)
+!!  logical function **qatom_load_fep**
+!!
+!!-------------------------------------------------------------------------------
     !arguments
     character(*), intent(in)              :: fep_file
     ! *** local variables
@@ -881,15 +879,15 @@ logical function qatom_load_fep(fep_file)
     character(len=40)                     :: section
     logical, allocatable, dimension(:)    :: type_read
     integer                               :: type_count, filestat
-    real(8)                   ::  el_scale(max_states) ! local variable for scaling of different states "masoud Oct_2013"
-    integer                   ::  stat
+    real(8)                   :: el_scale(max_states) ! local variable for scaling of different states "masoud Oct_2013"
+    integer                   :: stat
 
     !temp. array to read integer flags before switching to logicals
     integer                               :: exspectemp(max_states)
     character(len=keylength)              :: qtac_tmp(max_states)
 
     !temp array for reading special atom group members
-    integer                   ::  temp_atom(MAX_ATOMS_IN_SPECIAL_GROUP)             
+    integer                               :: temp_atom(MAX_ATOMS_IN_SPECIAL_GROUP)
 
 
     if(.not. use_new_fep_format) then
@@ -1079,7 +1077,7 @@ logical function qatom_load_fep(fep_file)
     if(nel_scale > 0) then
        allocate(qq_el_scale(nel_scale))
        write (*,154) nel_scale
-       write (*,155) ('state', i, i=1, nstates) !header fir qq_el_scale at different states "masoud Oct_2013"
+       write (*,155) ('state', i, i=1, nstates) !header for qq_el_scale at different states "masoud Oct_2013"
        do i=1,nel_scale
           if(.not. prm_get_line(line)) goto 1000
           read(line,*, err=1000) j, k, el_scale(1:nstates)
@@ -1102,7 +1100,7 @@ logical function qatom_load_fep(fep_file)
 155 format ('q-atom_i q-atom_j el_scale', 7(1x, a5, i2))
 156 format (i8, 1x, i8, 7x, 7(f8.2)) ! print out up to 7 states "masoud Oct_2013"
 
-    ! --- Read special exclusions among quantum atoms
+    ! --- Read special exclusions among quantum? atoms
     section='excluded_pairs'
     nexspec = prm_count(section) 
     if(nexspec > 0) then
@@ -1497,9 +1495,9 @@ logical function qatom_load_fep(fep_file)
     ! --- Read extra shake constraints
     section='shake_constraints'
     nqshake=prm_count(section)
-    if(nqshake > 0) then
+    if (nqshake > 0) then
        write (*,560) nqshake, ('state',i,i=1,nstates)
-560    format (/,'No. of fep/evb shake contraints = ',i5,/ &
+560    format (/,'No. of fep/evb shake constraints = ',i5,/ &
             'atom_i atom_j    distance in',5(1x,a5,i2))
        do i=1,nqshake
           if(.not. prm_get_line(line)) goto 1000
@@ -1556,7 +1554,9 @@ logical function qatom_load_fep(fep_file)
 620 format (i7,1x,3i7,f8.2,f6.2)
 622 format('>>>>> ERROR: Invalid combination of states: ',2i5)
 
-    !************Softcore section************  MPA  Martin Per Ander??
+!=========================== START SOFTCORE SECTION ============================
+! By: MPA (Martin Per Andér)
+!===============================================================================
     if (allocated(sc_lookup))    deallocate (sc_lookup)
     allocate (alpha_max(nqat,nstates),sc_lookup(nqat,natyps+nqat,nstates))
 
@@ -1615,9 +1615,9 @@ logical function qatom_load_fep(fep_file)
                          if (ivdw_rule == 1) then !geometric vdw rule
                             sc_lookup(i,j,i2) = (-sc_bq*sc_bj+sqrt(sc_bq*sc_bq*sc_bj* & 
                                  sc_bj+4*alpha_max(i,i2)*sc_aq*sc_aj))/(2*alpha_max(i,i2))
-                         else !arithmetic vdw rule. OBS some epsilons (q atom epsilons, sc_bq)
-                            !       have not been square rooted yet. We'll take this into account
-                            !   when calculating the sc_lookup
+                         else ! arithmetic vdw rule. OBS some epsilons (q atom epsilons, sc_bq)
+                              ! have not been square rooted yet. We'll take this into account
+                              ! when calculating the sc_lookup
                             sc_lookup(i,j,i2) = (-2*sqrt(sc_bq)*sc_bj+2*sqrt(sc_bq*sc_bj**2+ & 
                                  alpha_max(i,i2)*sqrt(sc_bq)*sc_bj))*(sc_aq+sc_aj)**6/(2*alpha_max(i,i2))
                          end if
@@ -1625,7 +1625,6 @@ logical function qatom_load_fep(fep_file)
                    else  !user has not requested alpha calculation, each q-atom has the same alpha for every atom type
                       sc_lookup(i,j,i2) = alpha_max(i,i2)
                    end if
-
 
                 end do
 
@@ -1643,12 +1642,9 @@ logical function qatom_load_fep(fep_file)
                             alpha_max_tmp = max ( alpha_max(i,i2), alpha_max(j,i2) )
                          end if
 
-
-
                       else  !use the largest alpha_max if we're using plain alphas
                          alpha_max_tmp = max ( alpha_max(i,i2), alpha_max(j,i2) )
                       end if
-
 
                       if (softcore_use_max_potential) then
 
@@ -1656,9 +1652,9 @@ logical function qatom_load_fep(fep_file)
                             sc_lookup(i,j+natyps,i2) = (-sc_bq*sc_bj+ & 
                                  sqrt(sc_bq*sc_bq*sc_bj*sc_bj+ & 
                                  4*alpha_max_tmp*sc_aq*sc_aj))/(2*alpha_max_tmp)
-                         else !arithmetic vdw rule   OBS some epsilons (q atom epsilons, sc_bq and sc_bj)
-                            !       have not been square-rooted yet. We'll take this into account
-                            !   when calculating the sc_lookup
+                         else ! arithmetic vdw rule. OBS some epsilons (q atom epsilons, sc_bq and sc_bj)
+                              ! have not been square-rooted yet. We'll take this into account
+                              ! when calculating the sc_lookup
                             sc_lookup(i,j+natyps,i2) = (-2*sqrt(sc_bq*sc_bj)+ & 
                                  2*sqrt(sc_bq*sc_bj+alpha_max_tmp*sqrt(sc_bq*sc_bj)))* & 
                                  (sc_aq+sc_aj)**6/(2*alpha_max_tmp)
@@ -1670,15 +1666,9 @@ logical function qatom_load_fep(fep_file)
 
                    end if
 
-
                 end do
 
-
-
-
-
              end do  ! states
-
 
           end do !softcore lookup table
        end if
@@ -1687,9 +1677,10 @@ logical function qatom_load_fep(fep_file)
 
 1630 format('No softcore section found. Using normal LJ potentials.')
 1631 format('>>>>> Erroneous softcore section.')
+!=========================== END SOFTCORE SECTION ===========================  MPA  Martin Per Andér
 
-    !********END*****Softcore section****END********  MPA
 
+!=========================== START NON-BONDED MONITOR SECTION ===========================
     !load atom groups whose non-bonded interactions are to be monitored
     section='monitor_groups'
     monitor_groups=prm_count(section)   
@@ -1736,15 +1727,17 @@ logical function qatom_load_fep(fep_file)
 1000 write(*,1900) i,section
     call prm_close
     qatom_load_fep = .false.
-1900 format('>>>>> ERROR: Read error at line ',i2,' of section [',a,']')     
-    !.......................................................................
+1900 format('>>>>> ERROR: Read error at line ',i2,' of section [',a,']')
+
 end function qatom_load_fep
 
-  !-------------------------------------------------------------------------
 
 logical function bond_harmonic_in_any_state(k)
-    integer, intent(in)                     ::      k
-    integer                                         ::      st
+!!  logical function **bond_harmonic_in_any_state**
+!!
+!!-------------------------------------------------------------------------------
+    integer, intent(in)                   :: k
+    integer                               :: st
 
     bond_harmonic_in_any_state = .false.
     do st=1, nstates
@@ -1756,7 +1749,9 @@ logical function bond_harmonic_in_any_state(k)
           end if
        end if
     end do
-547 format('>>>>> ERROR: Bond',i3,' is harmonic in state',i2)   
+547 format('>>>>> ERROR: Bond',i3,' is harmonic in state',i2)
+
 end function bond_harmonic_in_any_state
+
 
 end module qatom
