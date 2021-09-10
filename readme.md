@@ -1,7 +1,7 @@
 Qsource development.
 ================================================================================
 
-This a fork of **Q** (Version 6) with a large amount of differences from that
+This is a fork of **Q** (Version 6) with a large amount of differences from that
 original code.   
 **--Use at your own risk.--**
 
